@@ -1,0 +1,6 @@
+include(':sutil', ':msengine')
+
+project(':sutil').setProjectDir(new File("../sutil"))
+project(':msengine').setProjectDir(new File("../msengine"))
+
+rootProject.name = 'proc-gen'

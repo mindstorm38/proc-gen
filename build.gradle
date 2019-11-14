@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+version 'b1.0.0'
+description 'Procedural Generation Test'
+
+sourceCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile project(':sutil')
+    compile project(':msengine')
+
+}
+
+task(runMain, dependsOn: 'classes', type: JavaExec) {
+
+    main = 'fr.theorozier.procgen.Main'
+    classpath = sourceSets.main.runtimeClasspath
+
+}
