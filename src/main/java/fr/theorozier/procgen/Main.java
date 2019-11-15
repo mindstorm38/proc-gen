@@ -7,8 +7,10 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		final RenderGameOptions options = new RenderGameOptions(Main.class);
+		final RenderGameOptions options = new RenderGameOptions(ProcGenGame.class);
 		options.setInitialWindowTitle("Procedural Generation Test");
+		options.setResourceNamespace("procgen");
+		options.setLoggerName("ProcGen");
 		
 		final ProcGenGame game = new ProcGenGame(options);
 		
