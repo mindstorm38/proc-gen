@@ -19,9 +19,10 @@ dependencies {
 
 }
 
-task(runMain, dependsOn: 'classes', type: JavaExec) {
+task(runMain, dependsOn: 'jar', type: JavaExec) {
 
     main = 'fr.theorozier.procgen.Main'
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = files(jar.getArchiveFile().get())
+    classpath += sourceSets.main.runtimeClasspath
 
 }

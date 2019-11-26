@@ -31,12 +31,18 @@ public class PerlinNoise {
 	
 	private static final int GRADIENT_SIZE = 16;
 	
+	/**
+	 * Compute perlin noise value for a specific coordinate (x, y).
+	 * @param x The point X.
+	 * @param y The point Y.
+	 * @return The random perlin noise value, from -1 to +1.
+	 */
 	public static float perlin(float x, float y) {
 		
-		int x0 = MathUtils.fastfloor(x) % GRADIENT_SIZE;
+		int x0 = MathUtils.fastfloor(x);
 		int x1 = x0 + 1;
 		
-		int y0 = MathUtils.fastfloor(y) % GRADIENT_SIZE;
+		int y0 = MathUtils.fastfloor(y);
 		int y1 = y0 + 1;
 		
 		float sx = x - x0;
@@ -60,20 +66,20 @@ public class PerlinNoise {
 	 * @return Perlin noise scalar from point distance to cell corner and the gradient.
 	 */
 	private static float scalar(int x, int y, float px, float py) {
-	
-		int si = (y * GRADIENT_SIZE + x) * 2;
-		float gx = GRADIENT[si];
-		float gy = GRADIENT[si + 1];
-	
+		
 		float dx = px - x;
 		float dy = py - y;
+		
+		int si = ((y % GRADIENT_SIZE) * GRADIENT_SIZE + (x % GRADIENT_SIZE)) * 2;
+		float gx = GRADIENT[si];
+		float gy = GRADIENT[si + 1];
 		
 		return gx * dx + gy * dy;
 		
 	}
 	
 	/**
-	 * Build a Perlin noise refrence grid and output as suitable source code.
+	 * Build a Perlin noise refrence grid and output as suitable source code (mostly for {@link #GRADIENT}).
 	 * @param size The sides size
 	 * @return Suitable source code for a perlin noise grid.
 	 */
