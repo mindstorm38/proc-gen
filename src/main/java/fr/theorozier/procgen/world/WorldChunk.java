@@ -18,6 +18,8 @@ public class WorldChunk {
 	private final int ex, ey, ez;
 	private final short[][][] data;
 	
+	private ChunkStatus status;
+	
 	// Metadata for blocks needs them, the key is the block index.
 	private final Map<Short, OSFObject> metadata;
 	
@@ -33,6 +35,8 @@ public class WorldChunk {
 		this.ez = position.getZ() + CHUNK_SIZE;
 		
 		this.data = new short[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+		
+		this.status = ChunkStatus.EMPTY;
 		
 		this.metadata = new HashMap<>();
 		
@@ -52,6 +56,10 @@ public class WorldChunk {
 	 */
 	public WorldBlockPosition getChunkPosition() {
 		return this.position;
+	}
+	
+	public ChunkStatus getStatus() {
+		return this.status;
 	}
 	
 	/**

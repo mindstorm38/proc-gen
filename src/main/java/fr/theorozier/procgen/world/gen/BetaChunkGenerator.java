@@ -5,6 +5,10 @@ import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.WorldBlock;
 import fr.theorozier.procgen.world.WorldBlockPosition;
 import fr.theorozier.procgen.world.WorldChunk;
+import fr.theorozier.procgen.world.feature.ConfiguredFeature;
+import fr.theorozier.procgen.world.feature.NoFeatureConfig;
+import fr.theorozier.procgen.world.feature.TreeFeature;
+import io.msengine.common.util.noise.OctaveSimplexNoise;
 import io.msengine.common.util.noise.SeedSimplexNoise;
 
 import static fr.theorozier.procgen.world.World.CHUNK_SIZE;
@@ -13,24 +17,20 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	
 	public static final ChunkGeneratorProvider PROVIDER = world -> new BetaChunkGenerator(world.getSeed());
 	
-	private final SeedSimplexNoise surfaceNoise;
-	private final SeedSimplexNoise decorationNoise;
+	private final OctaveSimplexNoise surfaceNoise;
+	
+	private final ConfiguredFeature<NoFeatureConfig> testFeature = new ConfiguredFeature<>(new TreeFeature(), new NoFeatureConfig());
 	
 	public BetaChunkGenerator(long seed) {
 		
 		super(seed);
 		
-		this.surfaceNoise = new SeedSimplexNoise(seed);
-		this.decorationNoise = new SeedSimplexNoise(getDecorationSeed(seed));
+		this.surfaceNoise = new OctaveSimplexNoise(seed, 16, 0.4f, 2.0f);
 		
 	}
 	
-	private static long getDecorationSeed(long seed) {
-		return seed * 993402349510639L;
-	}
-	
 	@Override
-	public void gen(WorldChunk chunk, int cx, int cy, int cz) {
+	public void genBase(WorldChunk chunk, WorldBlockPosition pos) {
 		
 		float noise;
 		int wx, wy, wz;
@@ -39,35 +39,25 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		for (int x = 0; x < CHUNK_SIZE; x++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
 				
-				wx = cx + x;
-				wz = cz + z;
+				wx = pos.getX() + x;
+				wz = pos.getZ() + z;
 				
-				noise = 30 + noiseAt(this.surfaceNoise, wx, wz, 32, 8, 1.0f, 0.2f, 0);
+				// noise = 30 + noiseAt(this.surfaceNoise, wx, wz, 32, 8, 1.0f, 0.2f, 0);
+				noise = 48f + this.surfaceNoise.noise(wx, wz, 0.004f) * 64f;
 				
 				for (int y = 0; y < CHUNK_SIZE; y++) {
 					
-					wy = cy + y;
+					wy = pos.getY() + y;
 					
 					block = chunk.getBlockAtRelative(x, y, z);
 					
 					if (wy == 0) {
 						block.setBlockType(Blocks.BEDROCK);
-					} else if (wy < noise - 4) {
-						block.setBlockType(Blocks.STONE);
 					} else if (wy < noise - 1) {
-						block.setBlockType(Blocks.DIRT);
+						block.setBlockType(Blocks.STONE);
 					} else if (wy < noise) {
 						block.setBlockType(Blocks.GRASS);
-					} else if (wy < noise + 1) {
-						
-						// Decorate
-						noise = noiseAt(this.decorationNoise, wx, wz, 0.7f, 0.05f, 0.05f, 0.05f, 0.15f);
-						
-						if (noise > 0.8f) {
-							this.generateTreeAtRelative(chunk, x, y, z);
-						}
-						
-					} else if (!block.isSet()) {
+					} else {
 						block.setBlockType(Blocks.AIR);
 					}
 					
@@ -76,10 +66,25 @@ public class BetaChunkGenerator extends ChunkGenerator {
 			}
 		}
 		
-		chunk.triggerUpdatedListeners();
-		
 	}
 	
+	@Override
+	public void genSurface(WorldChunk chunk, WorldBlockPosition pos) {
+		// TODO: Generate surface (sand, grass, stone) from biome preferences.
+	}
+	
+	@Override
+	public void genFeatures(WorldChunk chunk, WorldBlockPosition pos) {
+	
+	
+	
+	}
+	
+	private static long getDecorationSeed(long seed) {
+		return seed * 993402349510639L;
+	}
+	
+	/*
 	private void generateTreeAtRelative(WorldChunk chunk, int x, int y, int z) {
 		
 		WorldBlock block;
@@ -118,6 +123,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		}
 		
 	}
+	*/
 	
 	/**
 	 * Package private method to generate noise for a specific point and parameters.
@@ -130,6 +136,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	 * @param a4 Amplitude for (x,y)/10.
 	 * @return Noise at this point.
 	 */
+	@Deprecated
 	private static float noiseAt(SeedSimplexNoise noise, float x, float y, float a1, float a2, float a3, float a4, float a5) {
 		
 		return a1 * noise.normnoise(x / 200, y / 200) +

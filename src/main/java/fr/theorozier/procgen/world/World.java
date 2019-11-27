@@ -5,7 +5,6 @@ import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
-import io.msengine.common.util.noise.SeedSimplexNoise;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -136,7 +135,7 @@ public class World {
 			
 			chunk = new WorldChunk(this, chunkpos);
 			this.chunks.put(chunkpos, chunk);
-			this.generator.gen(chunk, chunkpos.getX(), chunkpos.getY(), chunkpos.getZ());
+			this.generator.genBase(chunk, chunkpos);
 			
 			this.triggerChunkLoadedListeners(chunk);
 			
