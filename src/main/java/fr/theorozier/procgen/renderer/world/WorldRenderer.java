@@ -29,8 +29,12 @@ public class WorldRenderer implements ModelApplyListener,
 		WindowMousePositionEventListener,
 		WorldChunkLoadedListener {
 	
+	// These distances are squared, for optimisation.
 	public static final int RENDER_DISTANCE = CHUNK_SIZE * 16;
 	public static final int UNLOAD_DISTANCE = CHUNK_SIZE * 32;
+	
+	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
+	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
 	
 	private final Window window;
 	
@@ -164,9 +168,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.chunkRenderers.forEach((pos, cr) -> {
 			
 			cr.checkLastNeighbours();
-			
-			if (cr.getDistanceToCamera() <= RENDER_DISTANCE)
-				cr.render();
+			cr.render(RENDER_DISTANCE_SQUARED);
 			
 		});
 		
@@ -240,7 +242,7 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			this.chunkRenderers.values().forEach(cr -> {
 				
-				if (cr.updateDistanceTo(cx, cy, cz) > UNLOAD_DISTANCE) {
+				if (cr.updateDistanceToCamera(cx, cy, cz) > UNLOAD_DISTANCE_SQUARED) {
 					// System.out.println("Unloading CR " + cr.getChunkPosition());
 					this.unloadingChunkRenderers.add(cr.getChunkPosition());
 				}

@@ -36,6 +36,13 @@ public class WorldBlockPosition {
 		return new WorldBlockPosition(this.x + x, this.y + y, this.z + z);
 	}
 	
+	public float distSquared(float x, float y, float z) {
+		float dx = this.x - x;
+		float dy = this.y - y;
+		float dz = this.z - z;
+		return dx * dx + dy * dy + dz * dz;
+	}
+	
 	public float dist(float x, float y, float z) {
 		float dx = this.x - x;
 		float dy = this.y - y;

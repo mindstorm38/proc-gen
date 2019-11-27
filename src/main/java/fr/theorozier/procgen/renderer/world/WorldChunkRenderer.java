@@ -34,7 +34,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 	
 	private IndicesDrawBuffer drawBuffer;
 	
-	private float distanceToCamera;
+	private float distanceToCameraSquared;
 	
 	WorldChunkRenderer(WorldRenderer renderer, WorldChunk chunk) {
 		
@@ -46,7 +46,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 		this.neighbours = new HashMap<>();
 		this.lastNeighbours = new boolean[Direction.values().length];
 		
-		this.distanceToCamera = 0;
+		this.distanceToCameraSquared = 0;
 		
 	}
 	
@@ -100,12 +100,12 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 		
 	}
 	
-	float updateDistanceTo(float x, float y, float z) {
-		return this.distanceToCamera = this.chunk.getChunkPosition().dist(x, y, z);
+	float updateDistanceToCamera(float x, float y, float z) {
+		return this.distanceToCameraSquared = this.chunk.getChunkPosition().distSquared(x, y, z);
 	}
 	
-	float getDistanceToCamera() {
-		return this.distanceToCamera;
+	float getDistanceToCameraSquared() {
+		return this.distanceToCameraSquared;
 	}
 	
 	private void refreshBuffers() {
@@ -204,6 +204,13 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 			
 		}
 	
+	}
+	
+	void render(float maxdist) {
+		
+		if (this.distanceToCameraSquared <= maxdist)
+			render();
+		
 	}
 	
 	void render() {
