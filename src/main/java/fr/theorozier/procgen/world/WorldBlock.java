@@ -47,11 +47,19 @@ public class WorldBlock {
 		return this.chunk.getBlockTypeAtRelative(this.relative.getX(), this.relative.getY(), this.relative.getZ());
 	}
 	
-	public void setBlockType(Block block) {
+	public void setBlockType(Block block, boolean overwrite) {
 		
-		this.chunk.setBlockTypeAtRelative(this.relative.getX(), this.relative.getY(), this.relative.getZ(), block);
+		this.chunk.setBlockTypeAtRelative(this.relative.getX(), this.relative.getY(), this.relative.getZ(), block, overwrite);
 		this.notifyUpdate(block);
 		
+	}
+	
+	public void setBlockType(Block block) {
+		this.setBlockType(block, true);
+	}
+	
+	public boolean isSet() {
+		return this.chunk.hasBlockAtRelative(this.relative.getX(), this.relative.getY(), this.relative.getZ());
 	}
 	
 	public OSFObject getMetadata() {

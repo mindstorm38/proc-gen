@@ -117,7 +117,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (!this.escaped) {
 			
-			float speedMult = alpha * 0.5f;
+			float speedMult = alpha * 1.5f;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
 				this.camera.addPosition((float) Math.cos(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult);
@@ -366,7 +366,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private void updateRenderSize(int width, int height) {
 		
 		this.projectionMatrix.identity();
-		this.projectionMatrix.perspective((float) Math.toRadians(30f), (float) width / (float) height, 0.1f, 16 * 256);
+		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, 16 * 256);
 		this.updateGlobalMatrix();
 		
 	}

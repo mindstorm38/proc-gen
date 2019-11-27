@@ -1,7 +1,9 @@
 package fr.theorozier.procgen.world.gen;
 
 import fr.theorozier.procgen.block.Blocks;
+import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.WorldBlock;
+import fr.theorozier.procgen.world.WorldBlockPosition;
 import fr.theorozier.procgen.world.WorldChunk;
 import io.msengine.common.util.noise.SeedSimplexNoise;
 
@@ -11,14 +13,20 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	
 	public static final ChunkGeneratorProvider PROVIDER = world -> new BetaChunkGenerator(world.getSeed());
 	
-	private final SeedSimplexNoise noise;
+	private final SeedSimplexNoise surfaceNoise;
+	private final SeedSimplexNoise decorationNoise;
 	
 	public BetaChunkGenerator(long seed) {
 		
 		super(seed);
 		
-		this.noise = new SeedSimplexNoise(seed);
+		this.surfaceNoise = new SeedSimplexNoise(seed);
+		this.decorationNoise = new SeedSimplexNoise(getDecorationSeed(seed));
 		
+	}
+	
+	private static long getDecorationSeed(long seed) {
+		return seed * 993402349510639L;
 	}
 	
 	@Override
@@ -34,7 +42,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 				wx = cx + x;
 				wz = cz + z;
 				
-				noise = 30 + this.noiseAt(wx, wz, 32, 8, 1.0f, 0.2f);
+				noise = 30 + noiseAt(this.surfaceNoise, wx, wz, 32, 8, 1.0f, 0.2f, 0);
 				
 				for (int y = 0; y < CHUNK_SIZE; y++) {
 					
@@ -53,13 +61,13 @@ public class BetaChunkGenerator extends ChunkGenerator {
 					} else if (wy < noise + 1) {
 						
 						// Decorate
-						noise = this.noiseAt(wx, wz, 0.6f, 0.2f, 0.0f, 0.2f);
+						noise = noiseAt(this.decorationNoise, wx, wz, 0.7f, 0.05f, 0.05f, 0.05f, 0.15f);
 						
 						if (noise > 0.8f) {
 							this.generateTreeAtRelative(chunk, x, y, z);
 						}
 						
-					} else {
+					} else if (!block.isSet()) {
 						block.setBlockType(Blocks.AIR);
 					}
 					
@@ -68,17 +76,52 @@ public class BetaChunkGenerator extends ChunkGenerator {
 			}
 		}
 		
+		chunk.triggerUpdatedListeners();
+		
 	}
 	
 	private void generateTreeAtRelative(WorldChunk chunk, int x, int y, int z) {
 		
-		WorldBlock root = chunk.getBlockAtRelative(x, y, z);
-		root.setBlockType(Blocks.LOG);
+		WorldBlock block;
+		
+		int top = y + 4 + MathUtils.fastfloor(this.decorationNoise.noise(x, z));
+		
+		for (int logY = y; logY < top; logY++) {
+			
+			if (logY >= CHUNK_SIZE)
+				return;
+			
+			block = chunk.getBlockAtRelative(x, logY, z);
+			block.setBlockType(Blocks.LOG);
+			
+		}
+		
+		WorldBlockPosition center = new WorldBlockPosition(x, top - 1, z);
+		
+		for (int leavesY = (top - 2); leavesY < (top + 3); leavesY++) {
+			for (int leavesX = (x - 2); leavesX <= (x + 2); leavesX++) {
+				for (int leavesZ = (z - 2); leavesZ <= (z + 2); leavesZ++) {
+					
+					if (leavesY >= top || leavesX != x || leavesZ != z) {
+						
+						if (center.dist(leavesX, leavesY, leavesZ) <= 2.4f && chunk.isValidRelativePosition(leavesX, leavesY, leavesZ)) {
+							
+							block = chunk.getBlockAtRelative(leavesX, leavesY, leavesZ);
+							block.setBlockType(Blocks.LEAVES, false);
+							
+						}
+						
+					}
+					
+				}
+			}
+		}
 		
 	}
 	
 	/**
 	 * Package private method to generate noise for a specific point and parameters.
+	 * @param noise The simplex noise to use.
 	 * @param x Point X coordinate.
 	 * @param y Point Y coordinate.
 	 * @param a1 Amplitude for (x,y)/200.
@@ -87,12 +130,13 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	 * @param a4 Amplitude for (x,y)/10.
 	 * @return Noise at this point.
 	 */
-	private float noiseAt(float x, float y, float a1, float a2, float a3, float a4) {
+	private static float noiseAt(SeedSimplexNoise noise, float x, float y, float a1, float a2, float a3, float a4, float a5) {
 		
-		return a1 * this.noise.normnoise(x / 200, y / 200) +
-				a2 * this.noise.normnoise(x / 100, y / 100) +
-				a3 * this.noise.normnoise(x / 50, y / 50) +
-				a4 * this.noise.normnoise(x / 10, y / 10);
+		return a1 * noise.normnoise(x / 200, y / 200) +
+				a2 * noise.normnoise(x / 100, y / 100) +
+				a3 * noise.normnoise(x / 50, y / 50) +
+				a4 * noise.normnoise(x / 10, y / 10) +
+				a5 * noise.normnoise(x / 2, y / 2);
 		
 	}
 	

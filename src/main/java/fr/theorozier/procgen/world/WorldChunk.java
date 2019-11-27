@@ -3,7 +3,6 @@ package fr.theorozier.procgen.world;
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
 import io.msengine.common.osf.OSFObject;
-import io.msengine.common.util.noise.SeedSimplexNoise;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,6 +90,10 @@ public class WorldChunk {
 		return position;
 	}
 	
+	public boolean isValidRelativePosition(int x, int y, int z) {
+		return x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE;
+	}
+	
 	/**
 	 * Get the relative position in this chunk from a world position.
 	 * @param position The world position.
@@ -162,10 +165,15 @@ public class WorldChunk {
 	 * @param z Block relative Z.
 	 * @param block The block to set at this position.
 	 */
-	void setBlockTypeAtRelative(int x, int y, int z, Block block) {
+	void setBlockTypeAtRelative(int x, int y, int z, Block block, boolean overwrite) {
 		
 		if (this.data[x][y][z] != 0) {
+			
+			if (!overwrite)
+				return;
+			
 			this.removeBlockMetadataAt(this.getPositionIndex(x, y, z));
+			
 		}
 		
 		if (block == null || block.isUnsavable()) {
@@ -212,13 +220,6 @@ public class WorldChunk {
 	
 	}
 	
-	/**
-	 * (Re)generate the chunk of world.
-	 */
-	public void generate() {
-		this.triggerUpdatedListeners();
-	}
-	
 	public interface NotEmptyBlockConsumer {
 		void accept(int relx, int rely, int relz, Block block);
 	}
@@ -231,11 +232,11 @@ public class WorldChunk {
 		this.updateListeners.remove(l);
 	}
 	
-	void triggerUpdatedListeners() {
+	public void triggerUpdatedListeners() {
 		this.updateListeners.forEach(l -> l.worldChunkUpdated(this));
 	}
 	
-	void triggerUpdatedListenersAt(int x, int y, int z, Block block) {
+	public void triggerUpdatedListenersAt(int x, int y, int z, Block block) {
 		this.updateListeners.forEach(l -> l.worldChunkUpdated(this, x, y, z, block));
 	}
 	
