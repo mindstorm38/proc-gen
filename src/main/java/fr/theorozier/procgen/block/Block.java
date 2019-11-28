@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.block;
 
+import fr.theorozier.procgen.util.ErrorUtils;
 import fr.theorozier.procgen.world.WorldBlock;
 import io.sutil.StringUtils;
 
@@ -13,7 +14,7 @@ public class Block {
 	public Block(int uid, String identifier) {
 		
 		if (uid <= 0)
-			throw new IllegalArgumentException("Block's uid can't be less or equal than 0.");
+			throw ErrorUtils.invalidUidArgument("Block");
 		
 		this.uid = (short) uid;
 		this.identifier = StringUtils.requireNonNullAndEmpty(identifier, "Block's identifier can't be null or empty.");

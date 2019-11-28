@@ -2,6 +2,7 @@ package fr.theorozier.procgen.world;
 
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
+import fr.theorozier.procgen.world.biome.Biome;
 import io.msengine.common.osf.OSFObject;
 
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ public class WorldChunk {
 	private final World world;
 	private final WorldBlockPosition position;
 	private final int ex, ey, ez;
+	
 	private final short[][][] data;
+	private final Biome[] biomes;
 	
 	private ChunkStatus status;
 	
@@ -35,6 +38,7 @@ public class WorldChunk {
 		this.ez = position.getZ() + CHUNK_SIZE;
 		
 		this.data = new short[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+		this.biomes = new Biome[CHUNK_SIZE * CHUNK_SIZE];
 		
 		this.status = ChunkStatus.EMPTY;
 		

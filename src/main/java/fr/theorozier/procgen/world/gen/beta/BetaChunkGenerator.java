@@ -1,13 +1,14 @@
-package fr.theorozier.procgen.world.gen;
+package fr.theorozier.procgen.world.gen.beta;
 
 import fr.theorozier.procgen.block.Blocks;
-import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.WorldBlock;
 import fr.theorozier.procgen.world.WorldBlockPosition;
 import fr.theorozier.procgen.world.WorldChunk;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.world.feature.NoFeatureConfig;
 import fr.theorozier.procgen.world.feature.TreeFeature;
+import fr.theorozier.procgen.world.gen.ChunkGenerator;
+import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
 import io.msengine.common.util.noise.SeedSimplexNoise;
 
@@ -23,7 +24,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	
 	public BetaChunkGenerator(long seed) {
 		
-		super(seed);
+		super(seed, new BetaBiomeProvider(seed));
 		
 		this.surfaceNoise = new OctaveSimplexNoise(seed, 16, 0.4f, 2.0f);
 		
@@ -42,8 +43,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 				wx = pos.getX() + x;
 				wz = pos.getZ() + z;
 				
-				// noise = 30 + noiseAt(this.surfaceNoise, wx, wz, 32, 8, 1.0f, 0.2f, 0);
-				noise = 48f + this.surfaceNoise.noise(wx, wz, 0.004f) * 64f;
+				noise = 48f + (this.surfaceNoise.noise(wx, wz, 0.004f) + 1) * 48f;
 				
 				for (int y = 0; y < CHUNK_SIZE; y++) {
 					

@@ -6,9 +6,13 @@ import fr.theorozier.procgen.world.WorldChunk;
 public abstract class ChunkGenerator {
 
 	protected final long seed;
+	protected final BiomeProvider biomeProvider;
 	
-	public ChunkGenerator(long seed) {
+	public ChunkGenerator(long seed, BiomeProvider biomeProvider) {
+		
 		this.seed = seed;
+		this.biomeProvider = biomeProvider;
+		
 	}
 	
 	public abstract void genBase(WorldChunk chunk, WorldBlockPosition pos);
