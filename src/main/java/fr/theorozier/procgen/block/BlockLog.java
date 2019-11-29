@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.block;
 
 import fr.theorozier.procgen.world.Axis;
-import fr.theorozier.procgen.world.WorldBlock;
+import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.common.osf.OSFNumber;
 
 public class BlockLog extends Block {

@@ -12,7 +12,7 @@ public enum Direction {
 	public final int rx, ry, rz;
 	public final int opositeOrdinal;
 	public final Axis axis;
-	public final WorldBlockPosition pos;
+	public final BlockPosition pos;
 	
 	Direction(int rx, int ry, int rz, int opositeOrdinal, Axis axis) {
 		
@@ -22,12 +22,14 @@ public enum Direction {
 		this.opositeOrdinal = opositeOrdinal;
 		this.axis = axis;
 		
-		this.pos = new WorldBlockPosition(rx, ry, rz);
+		this.pos = new BlockPosition(rx, ry, rz);
 		
 	}
 	
 	public Direction oposite() {
 		return Direction.values()[this.opositeOrdinal];
 	}
+	
+	public static final Direction[] HORIZONTALS = {NORTH, SOUTH, EAST, WEST};
 	
 }

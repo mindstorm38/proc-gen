@@ -1,8 +1,10 @@
 package fr.theorozier.procgen.world.gen;
 
+import fr.theorozier.procgen.world.BiomeAccessor;
+import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.world.biome.Biome;
 
-public abstract class BiomeProvider {
+public abstract class BiomeProvider implements BiomeAccessor {
 
 	protected final long seed;
 	
@@ -14,23 +16,12 @@ public abstract class BiomeProvider {
 		return this.seed;
 	}
 	
+	@Override
 	public abstract Biome getBiomeAt(int x, int z);
 	
-	public Biome[] getBiomes(int x, int z, int dx, int dz) {
-		
-		Biome[] biomes = new Biome[dx * dz];
-		
-		int xMax = x + dx;
-		int zMax = z + dz;
-		
-		for (; x < xMax; x++) {
-			for (; z < zMax; z++) {
-				biomes[x * dz + z] = getBiomeAt(x, z);
-			}
-		}
-		
-		return biomes;
-		
+	@Override
+	public Biome getBiomeAt(BlockPosition pos) {
+		return this.getBiomeAt(pos.getX(), pos.getZ());
 	}
 
 }

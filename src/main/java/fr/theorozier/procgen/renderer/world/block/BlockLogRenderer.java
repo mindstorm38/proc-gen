@@ -2,7 +2,7 @@ package fr.theorozier.procgen.renderer.world.block;
 
 import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.world.Direction;
-import fr.theorozier.procgen.world.WorldBlock;
+import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 

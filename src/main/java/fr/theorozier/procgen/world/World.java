@@ -3,6 +3,8 @@ package fr.theorozier.procgen.world;
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.util.MathUtils;
+import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.world.chunk.WorldBlock;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
 
@@ -20,7 +22,7 @@ public class World {
 	private final long seed;
 	private final ChunkGenerator generator;
 	
-	private final Map<WorldBlockPosition, WorldChunk> chunks;
+	private final Map<BlockPosition, Chunk> chunks;
 	private final List<WorldChunkLoadedListener> chunkLoadedListeners;
 	
 	public World(long seed, ChunkGeneratorProvider provider) {
@@ -44,14 +46,18 @@ public class World {
 		return this.seed;
 	}
 	
+	/////////////////////
+	// Chunk Accessing //
+	/////////////////////
+	
 	/**
 	 * Get a chunk absolute position from block position.
 	 * @param blockPosition The block position.
 	 * @return The chunk position.
 	 */
-	public WorldBlockPosition getChunkPosition(WorldBlockPosition blockPosition) {
+	public BlockPosition getChunkPosition(BlockPosition blockPosition) {
 		
-		return new WorldBlockPosition(
+		return new BlockPosition(
 				blockPosition.getX() - (blockPosition.getX() & CHUNK_SIZE_MINUS),
 				blockPosition.getY() - (blockPosition.getY() & CHUNK_SIZE_MINUS),
 				blockPosition.getZ() - (blockPosition.getZ() & CHUNK_SIZE_MINUS)
@@ -66,9 +72,9 @@ public class World {
 	 * @param z The block Z position.
 	 * @return The chunk position.
 	 */
-	public WorldBlockPosition getChunkPosition(int x, int y, int z) {
+	public BlockPosition getChunkPosition(int x, int y, int z) {
 		
-		return new WorldBlockPosition(
+		return new BlockPosition(
 				x - (x & CHUNK_SIZE_MINUS),
 				y - (y & CHUNK_SIZE_MINUS),
 				z - (z & CHUNK_SIZE_MINUS)
@@ -81,7 +87,7 @@ public class World {
 	 * @param position The chunk absolute position.
 	 * @return The chunk object, or Null if not existing.
 	 */
-	public WorldChunk getChunkAtAbsolute(WorldBlockPosition position) {
+	public Chunk getChunkAtAbsolute(BlockPosition position) {
 		return this.chunks.get(position);
 	}
 	
@@ -90,11 +96,11 @@ public class World {
 	 * @param position The block position the get the chunk at.
 	 * @return The chunk object, or Null if not existing.
 	 */
-	public WorldChunk getChunkAt(WorldBlockPosition position) {
+	public Chunk getChunkAt(BlockPosition position) {
 		return this.getChunkAtAbsolute(this.getChunkPosition(position));
 	}
 	
-	public WorldChunk getChunkAt(int x, int y, int z) {
+	public Chunk getChunkAt(int x, int y, int z) {
 		return this.getChunkAtAbsolute(this.getChunkPosition(x, y, z));
 	}
 	
@@ -103,17 +109,17 @@ public class World {
 	 * @param position The block position to check.
 	 * @return True if the game can generate at this position.
 	 */
-	public boolean canGenerateAt(WorldBlockPosition position) {
+	public boolean canGenerateAt(BlockPosition position) {
 		return position.getY() >= 0 && position.getY() <= MAX_WORLD_HEIGHT;
 	}
 	
-	public WorldBlock getBlockAt(WorldBlockPosition position) {
-		WorldChunk chunk = this.getChunkAt(position);
+	public WorldBlock getBlockAt(BlockPosition position) {
+		Chunk chunk = this.getChunkAt(position);
 		return chunk == null ? null : chunk.getBlockAt(position);
 	}
 	
 	public Block getBlockTypeAt(int x, int y, int z) {
-		WorldChunk chunk = this.getChunkAt(x, y, z);
+		Chunk chunk = this.getChunkAt(x, y, z);
 		return chunk == null ? DEFAULT_BLOCK : chunk.getBlockTypeAt(x, y, z);
 	}
 	
@@ -121,21 +127,25 @@ public class World {
 	 * Force load a chunk at specific block position, if not existing, generate it.
 	 * @param position The block position where you want to load the world.
 	 * @return The chunk object, or Null if no generation is possible at this
-	 *         position (see {@link #canGenerateAt(WorldBlockPosition)}).
+	 *         position (see {@link #canGenerateAt(BlockPosition)}).
 	 */
-	public WorldChunk loadAt(WorldBlockPosition position) {
+	public Chunk loadAt(BlockPosition position) {
 		
 		if (!this.canGenerateAt(position))
 			return null;
 	
-		WorldBlockPosition chunkpos = this.getChunkPosition(position);
-		WorldChunk chunk = this.getChunkAtAbsolute(chunkpos);
+		BlockPosition chunkpos = this.getChunkPosition(position);
+		Chunk chunk = this.getChunkAtAbsolute(chunkpos);
 		
 		if (chunk == null) {
 			
-			chunk = new WorldChunk(this, chunkpos);
+			chunk = new Chunk(this, chunkpos);
 			this.chunks.put(chunkpos, chunk);
+			
+			this.generator.genBiomes(chunk, chunkpos);
 			this.generator.genBase(chunk, chunkpos);
+			this.generator.genSurface(chunk, chunkpos);
+			this.generator.genFeatures(chunk, chunkpos);
 			
 			this.triggerChunkLoadedListeners(chunk);
 			
@@ -145,28 +155,38 @@ public class World {
 		
 	}
 	
-	public void forEachChunkPosNear(float x, float y, float z, int range, boolean wholeY, Consumer<WorldBlockPosition> consumer) {
+	///////////////
+	// Heightmap //
+	///////////////
+	
+	
+	
+	////////////////////////
+	// Position Utilities //
+	////////////////////////
+	
+	public void forEachChunkPosNear(float x, float y, float z, int range, boolean wholeY, Consumer<BlockPosition> consumer) {
 		
-		WorldBlockPosition chunkPos = this.getChunkPosition(MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z));
-		WorldBlockPosition minPos = chunkPos.sub(this.getChunkPosition(range, range, range));
+		BlockPosition chunkPos = this.getChunkPosition(MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z));
+		BlockPosition minPos = chunkPos.sub(this.getChunkPosition(range, range, range));
 		
 		int xmax = chunkPos.getX() + range;
 		int ymax = wholeY ? MAX_WORLD_HEIGHT : chunkPos.getY() + range;
 		int zmax = chunkPos.getZ() + range;
 		
-		WorldBlockPosition pos;
+		BlockPosition pos;
 		
 		for (int xv = minPos.getX(); xv <= xmax; xv += CHUNK_SIZE)
 			for (int yv = (wholeY ? 0 : minPos.getY()); yv <= ymax; yv += CHUNK_SIZE)
 				for (int zv = minPos.getZ(); zv <= zmax; zv += CHUNK_SIZE)
-					consumer.accept(new WorldBlockPosition(xv, yv, zv));
+					consumer.accept(new BlockPosition(xv, yv, zv));
 					
 	}
 	
-	public void forEachChunkNear(float x, float y, float z, int range, Consumer<WorldChunk> consumer) {
+	public void forEachChunkNear(float x, float y, float z, int range, Consumer<Chunk> consumer) {
 		
 		this.forEachChunkPosNear(x, y, z, range, false, pos -> {
-			WorldChunk ck = this.getChunkAtAbsolute(pos);
+			Chunk ck = this.getChunkAtAbsolute(pos);
 			if (ck != null) consumer.accept(ck);
 		});
 	
@@ -186,11 +206,11 @@ public class World {
 		this.chunkLoadedListeners.remove(l);
 	}
 	
-	private void triggerChunkLoadedListeners(WorldChunk chunk) {
+	private void triggerChunkLoadedListeners(Chunk chunk) {
 		this.chunkLoadedListeners.forEach(l -> l.worldChunkLoaded(this, chunk));
 	}
 	
-	private void triggerChunkUnloadedListeners(WorldChunk chunk) {
+	private void triggerChunkUnloadedListeners(Chunk chunk) {
 		this.chunkLoadedListeners.forEach(l -> l.worldChunkUnloaded(this, chunk));
 	}
 	

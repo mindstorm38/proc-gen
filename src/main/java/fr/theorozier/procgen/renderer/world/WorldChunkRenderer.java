@@ -7,6 +7,8 @@ import fr.theorozier.procgen.renderer.world.block.BlockRenderers;
 import fr.theorozier.procgen.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.util.array.BufferedIntArray;
 import fr.theorozier.procgen.world.*;
+import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.util.BufferUsage;
 import io.msengine.client.renderer.util.BufferUtils;
@@ -25,7 +27,7 @@ import static fr.theorozier.procgen.world.World.CHUNK_SIZE_MINUS;
 public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 	
 	private final WorldRenderer renderer;
-	private final WorldChunk chunk;
+	private final Chunk chunk;
 	private final World world;
 	private final TextureMap terrainMap;
 	
@@ -36,7 +38,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 	
 	private float distanceToCameraSquared;
 	
-	WorldChunkRenderer(WorldRenderer renderer, WorldChunk chunk) {
+	WorldChunkRenderer(WorldRenderer renderer, Chunk chunk) {
 		
 		this.renderer = renderer;
 		this.chunk = chunk;
@@ -50,7 +52,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 		
 	}
 	
-	public WorldBlockPosition getChunkPosition() {
+	public BlockPosition getChunkPosition() {
 		return this.chunk.getChunkPosition();
 	}
 	
@@ -218,7 +220,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 	}
 	
 	@Override
-	public void worldChunkUpdated(WorldChunk chunk, int x, int y, int z, Block block) {
+	public void worldChunkUpdated(Chunk chunk, int x, int y, int z, Block block) {
 		
 		if (this.chunk == chunk) {
 			this.refreshBuffers();
@@ -227,7 +229,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 	}
 	
 	@Override
-	public void worldChunkUpdated(WorldChunk chunk) {
+	public void worldChunkUpdated(Chunk chunk) {
 		
 		if (this.chunk == chunk) {
 			this.refreshBuffers();

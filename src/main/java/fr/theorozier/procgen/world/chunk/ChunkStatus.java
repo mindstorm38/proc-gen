@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.world;
+package fr.theorozier.procgen.world.chunk;
 
 public enum ChunkStatus {
 	

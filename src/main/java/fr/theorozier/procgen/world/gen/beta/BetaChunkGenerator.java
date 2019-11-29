@@ -1,11 +1,13 @@
 package fr.theorozier.procgen.world.gen.beta;
 
 import fr.theorozier.procgen.block.Blocks;
-import fr.theorozier.procgen.world.WorldBlock;
-import fr.theorozier.procgen.world.WorldBlockPosition;
-import fr.theorozier.procgen.world.WorldChunk;
+import fr.theorozier.procgen.util.MathUtils;
+import fr.theorozier.procgen.world.*;
+import fr.theorozier.procgen.world.biome.Biome;
+import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.world.chunk.WorldBlock;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
-import fr.theorozier.procgen.world.feature.NoFeatureConfig;
+import fr.theorozier.procgen.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.world.feature.TreeFeature;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
@@ -13,6 +15,7 @@ import io.msengine.common.util.noise.OctaveSimplexNoise;
 import io.msengine.common.util.noise.SeedSimplexNoise;
 
 import static fr.theorozier.procgen.world.World.CHUNK_SIZE;
+import static fr.theorozier.procgen.world.World.MAX_WORLD_HEIGHT;
 
 public class BetaChunkGenerator extends ChunkGenerator {
 	
@@ -20,7 +23,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	
 	private final OctaveSimplexNoise surfaceNoise;
 	
-	private final ConfiguredFeature<NoFeatureConfig> testFeature = new ConfiguredFeature<>(new TreeFeature(), new NoFeatureConfig());
+	private final ConfiguredFeature<FeatureConfig> testFeature = new ConfiguredFeature<>(new TreeFeature(), FeatureConfig.EMPTY);
 	
 	public BetaChunkGenerator(long seed) {
 		
@@ -30,22 +33,65 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		
 	}
 	
-	@Override
-	public void genBase(WorldChunk chunk, WorldBlockPosition pos) {
+	private Biome getBiomeAtRelative(Chunk chunk, BlockPosition pos, int dx, int dz) {
 		
-		float noise;
+		if (dx < 0 || dx >= CHUNK_SIZE || dz < 0 || dz >= CHUNK_SIZE) {
+			return this.biomeProvider.getBiomeAt(pos.getX() + dx, pos.getZ() + dz);
+		} else {
+			return chunk.getBiomeAtRelative(dx, dz);
+		}
+		
+	}
+	
+	private static final byte TRANSITION_DIST = 1;
+	private static final byte FULL_DIST = TRANSITION_DIST * 2 + 1;
+	private static final float DIST_RATIO = (float) TRANSITION_DIST / (float) FULL_DIST;
+	
+	private static final byte[] X_OFFSETS = {1, 1, 0, -1};
+	private static final byte[] Z_OFFSETS = {0, 1, 1,  1};
+	private static final byte OFFSETS_COUNT = 4;
+	
+	@Override
+	public void genBase(Chunk chunk, BlockPosition pos) {
+		
+		Biome biome, nbiome1, nbiome2;
+		float depth, scale, noise;
+		byte neighbourBiomes;
 		int wx, wy, wz;
+		int nx, nz;
 		WorldBlock block;
 		
-		for (int x = 0; x < CHUNK_SIZE; x++) {
-			for (int z = 0; z < CHUNK_SIZE; z++) {
+		for (int x = 0; x < CHUNK_SIZE; ++x) {
+			for (int z = 0; z < CHUNK_SIZE; ++z) {
 				
 				wx = pos.getX() + x;
 				wz = pos.getZ() + z;
 				
-				noise = 48f + (this.surfaceNoise.noise(wx, wz, 0.004f) + 1) * 48f;
+				biome = chunk.getBiomeAtRelative(x, z);
+				depth = biome.getDepth();
+				scale = biome.getScale();
+				neighbourBiomes = 1;
 				
-				for (int y = 0; y < CHUNK_SIZE; y++) {
+				for (int i = 0; i < OFFSETS_COUNT; i++) {
+					
+					nbiome1 = this.getBiomeAtRelative(chunk, pos, x + X_OFFSETS[i], z - Z_OFFSETS[i]);
+					nbiome2 = this.getBiomeAtRelative(chunk, pos, x - X_OFFSETS[i], z + Z_OFFSETS[i]);
+					
+					if (nbiome1 != nbiome2) {
+						
+						depth += MathUtils.lerp(nbiome1.getDepth(), nbiome2.getDepth(), DIST_RATIO);
+						scale += MathUtils.lerp(nbiome1.getScale(), nbiome2.getScale(), DIST_RATIO);
+						neighbourBiomes++;
+						
+					}
+					
+				}
+				
+				depth /= neighbourBiomes;
+				scale /= neighbourBiomes;
+				noise = (depth * MAX_WORLD_HEIGHT) + (this.surfaceNoise.noise(wx, wz, 0.004f) + 1) * scale;
+				
+				for (int y = 0; y < CHUNK_SIZE; ++y) {
 					
 					wy = pos.getY() + y;
 					
@@ -53,10 +99,15 @@ public class BetaChunkGenerator extends ChunkGenerator {
 					
 					if (wy == 0) {
 						block.setBlockType(Blocks.BEDROCK);
-					} else if (wy < noise - 1) {
+					} else if (wy < noise - 4) {
 						block.setBlockType(Blocks.STONE);
+					} else if (wy < noise - 1) {
+						block.setBlockType(Blocks.DIRT);
 					} else if (wy < noise) {
+						
 						block.setBlockType(Blocks.GRASS);
+						chunk.setHeightAtRelative(x, z, (byte) (y + 1));
+						
 					} else {
 						block.setBlockType(Blocks.AIR);
 					}
@@ -69,82 +120,12 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	}
 	
 	@Override
-	public void genSurface(WorldChunk chunk, WorldBlockPosition pos) {
+	public void genSurface(Chunk chunk, BlockPosition pos) {
 		// TODO: Generate surface (sand, grass, stone) from biome preferences.
-	}
-	
-	@Override
-	public void genFeatures(WorldChunk chunk, WorldBlockPosition pos) {
-	
-	
-	
 	}
 	
 	private static long getDecorationSeed(long seed) {
 		return seed * 993402349510639L;
-	}
-	
-	/*
-	private void generateTreeAtRelative(WorldChunk chunk, int x, int y, int z) {
-		
-		WorldBlock block;
-		
-		int top = y + 4 + MathUtils.fastfloor(this.decorationNoise.noise(x, z));
-		
-		for (int logY = y; logY < top; logY++) {
-			
-			if (logY >= CHUNK_SIZE)
-				return;
-			
-			block = chunk.getBlockAtRelative(x, logY, z);
-			block.setBlockType(Blocks.LOG);
-			
-		}
-		
-		WorldBlockPosition center = new WorldBlockPosition(x, top - 1, z);
-		
-		for (int leavesY = (top - 2); leavesY < (top + 3); leavesY++) {
-			for (int leavesX = (x - 2); leavesX <= (x + 2); leavesX++) {
-				for (int leavesZ = (z - 2); leavesZ <= (z + 2); leavesZ++) {
-					
-					if (leavesY >= top || leavesX != x || leavesZ != z) {
-						
-						if (center.dist(leavesX, leavesY, leavesZ) <= 2.4f && chunk.isValidRelativePosition(leavesX, leavesY, leavesZ)) {
-							
-							block = chunk.getBlockAtRelative(leavesX, leavesY, leavesZ);
-							block.setBlockType(Blocks.LEAVES, false);
-							
-						}
-						
-					}
-					
-				}
-			}
-		}
-		
-	}
-	*/
-	
-	/**
-	 * Package private method to generate noise for a specific point and parameters.
-	 * @param noise The simplex noise to use.
-	 * @param x Point X coordinate.
-	 * @param y Point Y coordinate.
-	 * @param a1 Amplitude for (x,y)/200.
-	 * @param a2 Amplitude for (x,y)/100.
-	 * @param a3 Amplitude for (x,y)/50.
-	 * @param a4 Amplitude for (x,y)/10.
-	 * @return Noise at this point.
-	 */
-	@Deprecated
-	private static float noiseAt(SeedSimplexNoise noise, float x, float y, float a1, float a2, float a3, float a4, float a5) {
-		
-		return a1 * noise.normnoise(x / 200, y / 200) +
-				a2 * noise.normnoise(x / 100, y / 100) +
-				a3 * noise.normnoise(x / 50, y / 50) +
-				a4 * noise.normnoise(x / 10, y / 10) +
-				a5 * noise.normnoise(x / 2, y / 2);
-		
 	}
 	
 }

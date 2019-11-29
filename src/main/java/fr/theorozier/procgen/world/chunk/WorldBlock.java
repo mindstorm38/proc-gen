@@ -1,16 +1,18 @@
-package fr.theorozier.procgen.world;
+package fr.theorozier.procgen.world.chunk;
 
 import fr.theorozier.procgen.block.Block;
+import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.World;
 import io.msengine.common.osf.OSFObject;
 
 public class WorldBlock {
 
-	private final WorldChunk chunk;
-	private final WorldBlockPosition position;
-	private final WorldBlockPosition relative;
+	private final Chunk chunk;
+	private final BlockPosition position;
+	private final BlockPosition relative;
 	private final short positionIndex;
 	
-	WorldBlock(WorldChunk chunk, WorldBlockPosition position, WorldBlockPosition relative) {
+	WorldBlock(Chunk chunk, BlockPosition position, BlockPosition relative) {
 		
 		this.chunk = chunk;
 		this.position = position;
@@ -23,11 +25,11 @@ public class WorldBlock {
 		return this.chunk.getWorld();
 	}
 	
-	public WorldChunk getChunk() {
+	public Chunk getChunk() {
 		return this.chunk;
 	}
 	
-	public WorldBlockPosition getPosition() {
+	public BlockPosition getPosition() {
 		return this.position;
 	}
 	

@@ -1,10 +1,11 @@
 package fr.theorozier.procgen.world;
 
 import fr.theorozier.procgen.block.Block;
+import fr.theorozier.procgen.world.chunk.Chunk;
 
 public interface WorldChunkUpdatedListener {
 
-	void worldChunkUpdated(WorldChunk chunk, int x, int y, int z, Block block);
-	void worldChunkUpdated(WorldChunk chunk);
+	void worldChunkUpdated(Chunk chunk, int x, int y, int z, Block block);
+	void worldChunkUpdated(Chunk chunk);
 	
 }

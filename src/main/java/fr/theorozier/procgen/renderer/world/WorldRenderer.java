@@ -2,6 +2,7 @@ package fr.theorozier.procgen.renderer.world;
 
 import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.*;
+import fr.theorozier.procgen.world.chunk.Chunk;
 import io.msengine.client.game.RenderGame;
 import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.model.ModelApplyListener;
@@ -56,8 +57,8 @@ public class WorldRenderer implements ModelApplyListener,
 	private boolean init = false;
 	private boolean ready = false;
 	
-	private final Map<WorldBlockPosition, WorldChunkRenderer> chunkRenderers;
-	private final List<WorldBlockPosition> unloadingChunkRenderers;
+	private final Map<BlockPosition, WorldChunkRenderer> chunkRenderers;
+	private final List<BlockPosition> unloadingChunkRenderers;
 	
 	public WorldRenderer() {
 		
@@ -223,7 +224,7 @@ public class WorldRenderer implements ModelApplyListener,
 	 * @param at The absolute position of the chunk.
 	 * @return The chunk renderer, or Null if not existing.
 	 */
-	private WorldChunkRenderer getChunkRenderer(WorldBlockPosition at) {
+	private WorldChunkRenderer getChunkRenderer(BlockPosition at) {
 		return this.chunkRenderers.get(at);
 	}
 	
@@ -251,7 +252,7 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			if (this.unloadingChunkRenderers.size() != 0) {
 				
-				for (WorldBlockPosition pos : this.unloadingChunkRenderers)
+				for (BlockPosition pos : this.unloadingChunkRenderers)
 					this.chunkRenderers.remove(pos).delete();
 				
 				this.unloadingChunkRenderers.clear();
@@ -266,9 +267,9 @@ public class WorldRenderer implements ModelApplyListener,
 	 * Load a chunk renderer if not already loaded.
 	 * @param chunk The chunk to load.
 	 */
-	private void loadChunkRenderer(WorldChunk chunk) {
+	private void loadChunkRenderer(Chunk chunk) {
 		
-		WorldBlockPosition pos = chunk.getChunkPosition();
+		BlockPosition pos = chunk.getChunkPosition();
 		WorldChunkRenderer cr = this.chunkRenderers.get(pos);
 		
 		if (cr == null) {
@@ -300,10 +301,10 @@ public class WorldRenderer implements ModelApplyListener,
 	 * is near the camera ({@link #RENDER_DISTANCE}).
 	 * @param chunk The chunk to test.
 	 */
-	private void checkChunkRenderer(WorldChunk chunk) {
+	private void checkChunkRenderer(Chunk chunk) {
 	
 		// Camera chunk position
-		WorldBlockPosition camcp = this.renderingWorld.getChunkPosition(
+		BlockPosition camcp = this.renderingWorld.getChunkPosition(
 				MathUtils.fastfloor(this.camera.getX()),
 				MathUtils.fastfloor(this.camera.getY()),
 				MathUtils.fastfloor(this.camera.getZ())
@@ -317,7 +318,7 @@ public class WorldRenderer implements ModelApplyListener,
 		int ymax = camcp.getY() + RENDER_DISTANCE;
 		int zmax = camcp.getZ() + RENDER_DISTANCE;
 		
-		WorldBlockPosition cp = chunk.getChunkPosition();
+		BlockPosition cp = chunk.getChunkPosition();
 		
 		if (cp.getX() >= xmin && cp.getX() <= xmax && cp.getY() >= ymin && cp.getY() <= ymax && cp.getZ() >= zmin && cp.getZ() <= zmax) {
 			this.loadChunkRenderer(chunk);
@@ -405,7 +406,7 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	@Override
-	public void worldChunkLoaded(World world, WorldChunk chunk) {
+	public void worldChunkLoaded(World world, Chunk chunk) {
 		
 		if (this.renderingWorld == world) {
 			this.checkChunkRenderer(chunk);
@@ -414,7 +415,7 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	@Override
-	public void worldChunkUnloaded(World world, WorldChunk chunk) {
+	public void worldChunkUnloaded(World world, Chunk chunk) {
 		
 		if (this.renderingWorld == world) {
 			

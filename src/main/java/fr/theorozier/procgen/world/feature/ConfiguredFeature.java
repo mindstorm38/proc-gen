@@ -1,7 +1,8 @@
 package fr.theorozier.procgen.world.feature;
 
 import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.WorldBlockPosition;
+import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 
 import java.util.Random;
@@ -18,7 +19,7 @@ public class ConfiguredFeature<C extends FeatureConfig> {
 		
 	}
 	
-	public boolean place(World world, ChunkGenerator generator, Random rand, WorldBlockPosition at) {
+	public boolean place(World world, ChunkGenerator generator, Random rand, BlockPosition at) {
 		return this.feature.place(world, generator, rand, at, this.config);
 	}
 	

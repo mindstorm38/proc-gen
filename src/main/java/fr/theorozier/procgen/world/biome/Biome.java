@@ -3,7 +3,7 @@ package fr.theorozier.procgen.world.biome;
 import fr.theorozier.procgen.util.ErrorUtils;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.world.feature.Feature;
-import fr.theorozier.procgen.world.feature.FeatureConfig;
+import fr.theorozier.procgen.world.feature.config.FeatureConfig;
 import io.sutil.StringUtils;
 
 import java.util.ArrayList;
@@ -56,6 +56,10 @@ public abstract class Biome {
 	
 	public <C extends FeatureConfig> void addFeature(Feature<C> feature, C config) {
 		this.features.add(new ConfiguredFeature<>(feature, config));
+	}
+	
+	public List<ConfiguredFeature<?>> getConfiguredFeatures() {
+		return this.features;
 	}
 
 }

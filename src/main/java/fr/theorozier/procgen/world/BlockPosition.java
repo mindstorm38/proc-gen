@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.world;
 
-public class WorldBlockPosition {
+public class BlockPosition {
 	
 	private final int x, y, z;
 	
-	public WorldBlockPosition(int x, int y, int z) {
+	public BlockPosition(int x, int y, int z) {
 		
 		this.x = x;
 		this.y = y;
@@ -24,16 +24,16 @@ public class WorldBlockPosition {
 		return z;
 	}
 	
-	public WorldBlockPosition sub(int x, int y, int z) {
-		return new WorldBlockPosition(this.x - x, this.y - y, this.z - z);
+	public BlockPosition sub(int x, int y, int z) {
+		return new BlockPosition(this.x - x, this.y - y, this.z - z);
 	}
 	
-	public WorldBlockPosition sub(WorldBlockPosition other) {
-		return new WorldBlockPosition(this.x - other.x, this.y - other.y, this.z - other.z);
+	public BlockPosition sub(BlockPosition other) {
+		return new BlockPosition(this.x - other.x, this.y - other.y, this.z - other.z);
 	}
 	
-	public WorldBlockPosition add(int x, int y, int z) {
-		return new WorldBlockPosition(this.x + x, this.y + y, this.z + z);
+	public BlockPosition add(int x, int y, int z) {
+		return new BlockPosition(this.x + x, this.y + y, this.z + z);
 	}
 	
 	public float distSquared(float x, float y, float z) {
@@ -54,7 +54,7 @@ public class WorldBlockPosition {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		WorldBlockPosition t = (WorldBlockPosition) o;
+		BlockPosition t = (BlockPosition) o;
 		return x == t.x && y == t.y && z == t.z;
 	}
 	

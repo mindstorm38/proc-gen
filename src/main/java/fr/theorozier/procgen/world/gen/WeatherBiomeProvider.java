@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.world.gen;
 
 import fr.theorozier.procgen.world.biome.Biome;
+import fr.theorozier.procgen.world.biome.Biomes;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
 
 import java.util.*;
@@ -25,13 +26,25 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		
 	}
 	
-	protected void addBiome(Biome biome, byte priority) {
-		this.biomes.put(biome, priority);
+	protected void addBiome(Biome biome, int priority) {
+		this.biomes.put(biome, (byte) priority);
 	}
 	
 	@Override
 	public Biome getBiomeAt(int x, int z) {
-		return null;
+		
+		// Temp : [-20; 50]
+		// float temp = this.tempNoise.noise(x, z, 0.00001f) * 35f + 15f;
+		
+		// Humidity [0; 100]
+		// float humidity = (this.humidityNoise.noise(x, z, 0.00001f) + 1f) * 50f;
+		
+		if (this.humidityNoise.noise(x, z, 0.01f) > 0) {
+			return Biomes.FOREST_HILL;
+		} else {
+			return Biomes.PLAIN;
+		}
+		
 	}
 	
 	public static long getTempSeed(long seed) {

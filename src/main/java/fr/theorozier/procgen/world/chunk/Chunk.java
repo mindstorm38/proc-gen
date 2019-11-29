@@ -1,25 +1,27 @@
-package fr.theorozier.procgen.world;
+package fr.theorozier.procgen.world.chunk;
 
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
+import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.biome.Biome;
+import fr.theorozier.procgen.world.biome.Biomes;
 import io.msengine.common.osf.OSFObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static fr.theorozier.procgen.world.World.CHUNK_SIZE;
 
-public class WorldChunk {
+public class Chunk implements BiomeAccessor {
+	
+	public static final int CHUNK_SECTION_SURFACE = CHUNK_SIZE * CHUNK_SIZE;
 	
 	private final World world;
-	private final WorldBlockPosition position;
+	private final BlockPosition position;
 	private final int ex, ey, ez;
 	
 	private final short[][][] data;
-	private final Biome[] biomes;
+	private final byte[] heightmap;
+	private Biome[] biomes;
 	
 	private ChunkStatus status;
 	
@@ -28,7 +30,7 @@ public class WorldChunk {
 	
 	private final List<WorldChunkUpdatedListener> updateListeners;
 	
-	WorldChunk(World world, WorldBlockPosition position) {
+	public Chunk(World world, BlockPosition position) {
 		
 		this.world = world;
 		
@@ -38,7 +40,9 @@ public class WorldChunk {
 		this.ez = position.getZ() + CHUNK_SIZE;
 		
 		this.data = new short[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-		this.biomes = new Biome[CHUNK_SIZE * CHUNK_SIZE];
+		this.heightmap = new byte[CHUNK_SECTION_SURFACE];
+		this.biomes = new Biome[CHUNK_SECTION_SURFACE];
+		Arrays.fill(this.biomes, Biomes.EMPTY);
 		
 		this.status = ChunkStatus.EMPTY;
 		
@@ -58,13 +62,17 @@ public class WorldChunk {
 	/**
 	 * @return Chunk position, a multiple of (16, 16, 16).
 	 */
-	public WorldBlockPosition getChunkPosition() {
+	public BlockPosition getChunkPosition() {
 		return this.position;
 	}
 	
 	public ChunkStatus getStatus() {
 		return this.status;
 	}
+	
+	////////////////////////
+	// Position Utilities //
+	////////////////////////
 	
 	/**
 	 * Check if this chunk contains a block position.
@@ -86,7 +94,7 @@ public class WorldChunk {
 	 * @param position The block position.
 	 * @return True if this block position is in this chunk.
 	 */
-	public boolean validPosition(WorldBlockPosition position) {
+	public boolean validPosition(BlockPosition position) {
 		return this.validPosition(position.getX(), position.getY(), position.getZ());
 	}
 	
@@ -97,7 +105,7 @@ public class WorldChunk {
 		
 	}
 	
-	public WorldBlockPosition validatePosition(WorldBlockPosition position) {
+	public BlockPosition validatePosition(BlockPosition position) {
 		this.validatePosition(position.getX(), position.getY(), position.getZ());
 		return position;
 	}
@@ -111,16 +119,91 @@ public class WorldChunk {
 	 * @param position The world position.
 	 * @return The relative position in this chunk.
 	 */
-	public WorldBlockPosition getRelativePosition(WorldBlockPosition position) {
+	public BlockPosition getRelativePosition(BlockPosition position) {
 		return this.validatePosition(position).sub(this.position);
 	}
+	
+	/**
+	 * Get the relative position in this chunk from a world position.
+	 * @param x The world position X.
+	 * @param y The world position Y.
+	 * @param z The world position Z.
+	 * @return The relative position in this chunk.
+	 */
+	public BlockPosition getRelativePosition(int x, int y, int z) {
+		this.validatePosition(x, y, z);
+		return new BlockPosition(x - this.position.getX(), y - this.position.getY(), z - this.position.getZ());
+	}
+	
+	///////////////
+	// Heightmap //
+	///////////////
+	
+	public void setHeightAtRelative(int x, int z, byte heightY) {
+		this.heightmap[this.getHorizontalPositionIndex(x, z)] = heightY;
+	}
+	
+	public byte getHeightAtRelative(int x, int z) {
+		return this.heightmap[this.getHorizontalPositionIndex(x, z)];
+	}
+	
+	public byte getHeightAtRelative(BlockPosition pos) {
+		return this.getHeightAtRelative(pos.getX(), pos.getZ());
+	}
+	
+	public byte getHeightAt(int x, int z) {
+		return this.getHeightAtRelative(this.getRelativePosition(x, 0, z));
+	}
+	
+	/////////////////////
+	// Biome Accessing //
+	/////////////////////
+	
+	/**
+	 * Set the array of biomes.
+	 * @param biomes New biomes array, must have a length of {@link #CHUNK_SECTION_SURFACE}.
+	 */
+	public void setBiomes(Biome[] biomes) {
+		
+		if (biomes.length != CHUNK_SECTION_SURFACE)
+			throw new IllegalArgumentException("Invalid biomes array length, must have chunk section surface length (" + CHUNK_SECTION_SURFACE + ").");
+		
+		this.biomes = biomes;
+		
+	}
+	
+	/**
+	 * Get biome at relative position in this chunk.
+	 * @param x The X relative position.
+	 * @param z The Y relative position.
+	 * @return The biome at this block position.
+	 */
+	public Biome getBiomeAtRelative(int x, int z) {
+		return this.biomes[this.getHorizontalPositionIndex(x, z)];
+	}
+	
+	@Override
+	public Biome getBiomeAt(int x, int z) {
+		BlockPosition rel = this.getRelativePosition(x, 0, z);
+		return this.getBiomeAtRelative(rel.getX(), rel.getZ());
+	}
+	
+	@Override
+	public Biome getBiomeAt(BlockPosition pos) {
+		BlockPosition rel = this.getRelativePosition(pos);
+		return this.getBiomeAtRelative(rel.getX(), rel.getZ());
+	}
+	
+	/////////////////////
+	// Block Accessing //
+	/////////////////////
 	
 	/**
 	 * Get the world block at specific position.
 	 * @param position The position of the block.
 	 * @return An interface to the block data.
 	 */
-	public WorldBlock getBlockAt(WorldBlockPosition position) {
+	public WorldBlock getBlockAt(BlockPosition position) {
 		
 		this.validatePosition(position);
 		return new WorldBlock(this, position, this.getRelativePosition(position));
@@ -128,7 +211,7 @@ public class WorldChunk {
 	}
 	
 	public WorldBlock getBlockAtRelative(int x, int y, int z) {
-		return new WorldBlock(this, new WorldBlockPosition(this.position.getX() + x, this.position.getY() + y, this.position.getZ() + z), new WorldBlockPosition(x, y, z));
+		return new WorldBlock(this, new BlockPosition(this.position.getX() + x, this.position.getY() + y, this.position.getZ() + z), new BlockPosition(x, y, z));
 	}
 	
 	/**
@@ -201,9 +284,30 @@ public class WorldChunk {
 		
 	}
 	
+	/**
+	 * Internal method to get the position index in a 3D linear array of cube size {@link World#CHUNK_SIZE}.
+	 * @param x Relative position X.
+	 * @param y Relative position Y.
+	 * @param z Relative position Z.
+	 * @return Position index.
+	 */
 	short getPositionIndex(int x, int y, int z) {
 		return (short) (x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z);
 	}
+	
+	/**
+	 * Internal method to get the position index in a 2D linear array of square size {@link World#CHUNK_SIZE}.
+	 * @param x Relative position X.
+	 * @param z Relative position Z.
+	 * @return Position index.
+	 */
+	short getHorizontalPositionIndex(int x, int z) {
+		return (short) (x * CHUNK_SIZE + z);
+	}
+	
+	////////////////////
+	// Block Metadata //
+	////////////////////
 	
 	OSFObject getBlockMetadataAt(short index, boolean create) {
 		
