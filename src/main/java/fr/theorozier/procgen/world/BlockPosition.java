@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.world;
 
+import fr.theorozier.procgen.world.chunk.SectionPosition;
+
 public class BlockPosition {
 	
 	private final int x, y, z;
@@ -48,6 +50,10 @@ public class BlockPosition {
 		float dy = this.y - y;
 		float dz = this.z - z;
 		return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+	
+	public SectionPosition toSectionPosition() {
+		return new SectionPosition(this.x, this.z);
 	}
 	
 	@Override

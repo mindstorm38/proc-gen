@@ -93,7 +93,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		} else if (key == GLFW.GLFW_KEY_L && action == GLFW.GLFW_PRESS) {
 			
 			Camera3D cam = this.worldRenderer.getCamera();
-			this.testWorld.loadNear(cam.getX(), cam.getY(), cam.getZ());
+			this.testWorld.loadNear(cam.getX(), cam.getZ());
 		
 		}
 		

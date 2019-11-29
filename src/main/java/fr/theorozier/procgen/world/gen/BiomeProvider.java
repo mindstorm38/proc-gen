@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.world.gen;
 
-import fr.theorozier.procgen.world.BiomeAccessor;
-import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import fr.theorozier.procgen.world.biome.Biome;
+import fr.theorozier.procgen.world.chunk.SectionPosition;
 
 public abstract class BiomeProvider implements BiomeAccessor {
 
@@ -20,7 +20,7 @@ public abstract class BiomeProvider implements BiomeAccessor {
 	public abstract Biome getBiomeAt(int x, int z);
 	
 	@Override
-	public Biome getBiomeAt(BlockPosition pos) {
+	public Biome getBiomeAt(SectionPosition pos) {
 		return this.getBiomeAt(pos.getX(), pos.getZ());
 	}
 

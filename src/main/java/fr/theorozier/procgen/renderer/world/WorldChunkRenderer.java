@@ -21,9 +21,6 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static fr.theorozier.procgen.world.World.CHUNK_SIZE;
-import static fr.theorozier.procgen.world.World.CHUNK_SIZE_MINUS;
-
 public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 	
 	private final WorldRenderer renderer;
@@ -133,9 +130,9 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 			int wx, wy, wz;
 			int lidx = 0;
 			
-			for (int x = 0; x < CHUNK_SIZE; x++) {
-				for (int y = 0; y < CHUNK_SIZE; y++) {
-					for (int z = 0; z < CHUNK_SIZE; z++) {
+			for (int x = 0; x < 16; x++) {
+				for (int y = 0; y < 16; y++) {
+					for (int z = 0; z < 16; z++) {
 						
 						if (!this.chunk.hasBlockAtRelative(x, y, z))
 							continue;
@@ -149,7 +146,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 							wy = cy + y;
 							wz = cz + z;
 							
-							if (y < CHUNK_SIZE_MINUS)
+							if (y < 15)
 								 faces.topBlock(this.chunk.getBlockTypeAtRelative(x, y + 1, z));
 							else faces.topBlock(this.world.getBlockTypeAt(wx, wy + 1, wz));
 							
@@ -157,7 +154,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 								 faces.bottomBlock(this.chunk.getBlockTypeAtRelative(x, y - 1, z));
 							else faces.bottomBlock(this.world.getBlockTypeAt(wx, wy - 1, wz));
 							
-							if (x < CHUNK_SIZE_MINUS)
+							if (x < 15)
 								 faces.northBlock(this.chunk.getBlockTypeAtRelative(x + 1, y, z));
 							else faces.northBlock(this.world.getBlockTypeAt(wx + 1, wy, wz));
 							
@@ -165,7 +162,7 @@ public class WorldChunkRenderer implements WorldChunkUpdatedListener {
 								 faces.southBlock(this.chunk.getBlockTypeAtRelative(x - 1, y, z));
 							else faces.southBlock(this.world.getBlockTypeAt(wx - 1, wy, wz));
 							
-							if (z < CHUNK_SIZE_MINUS)
+							if (z < 15)
 								 faces.eastBlock(this.chunk.getBlockTypeAtRelative(x, y, z + 1));
 							else faces.eastBlock(this.world.getBlockTypeAt(wx, wy, wz + 1));
 							

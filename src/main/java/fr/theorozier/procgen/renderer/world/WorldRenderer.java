@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static fr.theorozier.procgen.world.World.CHUNK_SIZE;
 import static org.lwjgl.opengl.GL11.*;
 
 public class WorldRenderer implements ModelApplyListener,
@@ -31,8 +30,8 @@ public class WorldRenderer implements ModelApplyListener,
 		WorldChunkLoadedListener {
 	
 	// These distances are squared, for optimisation.
-	public static final int RENDER_DISTANCE = CHUNK_SIZE * 16;
-	public static final int UNLOAD_DISTANCE = CHUNK_SIZE * 32;
+	public static final int RENDER_DISTANCE = 16 * 16;
+	public static final int UNLOAD_DISTANCE = 16 * 32;
 	
 	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
 	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
@@ -282,7 +281,7 @@ public class WorldRenderer implements ModelApplyListener,
 			WorldChunkRenderer nb;
 			
 			for (Direction face : Direction.values()) {
-				if ((nb = this.getChunkRenderer(pos.add(face.rx * CHUNK_SIZE, face.ry * CHUNK_SIZE, face.rz * CHUNK_SIZE))) != null) {
+				if ((nb = this.getChunkRenderer(pos.add(face.rx * 16, face.ry * 16, face.rz * 16))) != null) {
 					
 					nb.setNeighbour(face.oposite(), cr);
 					cr.setNeighbour(face, nb);
@@ -304,7 +303,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private void checkChunkRenderer(Chunk chunk) {
 	
 		// Camera chunk position
-		BlockPosition camcp = this.renderingWorld.getChunkPosition(
+		BlockPosition camcp = World.getChunkPosition(
 				MathUtils.fastfloor(this.camera.getX()),
 				MathUtils.fastfloor(this.camera.getY()),
 				MathUtils.fastfloor(this.camera.getZ())

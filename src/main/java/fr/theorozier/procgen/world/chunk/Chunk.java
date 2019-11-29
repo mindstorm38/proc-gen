@@ -4,24 +4,20 @@ import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.biome.Biome;
-import fr.theorozier.procgen.world.biome.Biomes;
+import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import io.msengine.common.osf.OSFObject;
 
 import java.util.*;
 
-import static fr.theorozier.procgen.world.World.CHUNK_SIZE;
-
 public class Chunk implements BiomeAccessor {
 	
-	public static final int CHUNK_SECTION_SURFACE = CHUNK_SIZE * CHUNK_SIZE;
-	
 	private final World world;
+	private final Section section;
 	private final BlockPosition position;
 	private final int ex, ey, ez;
 	
 	private final short[][][] data;
-	private final byte[] heightmap;
-	private Biome[] biomes;
+	private int blocksCount;
 	
 	private ChunkStatus status;
 	
@@ -30,19 +26,18 @@ public class Chunk implements BiomeAccessor {
 	
 	private final List<WorldChunkUpdatedListener> updateListeners;
 	
-	public Chunk(World world, BlockPosition position) {
+	public Chunk(Section section, BlockPosition position) {
 		
-		this.world = world;
+		this.world = section.getWorld();
+		this.section = section;
 		
 		this.position = position;
-		this.ex = position.getX() + CHUNK_SIZE;
-		this.ey = position.getY() + CHUNK_SIZE;
-		this.ez = position.getZ() + CHUNK_SIZE;
+		this.ex = position.getX() + 16;
+		this.ey = position.getY() + 16;
+		this.ez = position.getZ() + 16;
 		
-		this.data = new short[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-		this.heightmap = new byte[CHUNK_SECTION_SURFACE];
-		this.biomes = new Biome[CHUNK_SECTION_SURFACE];
-		Arrays.fill(this.biomes, Biomes.EMPTY);
+		this.data = new short[16][16][16];
+		this.blocksCount = 0;
 		
 		this.status = ChunkStatus.EMPTY;
 		
@@ -60,6 +55,13 @@ public class Chunk implements BiomeAccessor {
 	}
 	
 	/**
+	 * @return The section where this chunk is.
+	 */
+	public Section getSection() {
+		return this.section;
+	}
+	
+	/**
 	 * @return Chunk position, a multiple of (16, 16, 16).
 	 */
 	public BlockPosition getChunkPosition() {
@@ -68,6 +70,10 @@ public class Chunk implements BiomeAccessor {
 	
 	public ChunkStatus getStatus() {
 		return this.status;
+	}
+	
+	public int getBlocksCount() {
+		return this.blocksCount;
 	}
 	
 	////////////////////////
@@ -111,7 +117,7 @@ public class Chunk implements BiomeAccessor {
 	}
 	
 	public boolean isValidRelativePosition(int x, int y, int z) {
-		return x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE;
+		return x >= 0 && x < 16 && y >= 0 && y < 16 && z >= 0 && z < 16;
 	}
 	
 	/**
@@ -135,63 +141,18 @@ public class Chunk implements BiomeAccessor {
 		return new BlockPosition(x - this.position.getX(), y - this.position.getY(), z - this.position.getZ());
 	}
 	
-	///////////////
-	// Heightmap //
-	///////////////
-	
-	public void setHeightAtRelative(int x, int z, byte heightY) {
-		this.heightmap[this.getHorizontalPositionIndex(x, z)] = heightY;
-	}
-	
-	public byte getHeightAtRelative(int x, int z) {
-		return this.heightmap[this.getHorizontalPositionIndex(x, z)];
-	}
-	
-	public byte getHeightAtRelative(BlockPosition pos) {
-		return this.getHeightAtRelative(pos.getX(), pos.getZ());
-	}
-	
-	public byte getHeightAt(int x, int z) {
-		return this.getHeightAtRelative(this.getRelativePosition(x, 0, z));
-	}
-	
 	/////////////////////
 	// Biome Accessing //
 	/////////////////////
 	
-	/**
-	 * Set the array of biomes.
-	 * @param biomes New biomes array, must have a length of {@link #CHUNK_SECTION_SURFACE}.
-	 */
-	public void setBiomes(Biome[] biomes) {
-		
-		if (biomes.length != CHUNK_SECTION_SURFACE)
-			throw new IllegalArgumentException("Invalid biomes array length, must have chunk section surface length (" + CHUNK_SECTION_SURFACE + ").");
-		
-		this.biomes = biomes;
-		
-	}
-	
-	/**
-	 * Get biome at relative position in this chunk.
-	 * @param x The X relative position.
-	 * @param z The Y relative position.
-	 * @return The biome at this block position.
-	 */
-	public Biome getBiomeAtRelative(int x, int z) {
-		return this.biomes[this.getHorizontalPositionIndex(x, z)];
-	}
-	
 	@Override
 	public Biome getBiomeAt(int x, int z) {
-		BlockPosition rel = this.getRelativePosition(x, 0, z);
-		return this.getBiomeAtRelative(rel.getX(), rel.getZ());
+		return this.section.getBiomeAt(x, z);
 	}
 	
 	@Override
-	public Biome getBiomeAt(BlockPosition pos) {
-		BlockPosition rel = this.getRelativePosition(pos);
-		return this.getBiomeAtRelative(rel.getX(), rel.getZ());
+	public Biome getBiomeAt(SectionPosition pos) {
+		return this.section.getBiomeAt(pos);
 	}
 	
 	/////////////////////
@@ -204,10 +165,7 @@ public class Chunk implements BiomeAccessor {
 	 * @return An interface to the block data.
 	 */
 	public WorldBlock getBlockAt(BlockPosition position) {
-		
-		this.validatePosition(position);
 		return new WorldBlock(this, position, this.getRelativePosition(position));
-		
 	}
 	
 	public WorldBlock getBlockAtRelative(int x, int y, int z) {
@@ -268,6 +226,7 @@ public class Chunk implements BiomeAccessor {
 				return;
 			
 			this.removeBlockMetadataAt(this.getPositionIndex(x, y, z));
+			this.blocksCount--;
 			
 		}
 		
@@ -279,30 +238,21 @@ public class Chunk implements BiomeAccessor {
 			
 			this.data[x][y][z] = block.getUid();
 			block.initBlock(this.getBlockAtRelative(x, y, z));
+			this.blocksCount++;
 			
 		}
 		
 	}
 	
 	/**
-	 * Internal method to get the position index in a 3D linear array of cube size {@link World#CHUNK_SIZE}.
+	 * Internal method to get the position index in a 3D linear array of cube size 16.
 	 * @param x Relative position X.
 	 * @param y Relative position Y.
 	 * @param z Relative position Z.
 	 * @return Position index.
 	 */
 	short getPositionIndex(int x, int y, int z) {
-		return (short) (x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z);
-	}
-	
-	/**
-	 * Internal method to get the position index in a 2D linear array of square size {@link World#CHUNK_SIZE}.
-	 * @param x Relative position X.
-	 * @param z Relative position Z.
-	 * @return Position index.
-	 */
-	short getHorizontalPositionIndex(int x, int z) {
-		return (short) (x * CHUNK_SIZE + z);
+		return (short) (x * 16 * 16 + y * 16 + z);
 	}
 	
 	////////////////////
@@ -328,9 +278,9 @@ public class Chunk implements BiomeAccessor {
 	 */
 	public void forEachNotEmptyBlock(NotEmptyBlockConsumer consumer) {
 		
-		for (int x = 0; x < CHUNK_SIZE; x++)
-			for (int y = 0; y < CHUNK_SIZE; y++)
-				for (int z = 0; z < CHUNK_SIZE; z++)
+		for (int x = 0; x < 16; x++)
+			for (int y = 0; y < 16; y++)
+				for (int z = 0; z < 16; z++)
 					if (this.data[x][y][z] != 0)
 						consumer.accept(x, y, z, this.getBlockTypeAtRelative(x, y, z));
 	
