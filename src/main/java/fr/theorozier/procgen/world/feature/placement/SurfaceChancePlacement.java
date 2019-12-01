@@ -8,12 +8,16 @@ import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class SurfaceChancePlacement extends Placement<ChanceConfig> {
+public class SurfaceChancePlacement extends SurfacePlacement<ChanceConfig> {
 	
 	@Override
 	protected Stream<BlockPosition> position(World world, ChunkGenerator generator, Random rand, BlockPosition at, ChanceConfig config) {
 		
-		return null;
+		if (rand.nextFloat() < config.getChance()) {
+			return Stream.of(randomSurfacePosition(world, rand, at));
+		} else {
+			return Stream.empty();
+		}
 		
 	}
 	

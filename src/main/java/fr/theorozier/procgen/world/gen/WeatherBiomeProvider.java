@@ -13,6 +13,7 @@ public class WeatherBiomeProvider extends BiomeProvider {
 	private final OctaveSimplexNoise saltNoise;
 	
 	private final Map<Biome, Byte> biomes;
+	private final List<Biome> biomesList;
 	
 	public WeatherBiomeProvider(long seed) {
 		
@@ -23,11 +24,15 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		this.saltNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.5f, 2f);
 		
 		this.biomes = new HashMap<>();
+		this.biomesList = new ArrayList<>();
 		
 	}
 	
 	protected void addBiome(Biome biome, int priority) {
+		
 		this.biomes.put(biome, (byte) priority);
+		this.biomesList.add(biome);
+		
 	}
 	
 	@Override
@@ -39,11 +44,8 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		// Humidity [0; 100]
 		// float humidity = (this.humidityNoise.noise(x, z, 0.00001f) + 1f) * 50f;
 		
-		if (this.humidityNoise.noise(x, z, 0.01f) > 0) {
-			return Biomes.FOREST_HILL;
-		} else {
-			return Biomes.PLAIN;
-		}
+		float normnoise = (this.humidityNoise.noise(x, z, 0.01f) + 1f) / 2f;
+		return this.biomesList.get((int) (normnoise * this.biomesList.size()));
 		
 	}
 	

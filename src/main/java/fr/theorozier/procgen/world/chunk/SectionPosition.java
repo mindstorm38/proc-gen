@@ -1,8 +1,9 @@
 package fr.theorozier.procgen.world.chunk;
 
 import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.HorizontalPosition;
 
-public class SectionPosition {
+public class SectionPosition implements HorizontalPosition {
 
 	private final int x, z;
 	
@@ -13,10 +14,12 @@ public class SectionPosition {
 		
 	}
 	
+	@Override
 	public int getX() {
 		return this.x;
 	}
 	
+	@Override
 	public int getZ() {
 		return this.z;
 	}
@@ -56,6 +59,11 @@ public class SectionPosition {
 		result = prime * result + x;
 		result = prime * result + z;
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return "<" + x + "," + z + ">";
 	}
 
 }

@@ -21,7 +21,7 @@ public abstract class Placement<C extends PlacementConfig> {
 		
 		this.position(world, generator, rand, at, config).forEach(pos -> {
 			
-			if (featureConfig.place(world, generator, rand, at))
+			if (featureConfig.place(world, generator, rand, pos))
 				placed.set(true);
 			
 		});

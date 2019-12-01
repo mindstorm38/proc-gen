@@ -11,6 +11,7 @@ public class BetaBiomeProvider extends WeatherBiomeProvider {
 		
 		this.addBiome(Biomes.PLAIN, 1);
 		this.addBiome(Biomes.FOREST_HILL, 2);
+		this.addBiome(Biomes.LOW_HILL, 3);
 		
 	}
 	

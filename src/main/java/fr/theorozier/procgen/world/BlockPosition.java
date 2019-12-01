@@ -2,7 +2,7 @@ package fr.theorozier.procgen.world;
 
 import fr.theorozier.procgen.world.chunk.SectionPosition;
 
-public class BlockPosition {
+public class BlockPosition implements HorizontalPosition {
 	
 	private final int x, y, z;
 	
@@ -14,6 +14,11 @@ public class BlockPosition {
 		
 	}
 	
+	public BlockPosition(HorizontalPosition pos, int y) {
+		this(pos.getX(), y, pos.getZ());
+	}
+	
+	@Override
 	public int getX() {
 		return x;
 	}
@@ -22,6 +27,7 @@ public class BlockPosition {
 		return y;
 	}
 	
+	@Override
 	public int getZ() {
 		return z;
 	}
@@ -78,4 +84,5 @@ public class BlockPosition {
 	public String toString() {
 		return "<" + x + "," + y + "," + z + ">";
 	}
+	
 }

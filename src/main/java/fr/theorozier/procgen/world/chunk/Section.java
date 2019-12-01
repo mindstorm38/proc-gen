@@ -1,14 +1,14 @@
 package fr.theorozier.procgen.world.chunk;
 
+import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.HorizontalPosition;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.biome.Biome;
 import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import fr.theorozier.procgen.world.biome.Biomes;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -29,6 +29,8 @@ public class Section implements BiomeAccessor {
 	private final Map<Integer, Chunk> chunks;
 	private Biome[] biomes;
 	
+	private final Map<Heightmap.Type, Heightmap> heightmaps;
+	
 	public Section(World world, SectionPosition position, ChunkGenerator generator) {
 		
 		this.world = world;
@@ -41,10 +43,16 @@ public class Section implements BiomeAccessor {
 		this.biomes = new Biome[256];
 		Arrays.fill(this.biomes, Biomes.EMPTY);
 		
+		this.heightmaps = new EnumMap<>(Heightmap.Type.class);
+		
 	}
 	
 	public World getWorld() {
 		return this.world;
+	}
+	
+	public SectionPosition getSectionPosition() {
+		return this.position;
 	}
 	
 	public boolean wasGenerated() {
@@ -114,6 +122,34 @@ public class Section implements BiomeAccessor {
 	
 	public Chunk getChunkAt(int y) {
 		return this.chunks.get(y >> 4);
+	}
+	
+	
+	////////////////
+	// Heightmaps //
+	////////////////
+	
+	public Heightmap getHeightmap(Heightmap.Type type) {
+		return this.heightmaps.computeIfAbsent(type, tp -> new Heightmap(this, tp));
+	}
+	
+	public short getHeightAt(Heightmap.Type type, int x, int z) {
+		
+		Heightmap map = this.heightmaps.get(type);
+		
+		if (map == null) {
+			
+			Heightmap.updateSectionHeightmaps(this, EnumSet.of(type));
+			map = this.heightmaps.get(type);
+			
+		}
+		
+		return map.get(x & 15, z & 15);
+		
+	}
+	
+	public short getHeightAt(Heightmap.Type type, HorizontalPosition pos) {
+		return this.getHeightAt(type, pos.getX(), pos.getZ());
 	}
 	
 	/////////////////////

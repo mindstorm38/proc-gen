@@ -225,7 +225,7 @@ public class Chunk implements BiomeAccessor {
 			if (!overwrite)
 				return;
 			
-			this.removeBlockMetadataAt(this.getPositionIndex(x, y, z));
+			this.removeBlockMetadataAt(getPositionIndex(x, y, z));
 			this.blocksCount--;
 			
 		}
@@ -251,7 +251,7 @@ public class Chunk implements BiomeAccessor {
 	 * @param z Relative position Z.
 	 * @return Position index.
 	 */
-	short getPositionIndex(int x, int y, int z) {
+	public static short getPositionIndex(int x, int y, int z) {
 		return (short) (x * 16 * 16 + y * 16 + z);
 	}
 	

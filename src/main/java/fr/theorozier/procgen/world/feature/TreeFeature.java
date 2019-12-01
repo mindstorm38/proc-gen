@@ -19,17 +19,69 @@ public class TreeFeature extends Feature<FeatureConfig> {
 	@Override
 	public boolean place(World world, ChunkGenerator generator, Random rand, BlockPosition at, FeatureConfig config) {
 		
-		if (!canGrowOn(world.getBlockTypeAt(at.getX(), at.getY(), at.getZ())))
+		if (!canGrowOn(world.getBlockTypeAt(at.getX(), at.getY() - 1, at.getZ())))
 			return false;
 		
 		int height = this.getRandomHeight(rand);
+		int safeHeight = height + 5;
 		
 		WorldBlock block;
 		
-		for (int y = 0; y < height; y++) {
-			block = world.getBlockAt(at.add(0, y, 0));
-			if (block != null) {
+		for (int x = -1; x <= 1; ++x)
+			for (int z = -1; z <= 1; ++z)
+				for (int y = 0; y < safeHeight; ++y)
+					if (world.getBlockTypeAt(at.add(x, y, z)) == Blocks.LOG)
+						return false;
+		
+		for (int y = 0; y < height; y++)
+			if ((block = world.getBlockAt(at.add(0, y, 0))) != null)
 				block.setBlockType(Blocks.LOG);
+		
+		for (int x = -2; x <= 2; ++x) {
+			for (int z = -2; z <= 2; ++z) {
+				if (x != 0 || z != 0) {
+					
+					for (int y = height - 2; y < height; ++y) {
+						
+						if ((block = world.getBlockAt(at.add(x, y, z))) != null) {
+							
+							
+							if ((x == 2 || x == -2) && (x == z || x == -z)) {
+								if (y != height - 1 && rand.nextInt(2) == 0) {
+									placeLeaves(block);
+								}
+							} else {
+								placeLeaves(block);
+							}
+							
+						}
+						
+					}
+					
+				}
+			}
+		}
+		
+		for (int x = -1; x <= 1; ++x) {
+			for (int z = -1; z <= 1; ++z) {
+				
+				if (x == 0 || z == 0) {
+					
+					for (int y = height; y < height + 2; ++y) {
+						
+						if ((block = world.getBlockAt(at.add(x, y, z))) != null)
+							placeLeaves(block);
+						
+					}
+					
+				} else {
+					
+					if (rand.nextInt(2) == 0)
+						if ((block = world.getBlockAt(at.add(x, height, z))) != null)
+							placeLeaves(block);
+						
+				}
+				
 			}
 		}
 		
@@ -37,8 +89,12 @@ public class TreeFeature extends Feature<FeatureConfig> {
 		
 	}
 	
+	private static void placeLeaves(WorldBlock block) {
+		if (!block.isSet()) block.setBlockType(Blocks.LEAVES);
+	}
+	
 	protected int getRandomHeight(Random rand) {
-		return 4 + rand.nextInt(3);
+		return 4 + rand.nextInt(2);
 	}
 	
 }
