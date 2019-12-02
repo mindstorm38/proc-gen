@@ -17,7 +17,7 @@ public class BlockRenderers {
 		registerRenderer(Blocks.GRASS, new BlockGrassRenderer());
 		registerRenderer(Blocks.BEDROCK, new BlockCubeRenderer("bedrock"));
 		registerRenderer(Blocks.LOG, new BlockLogRenderer());
-		registerRenderer(Blocks.LEAVES, new BlockCubeRenderer("leaves"));
+		registerRenderer(Blocks.LEAVES, new BlockCubeRenderer("leaves_fancy"));
 		registerRenderer(Blocks.SAND, new BlockCubeRenderer("sand"));
 		registerRenderer(Blocks.SANDSTONE, new BlockSandstoneRenderer());
 		
