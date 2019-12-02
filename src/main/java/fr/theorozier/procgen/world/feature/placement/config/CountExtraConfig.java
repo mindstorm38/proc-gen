@@ -1,11 +1,11 @@
 package fr.theorozier.procgen.world.feature.placement.config;
 
-public class SurfaceCountExtraConfig extends SurfaceCountConfig {
+public class CountExtraConfig extends CountConfig {
 	
 	private final int extraCount;
 	private final float extraChance;
 	
-	public SurfaceCountExtraConfig(int count, int extraCount, float extraChance) {
+	public CountExtraConfig(int count, int extraCount, float extraChance) {
 		
 		super(count);
 		

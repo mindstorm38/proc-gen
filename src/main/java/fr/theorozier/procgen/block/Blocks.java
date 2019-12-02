@@ -15,6 +15,14 @@ public class Blocks {
 	public static final Block BEDROCK       = registerBlock(new Block(5, "bedrock"));
 	public static final BlockLog LOG        = registerBlock(new BlockLog(6, "log"));
 	public static final BlockLeaves LEAVES  = registerBlock(new BlockLeaves(7, "leaves"));
+	public static final Block SAND          = registerBlock(new Block(8, "sand"));
+	public static final Block SANDSTONE     = registerBlock(new Block(9, "sandstone"));
+	
+	public static final Block COAL_ORE      = registerBlock(new Block(20, "coal_ore"));
+	public static final Block IRON_ORE      = registerBlock(new Block(21, "iron_ore"));
+	public static final Block GOLD_ORE      = registerBlock(new Block(22, "gold_ore"));
+	public static final Block REDSTONE_ORE  = registerBlock(new Block(23, "redstone_ore"));
+	public static final Block DIAMOND_ORE   = registerBlock(new Block(24, "diamond_ore"));
 	
 	public static <T extends Block> T registerBlock(T block) {
 		

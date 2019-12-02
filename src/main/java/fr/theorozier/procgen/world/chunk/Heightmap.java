@@ -1,6 +1,9 @@
 package fr.theorozier.procgen.world.chunk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class Heightmap {
@@ -31,6 +34,7 @@ public class Heightmap {
 	
 	public enum Type {
 	
+		WORLD_BASE_SURFACE (IS_NOT_AIR),
 		WORLD_SURFACE (IS_NOT_AIR);
 	
 		public final Predicate<WorldBlock> limitPredicate;

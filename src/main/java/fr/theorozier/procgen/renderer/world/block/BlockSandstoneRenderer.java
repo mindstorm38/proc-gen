@@ -5,9 +5,9 @@ import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 
-public class BlockGrassRenderer extends BlockCubeRenderer {
+public class BlockSandstoneRenderer extends BlockCubeRenderer {
 	
-	public BlockGrassRenderer() {
+	public BlockSandstoneRenderer() {
 		super(null);
 	}
 	
@@ -15,11 +15,11 @@ public class BlockGrassRenderer extends BlockCubeRenderer {
 	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {
 		
 		if (face == Direction.TOP) {
-			return map.getTile("grass_top");
+			return map.getTile("sandstone_top");
 		} else if (face == Direction.BOTTOM) {
-			return map.getTile("dirt");
+			return map.getTile("sandstone_bottom");
 		} else {
-			return map.getTile("grass_side");
+			return map.getTile("sandstone_side");
 		}
 		
 	}

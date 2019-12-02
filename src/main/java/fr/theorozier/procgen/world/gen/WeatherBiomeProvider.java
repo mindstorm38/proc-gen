@@ -5,6 +5,7 @@ import fr.theorozier.procgen.world.biome.Biomes;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WeatherBiomeProvider extends BiomeProvider {
 	
@@ -19,8 +20,8 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		
 		super(seed);
 		
-		this.tempNoise = new OctaveSimplexNoise(getTempSeed(seed), 4, 0.5f, 2f);
-		this.humidityNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.5f, 2f);
+		this.tempNoise = new OctaveSimplexNoise(getTempSeed(seed), 4, 0.2f, 4f);
+		this.humidityNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.2f, 4f);
 		this.saltNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.5f, 2f);
 		
 		this.biomes = new HashMap<>();
@@ -38,14 +39,28 @@ public class WeatherBiomeProvider extends BiomeProvider {
 	@Override
 	public Biome getBiomeAt(int x, int z) {
 		
-		// Temp : [-20; 50]
-		// float temp = this.tempNoise.noise(x, z, 0.00001f) * 35f + 15f;
-		
-		// Humidity [0; 100]
-		// float humidity = (this.humidityNoise.noise(x, z, 0.00001f) + 1f) * 50f;
-		
-		float normnoise = (this.humidityNoise.noise(x, z, 0.01f) + 1f) / 2f;
-		return this.biomesList.get((int) (normnoise * this.biomesList.size()));
+		if (this.biomes.isEmpty()) {
+			
+			return Biomes.EMPTY;
+			
+		} else {
+			
+			// Temp : [-30; 60]
+			float temp = this.tempNoise.noise(x, z, 0.0005f) * 45f + 15f;
+			
+			// Humidity [-20; 120]
+			float humidity = this.humidityNoise.noise(x, z, 0.0005f) * 70f + 50f;
+			
+			List<Biome> biomes = this.biomesList.stream()
+					.filter(b -> b.getWeather().isInRange(temp, humidity))
+					.collect(Collectors.toList());
+			
+			if (biomes.isEmpty())
+				biomes = this.biomesList;
+			
+			return biomes.get((int) ((this.saltNoise.noise(x, z, 0.01f) + 1f) / 2f * biomes.size()));
+			
+		}
 		
 	}
 	

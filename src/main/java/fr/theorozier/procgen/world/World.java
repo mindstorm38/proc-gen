@@ -3,6 +3,8 @@ package fr.theorozier.procgen.world;
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.util.MathUtils;
+import fr.theorozier.procgen.world.biome.Biome;
+import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import fr.theorozier.procgen.world.chunk.*;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
@@ -10,7 +12,7 @@ import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class World {
+public class World implements BiomeAccessor {
 	
 	public static final int NEAR_CHUNK_LOADING = 16 * 4;
 	public static final Block DEFAULT_BLOCK    = Blocks.AIR;
@@ -182,6 +184,18 @@ public class World {
 	
 	public Block getBlockTypeAt(BlockPosition position) {
 		return this.getBlockTypeAt(position.getX(), position.getY(), position.getZ());
+	}
+	
+	@Override
+	public Biome getBiomeAt(int x, int z) {
+		Section section = this.getSectionAt(x, z);
+		return section == null ? null : section.getBiomeAt(x, z);
+	}
+	
+	@Override
+	public Biome getBiomeAt(SectionPosition pos) {
+		Section section = this.getSectionAt(pos);
+		return section == null ? null : section.getBiomeAt(pos);
 	}
 	
 	////////////////

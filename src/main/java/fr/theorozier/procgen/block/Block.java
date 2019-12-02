@@ -39,4 +39,8 @@ public class Block {
 	
 	public void initBlock(WorldBlock block) {}
 	
+	@Override
+	public int hashCode() {
+		return this.getUid();
+	}
 }

@@ -5,8 +5,6 @@ import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.biome.Biome;
 import fr.theorozier.procgen.world.chunk.Chunk;
-import fr.theorozier.procgen.world.chunk.Section;
-import fr.theorozier.procgen.world.chunk.SectionPosition;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
@@ -15,14 +13,6 @@ import io.msengine.common.util.noise.OctaveSimplexNoise;
 public class BetaChunkGenerator extends ChunkGenerator {
 	
 	public static final ChunkGeneratorProvider PROVIDER = world -> new BetaChunkGenerator(world.getSeed());
-	
-	private static final byte TRANSITION_DIST = 1;
-	private static final byte FULL_DIST = TRANSITION_DIST * 2 + 1;
-	private static final float DIST_RATIO = (float) TRANSITION_DIST / (float) FULL_DIST;
-	
-	private static final byte[] X_OFFSETS = {1, 1, 0, -1};
-	private static final byte[] Z_OFFSETS = {0, 1, 1,  1};
-	private static final byte OFFSETS_COUNT = 4;
 	
 	// Class //
 	
@@ -39,16 +29,6 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		
 		this.noiseHorizontalGranularity = 4;
 		this.noiseHorizontalSize = 16 / this.noiseHorizontalGranularity;
-		
-	}
-	
-	private Biome getBiomeAtRelative(Chunk chunk, BlockPosition pos, int dx, int dz) {
-		
-		if (dx < 0 || dx >= 16 || dz < 0 || dz >= 16) {
-			return this.biomeProvider.getBiomeAt(pos.getX() + dx, pos.getZ() + dz);
-		} else {
-			return chunk.getSection().getBiomeAtRelative(dx, dz);
-		}
 		
 	}
 	
@@ -72,7 +52,12 @@ public class BetaChunkGenerator extends ChunkGenerator {
 					biome = chunk.getSection().getBiomeAtRelative(x * this.noiseHorizontalGranularity, z * this.noiseHorizontalGranularity);
 				}
 				
-				randomMap[x][z] = (biome.getDepth() * maxHeight) + this.surfaceNoise.noise(chunkX * this.noiseHorizontalSize + x, chunkZ * this.noiseHorizontalSize + z, 0.04f) * biome.getScale();
+				randomMap[x][z] = (biome.getDepth() * maxHeight) +
+						this.surfaceNoise.noise(
+								chunkX * this.noiseHorizontalSize + x,
+								chunkZ * this.noiseHorizontalSize + z,
+								0.04f
+						) * biome.getScale();
 			
 			}
 		}
@@ -113,14 +98,8 @@ public class BetaChunkGenerator extends ChunkGenerator {
 					
 					if (wy == 0) {
 						block.setBlockType(Blocks.BEDROCK);
-					} else if (wy < noise - 4) {
-						block.setBlockType(Blocks.STONE);
-					} else if (wy < noise - 1) {
-						block.setBlockType(Blocks.DIRT);
 					} else if (wy < noise) {
-						block.setBlockType(Blocks.GRASS);
-					} else {
-						block.setBlockType(Blocks.AIR);
+						block.setBlockType(Blocks.STONE);
 					}
 					
 				}
@@ -128,79 +107,6 @@ public class BetaChunkGenerator extends ChunkGenerator {
 			}
 		}
 		
-		/*
-		Biome biome, nbiome1, nbiome2;
-		float depth, scale, noise;
-		byte neighbourBiomes;
-		int wx, wy, wz;
-		int nx, nz;
-		WorldBlock block;
-		
-		int maxHeight = chunk.getWorld().getWorldHeightLimit();
-		
-		for (int x = 0; x < 16; ++x) {
-			for (int z = 0; z < 16; ++z) {
-				
-				wx = pos.getX() + x;
-				wz = pos.getZ() + z;
-				
-				biome = chunk.getSection().getBiomeAtRelative(x, z);
-				depth = biome.getDepth();
-				scale = biome.getScale();
-				neighbourBiomes = 1;
-				
-				for (int i = 0; i < OFFSETS_COUNT; i++) {
-					
-					nbiome1 = this.getBiomeAtRelative(chunk, pos, x + X_OFFSETS[i], z - Z_OFFSETS[i]);
-					nbiome2 = this.getBiomeAtRelative(chunk, pos, x - X_OFFSETS[i], z + Z_OFFSETS[i]);
-					
-					if (nbiome1 != nbiome2) {
-						
-						depth += MathUtils.lerp(nbiome1.getDepth(), nbiome2.getDepth(), DIST_RATIO);
-						scale += MathUtils.lerp(nbiome1.getScale(), nbiome2.getScale(), DIST_RATIO);
-						neighbourBiomes++;
-						
-					}
-					
-				}
-				
-				depth /= neighbourBiomes;
-				scale /= neighbourBiomes;
-				noise = (depth * maxHeight) + (this.surfaceNoise.noise(wx, wz, 0.004f) + 1) * scale;
-				
-				for (int y = 0; y < 16; ++y) {
-					
-					wy = pos.getY() + y;
-					
-					block = chunk.getBlockAtRelative(x, y, z);
-					
-					if (wy == 0) {
-						block.setBlockType(Blocks.BEDROCK);
-					} else if (wy < noise - 4) {
-						block.setBlockType(Blocks.STONE);
-					} else if (wy < noise - 1) {
-						block.setBlockType(Blocks.DIRT);
-					} else if (wy < noise) {
-						block.setBlockType(Blocks.GRASS);
-					} else {
-						block.setBlockType(Blocks.AIR);
-					}
-					
-				}
-				
-			}
-		}
-		*/
-		
-	}
-	
-	@Override
-	public void genSurface(Section section, SectionPosition pos) {
-		// TODO: Generate surface (sand, grass, stone) from biome preferences.
-	}
-	
-	private static long getDecorationSeed(long seed) {
-		return seed * 993402349510639L;
 	}
 	
 }

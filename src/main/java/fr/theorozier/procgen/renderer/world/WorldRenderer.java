@@ -218,6 +218,10 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	}
 	
+	public World getRenderingWorld() {
+		return this.renderingWorld;
+	}
+	
 	/**
 	 * Internal method to get an existing chunk renderer.
 	 * @param at The absolute position of the chunk.

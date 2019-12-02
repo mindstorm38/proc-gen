@@ -124,6 +124,10 @@ public class Section implements BiomeAccessor {
 		return this.chunks.get(y >> 4);
 	}
 	
+	public WorldBlock getBlockAtRelative(int x, int y, int z) {
+		Chunk chunk = this.getChunkAt(y);
+		return chunk == null ? null : chunk.getBlockAtRelative(x, y - chunk.getChunkPosition().getY(), z);
+	}
 	
 	////////////////
 	// Heightmaps //

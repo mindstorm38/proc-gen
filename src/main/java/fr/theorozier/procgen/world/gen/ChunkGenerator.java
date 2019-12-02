@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.world.gen;
 
+import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.world.BlockPosition;
-import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
+import fr.theorozier.procgen.world.chunk.*;
 import fr.theorozier.procgen.world.biome.Biome;
-import fr.theorozier.procgen.world.chunk.Section;
-import fr.theorozier.procgen.world.chunk.SectionPosition;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
 
 import java.util.Random;
@@ -30,7 +30,40 @@ public abstract class ChunkGenerator {
 	
 	public abstract void genBase(Chunk chunk, BlockPosition pos);
 	
-	public abstract void genSurface(Section section, SectionPosition pos);
+	public void genSurface(Section section, SectionPosition pos) {
+		
+		// TODO: Generate surface (sand, grass, stone) from biome preferences.
+		
+		short height, baseHeight;
+		Biome biome;
+		BiomeSurface surface;
+		Block newBlock, block = null;
+		WorldBlock worldBlock;
+		
+		for (int x = 0; x < 16; ++x) {
+			for (int z = 0; z < 16; ++z) {
+				
+				height = (short) (section.getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, x, z) - 1);
+				biome = section.getBiomeAtRelative(x, z);
+				surface = biome.getSurface();
+				baseHeight = surface.getBaseHeight();
+				
+				for (short y = 0; y < baseHeight; ++y) {
+					
+					newBlock = surface.getLayer(y);
+					
+					if (newBlock != null)
+						block = newBlock;
+					
+					worldBlock = section.getBlockAtRelative(x, height - y, z);
+					worldBlock.setBlockType(block);
+					
+				}
+				
+			}
+		}
+		
+	}
 	
 	public void genFeatures(Section section, SectionPosition pos) {
 	

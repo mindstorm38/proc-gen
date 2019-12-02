@@ -40,12 +40,24 @@ public class BiomeWeatherRange {
 		return this.humiditySup;
 	}
 	
+	public boolean isInRange(float temp, float humidity) {
+		return temp >= this.tempInf && temp <= this.tempSup && humidity >= this.humidityInf && humidity <= this.humiditySup;
+	}
+	
 	public float getTypicalTemp() {
 		return this.typicalTemp;
 	}
 	
 	public float getTypicalHumidity() {
 		return this.typicalHumidity;
+	}
+	
+	public float getTypicalSquaredDist(float temp, float humidity) {
+		
+		float dTemp = temp - this.typicalTemp;
+		float dHumidity = humidity - this.typicalHumidity;
+		return dTemp * dTemp + dHumidity * dHumidity;
+		
 	}
 	
 }

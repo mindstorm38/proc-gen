@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.world.feature.placement.config;
 
-public class SurfaceCountConfig implements PlacementConfig {
+public class CountConfig implements PlacementConfig {
 	
 	private final int count;
 	
-	public SurfaceCountConfig(int count) {
+	public CountConfig(int count) {
 		this.count = count;
 	}
 	

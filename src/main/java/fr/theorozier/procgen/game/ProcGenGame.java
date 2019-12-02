@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.game;
 
+import fr.theorozier.procgen.gui.DebugScene;
 import fr.theorozier.procgen.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.gen.beta.BetaChunkGenerator;
@@ -29,6 +30,10 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 	}
 	
+	public WorldRenderer getWorldRenderer() {
+		return this.worldRenderer;
+	}
+	
 	@Override
 	protected void init() {
 		
@@ -43,7 +48,10 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		this.worldRenderer.renderWorld(this.testWorld);
 		
-		//glClearColor(0, 200 / 255f, 255 / 255f, 1f);
+		this.guiManager.registerSceneClass("debug", DebugScene.class);
+		this.guiManager.loadScene("debug");
+		
+		glEnable(GL_BLEND);
 		glClearColor(0, 0, 0, 1);
 		
 	}
@@ -62,7 +70,11 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+		glEnable(GL_DEPTH_TEST);
 		this.worldRenderer.render(alpha);
+		
+		glDisable(GL_DEPTH_TEST);
+		this.guiManager.render(alpha);
 		
 	}
 	
@@ -70,6 +82,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	protected void update() {
 		
 		this.worldRenderer.update();
+		this.guiManager.update();
 		
 	}
 	

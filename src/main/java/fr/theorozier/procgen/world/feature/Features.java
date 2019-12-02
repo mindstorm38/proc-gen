@@ -6,5 +6,6 @@ public class Features {
 	
 	public static final TreeFeature           TREE = new TreeFeature();
 	public static final PlacementFeature PLACEMENT = new PlacementFeature();
+	public static final OreFeature             ORE = new OreFeature();
 	
 }

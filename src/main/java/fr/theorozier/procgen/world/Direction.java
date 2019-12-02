@@ -32,4 +32,8 @@ public enum Direction {
 	
 	public static final Direction[] HORIZONTALS = {NORTH, SOUTH, EAST, WEST};
 	
+	public static Direction getRandom(float n) {
+		return values()[(int) (n * values().length)];
+	}
+	
 }
