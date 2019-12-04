@@ -1,102 +1,88 @@
 package fr.theorozier.procgen.renderer.world.block;
 
 import fr.theorozier.procgen.block.Block;
-
-import java.util.Arrays;
+import fr.theorozier.procgen.world.Direction;
 
 public class BlockFaces {
 
-	// Top     Y+1
-	// Bottom  Y-1
-	// North   X+1
-	// South   X-1
-	// East    Z+1
-	// West    Z-1
-	private boolean top, bottom, north, south, east, west;
+	private byte data;
+	
+	public void setFace(Direction dir, boolean b) {
+		if (b) this.data |= 1 << dir.ordinal();
+		else this.data &= ~(1 << dir.ordinal());
+	}
+	
+	public boolean getFace(Direction dir) {
+		return ((this.data >> dir.ordinal()) & 1) == 1;
+	}
 	
 	public boolean isObscured() {
-		return !this.top && !this.bottom && !this.north && !this.south && !this.east && !this.west;
+		return this.data == 0;
 	}
 	
 	public boolean isVisible() {
-		return this.top || this.bottom || this.north || this.south || this.east || this.west;
+		return this.data != 0;
 	}
 	
 	public boolean isTop() {
-		return top;
-	}
-	
-	public void setTop(boolean top) {
-		this.top = top;
+		return this.getFace(Direction.TOP);
 	}
 	
 	public boolean isBottom() {
-		return bottom;
-	}
-	
-	public void setBottom(boolean bottom) {
-		this.bottom = bottom;
+		return this.getFace(Direction.BOTTOM);
 	}
 	
 	public boolean isNorth() {
-		return north;
-	}
-	
-	public void setNorth(boolean north) {
-		this.north = north;
+		return this.getFace(Direction.NORTH);
 	}
 	
 	public boolean isSouth() {
-		return south;
-	}
-	
-	public void setSouth(boolean south) {
-		this.south = south;
+		return this.getFace(Direction.SOUTH);
 	}
 	
 	public boolean isEast() {
-		return east;
-	}
-	
-	public void setEast(boolean east) {
-		this.east = east;
+		return this.getFace(Direction.EAST);
 	}
 	
 	public boolean isWest() {
-		return west;
-	}
-	
-	public void setWest(boolean west) {
-		this.west = west;
+		return this.getFace(Direction.WEST);
 	}
 	
 	public void topBlock(Block block) {
-		this.top = !block.isOpaque();
+		this.setFace(Direction.TOP, !block.isOpaque());
 	}
 	
 	public void bottomBlock(Block block) {
-		this.bottom = !block.isOpaque();
+		this.setFace(Direction.BOTTOM, !block.isOpaque());
 	}
 	
 	public void northBlock(Block block) {
-		this.north = !block.isOpaque();
+		this.setFace(Direction.NORTH, !block.isOpaque());
 	}
 	
 	public void southBlock(Block block) {
-		this.south = !block.isOpaque();
+		this.setFace(Direction.SOUTH, !block.isOpaque());
 	}
 	
 	public void eastBlock(Block block) {
-		this.east = !block.isOpaque();
+		this.setFace(Direction.EAST, !block.isOpaque());
 	}
 	
 	public void westBlock(Block block) {
-		this.west = !block.isOpaque();
+		this.setFace(Direction.WEST, !block.isOpaque());
+	}
+	
+	public byte toByte() {
+		return this.data;
+	}
+	
+	public void setData(byte data) {
+		this.data = data;
 	}
 	
 	@Override
 	public String toString() {
-		return Arrays.toString(new boolean[]{this.top, this.bottom, this.north, this.south, this.east, this.west});
+		return Integer.toBinaryString(this.data);
 	}
 	
 }

@@ -1,6 +1,5 @@
 package fr.theorozier.procgen.renderer.world;
 
-import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.chunk.Chunk;
 import io.msengine.client.game.RenderGame;
@@ -17,24 +16,12 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.lwjgl.opengl.GL11.*;
 
 public class WorldRenderer implements ModelApplyListener,
 		WindowFramebufferSizeEventListener,
 		WindowMousePositionEventListener,
 		WorldChunkLoadedListener {
-	
-	// These distances are squared, for optimisation.
-	public static final int RENDER_DISTANCE = 16 * 16;
-	public static final int UNLOAD_DISTANCE = 16 * 32;
-	
-	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
-	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
 	
 	private final Window window;
 	
@@ -56,8 +43,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private boolean init = false;
 	private boolean ready = false;
 	
-	private final Map<BlockPosition, WorldChunkRenderer> chunkRenderers;
-	private final List<BlockPosition> unloadingChunkRenderers;
+	private final ChunkRenderManager chunkRenderManager;
 	
 	public WorldRenderer() {
 		
@@ -73,8 +59,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.globalMatrix = new Matrix4f();
 		this.projectionMatrix = new Matrix4f();
 		
-		this.chunkRenderers = new HashMap<>();
-		this.unloadingChunkRenderers = new ArrayList<>();
+		this.chunkRenderManager = new ChunkRenderManager(this);
 		
 	}
 	
@@ -142,7 +127,7 @@ public class WorldRenderer implements ModelApplyListener,
 			}
 			
 			this.camera.updateViewMatrix();
-			this.refreshCameraRenderedChunks();
+			this.chunkRenderManager.updateViewPosition(this.camera);
 			
 		}
 		
@@ -154,23 +139,17 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.shaderManager.use();
 		this.renderSkyBox();
-		this.renderChunks();
+		this.renderChunks(alpha);
 		this.shaderManager.end();
 	
 	}
 	
-	private void renderChunks() {
+	private void renderChunks(float alpha) {
 		
 		glEnable(GL_DEPTH_TEST);
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
-		
-		this.chunkRenderers.forEach((pos, cr) -> {
-			
-			cr.checkLastNeighbours();
-			cr.render(RENDER_DISTANCE_SQUARED);
-			
-		});
+		this.chunkRenderManager.render(alpha);
 		
 	}
 	
@@ -201,8 +180,7 @@ public class WorldRenderer implements ModelApplyListener,
 		if (this.ready) {
 			
 			this.renderingWorld.removeChunkLoadedListener(this);
-			this.chunkRenderers.values().forEach(WorldChunkRenderer::delete);
-			this.chunkRenderers.clear();
+			this.chunkRenderManager.unload();
 		
 		}
 		
@@ -211,7 +189,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (this.ready) {
 			
-			this.refreshCameraRenderedChunks();
+			this.chunkRenderManager.updateViewPosition(this.camera);
 			this.renderingWorld.addChunkLoadedListener(this);
 			
 		}
@@ -222,18 +200,21 @@ public class WorldRenderer implements ModelApplyListener,
 		return this.renderingWorld;
 	}
 	
-	/**
+	/*
 	 * Internal method to get an existing chunk renderer.
 	 * @param at The absolute position of the chunk.
 	 * @return The chunk renderer, or Null if not existing.
 	 */
-	private WorldChunkRenderer getChunkRenderer(BlockPosition at) {
+	/*
+	private ChunkRenderer getChunkRenderer(BlockPosition at) {
 		return this.chunkRenderers.get(at);
 	}
+	*/
 	
-	/**
+	/*
 	 * For each chunks near the camera ({@link #RENDER_DISTANCE}), load it if not already loaded.
 	 */
+	/*
 	private void refreshCameraRenderedChunks() {
 		
 		if (this.ready) {
@@ -265,24 +246,26 @@ public class WorldRenderer implements ModelApplyListener,
 		}
 		
 	}
+	*/
 	
-	/**
+	/*
 	 * Load a chunk renderer if not already loaded.
 	 * @param chunk The chunk to load.
 	 */
+	/*
 	private void loadChunkRenderer(Chunk chunk) {
 		
 		BlockPosition pos = chunk.getChunkPosition();
-		WorldChunkRenderer cr = this.chunkRenderers.get(pos);
+		ChunkRenderer cr = this.chunkRenderers.get(pos);
 		
 		if (cr == null) {
 			
-			cr = new WorldChunkRenderer(this, chunk);
+			cr = new ChunkRenderer(this, chunk);
 			this.chunkRenderers.put(chunk.getChunkPosition(), cr);
 			
 			cr.init();
 			
-			WorldChunkRenderer nb;
+			ChunkRenderer nb;
 			
 			for (Direction face : Direction.values()) {
 				if ((nb = this.getChunkRenderer(pos.add(face.rx * 16, face.ry * 16, face.rz * 16))) != null) {
@@ -298,12 +281,14 @@ public class WorldRenderer implements ModelApplyListener,
 		}
 		
 	}
+	*/
 	
-	/**
+	/*
 	 * Load a chunk renderer if not already loaded only if the chunk
 	 * is near the camera ({@link #RENDER_DISTANCE}).
 	 * @param chunk The chunk to test.
 	 */
+	/*
 	private void checkChunkRenderer(Chunk chunk) {
 	
 		// Camera chunk position
@@ -328,6 +313,7 @@ public class WorldRenderer implements ModelApplyListener,
 		}
 	
 	}
+	*/
 	
 	/**
 	 * Package private method.
@@ -337,7 +323,7 @@ public class WorldRenderer implements ModelApplyListener,
 		return this.shaderManager;
 	}
 	
-	TextureMap getTerrainMap() {
+	public TextureMap getTerrainMap() {
 		return this.terrainMap;
 	}
 	
@@ -412,7 +398,7 @@ public class WorldRenderer implements ModelApplyListener,
 	public void worldChunkLoaded(World world, Chunk chunk) {
 		
 		if (this.renderingWorld == world) {
-			this.checkChunkRenderer(chunk);
+			this.chunkRenderManager.chunkLoaded(chunk);
 		}
 		
 	}
@@ -421,16 +407,7 @@ public class WorldRenderer implements ModelApplyListener,
 	public void worldChunkUnloaded(World world, Chunk chunk) {
 		
 		if (this.renderingWorld == world) {
-			
-			WorldChunkRenderer cr = this.chunkRenderers.get(chunk.getChunkPosition());
-			
-			if (cr != null) {
-				
-				this.chunkRenderers.remove(chunk.getChunkPosition());
-				cr.delete();
-				
-			}
-			
+			this.chunkRenderManager.chunkUnloaded(chunk);
 		}
 		
 	}

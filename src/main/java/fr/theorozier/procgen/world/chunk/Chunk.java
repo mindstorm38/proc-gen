@@ -68,6 +68,17 @@ public class Chunk implements BiomeAccessor {
 		return this.position;
 	}
 	
+	/**
+	 * Compute the squared distance to the center of this chunk from an other point.
+	 * @param x The x coordinate.
+	 * @param y The y coordinate.
+	 * @param z The z coordinate.
+	 * @return The squared distance to the center of this chunk.
+	 */
+	public float getDistanceSquaredTo(float x, float y, float z) {
+		return this.position.distSquared(x + 7, y + 7, z + 7);
+	}
+	
 	public ChunkStatus getStatus() {
 		return this.status;
 	}

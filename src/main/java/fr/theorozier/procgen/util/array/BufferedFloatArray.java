@@ -29,6 +29,24 @@ public class BufferedFloatArray {
 		return this.size;
 	}
 	
+	public void setSize(int size) {
+		this.size = size;
+	}
+	
+	public void checkOverflow() {
+	
+		int expectedSize = (this.size + this.grow - 1) / this.grow * this.grow;
+		
+		if (this.arr.length != expectedSize) {
+			
+			final float[] narr = new float[expectedSize];
+			System.arraycopy(this.arr, 0, narr, 0, expectedSize);
+			this.arr = narr;
+			
+		}
+		
+	}
+	
 	public float[] result() {
 		
 		final float[] result = new float[this.size];

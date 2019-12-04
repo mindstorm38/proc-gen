@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.world.chunk;
 
 import fr.theorozier.procgen.block.Block;
+import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.world.World;
 import io.msengine.common.osf.OSFObject;
@@ -17,7 +18,7 @@ public class WorldBlock {
 		this.chunk = chunk;
 		this.position = position;
 		this.relative = relative;
-		this.positionIndex = chunk.getPositionIndex(position.getX(), position.getY(), position.getZ());
+		this.positionIndex = Chunk.getPositionIndex(position.getX(), position.getY(), position.getZ());
 		
 	}
 	
@@ -43,6 +44,10 @@ public class WorldBlock {
 	
 	public int getZ() {
 		return this.position.getZ();
+	}
+	
+	public boolean isInRenderLayer(BlockRenderLayer layer) {
+		return this.getBlockType().getRenderLayer() == layer;
 	}
 	
 	public Block getBlockType() {

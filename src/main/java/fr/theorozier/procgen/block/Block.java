@@ -37,6 +37,10 @@ public class Block {
 		return this.opaque;
 	}
 	
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.OPAQUE;
+	}
+	
 	public void initBlock(WorldBlock block) {}
 	
 	@Override

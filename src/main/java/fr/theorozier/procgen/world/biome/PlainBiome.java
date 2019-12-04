@@ -10,7 +10,7 @@ import fr.theorozier.procgen.world.feature.placement.config.ChanceConfig;
 
 public class PlainBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(-5f, 35f, 20f, 90f);
+	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(20f, 30f, 50f, 90f);
 	
 	public PlainBiome(int uid, String identifier) {
 		

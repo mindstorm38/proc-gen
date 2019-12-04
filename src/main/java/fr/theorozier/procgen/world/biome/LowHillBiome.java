@@ -2,7 +2,7 @@ package fr.theorozier.procgen.world.biome;
 
 public class LowHillBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(-5f, 30f, 40f, 100f);
+	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(15f, 20f, 60f, 90f);
 	
 	public LowHillBiome(int uid, String identifier) {
 		

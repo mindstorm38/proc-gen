@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.util;
+package fr.theorozier.procgen.util.array;
 
 import java.lang.reflect.Array;
 

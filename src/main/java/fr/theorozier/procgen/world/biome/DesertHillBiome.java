@@ -2,7 +2,7 @@ package fr.theorozier.procgen.world.biome;
 
 public class DesertHillBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(15f, 50f, 0f, 10f);
+	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(45f, 50f, 0f, 10f);
 	
 	public DesertHillBiome(int uid, String identifier) {
 		

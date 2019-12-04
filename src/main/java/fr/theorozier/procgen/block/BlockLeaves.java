@@ -10,4 +10,9 @@ public class BlockLeaves extends Block {
 		
 	}
 	
+	@Override
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT;
+	}
+	
 }

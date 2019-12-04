@@ -29,6 +29,24 @@ public class BufferedIntArray {
 		return this.size;
 	}
 	
+	public void setSize(int size) {
+		this.size = size;
+	}
+	
+	public void checkOverflow() {
+		
+		int expectedSize = (this.size + this.grow - 1) / this.grow * this.grow;
+		
+		if (this.arr.length != expectedSize) {
+			
+			final int[] narr = new int[expectedSize];
+			System.arraycopy(this.arr, 0, narr, 0, expectedSize);
+			this.arr = narr;
+			
+		}
+		
+	}
+	
 	public int[] result() {
 		
 		final int[] result = new int[this.size];

@@ -7,7 +7,7 @@ import fr.theorozier.procgen.world.feature.placement.config.CountExtraConfig;
 
 public class ForestBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(-5f, 20f, 30f, 100f);
+	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(10f, 15f, 30f, 100f);
 	
 	public ForestBiome(int uid, String identifier) {
 		
