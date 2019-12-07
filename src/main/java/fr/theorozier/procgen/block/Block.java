@@ -1,15 +1,17 @@
 package fr.theorozier.procgen.block;
 
 import fr.theorozier.procgen.util.ErrorUtils;
+import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.sutil.StringUtils;
+
+import java.util.Random;
 
 public class Block {
 	
 	private final short uid;
 	private final String identifier;
-	
-	protected boolean opaque = true;
 	
 	public Block(int uid, String identifier) {
 		
@@ -34,14 +36,22 @@ public class Block {
 	}
 	
 	public boolean isOpaque() {
-		return this.opaque;
+		return true;
 	}
 	
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.OPAQUE;
 	}
 	
+	public boolean isTickable() {
+		return true;
+	}
+	
+	// Dynamic function for modifying the world
+	
 	public void initBlock(WorldBlock block) {}
+	
+	public void tickBlock(WorldBlock block, Random rand) {}
 	
 	@Override
 	public int hashCode() {

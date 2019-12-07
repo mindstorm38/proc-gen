@@ -8,6 +8,7 @@ import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import io.msengine.common.osf.OSFObject;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class Chunk implements BiomeAccessor {
 	
@@ -150,6 +151,23 @@ public class Chunk implements BiomeAccessor {
 	public BlockPosition getRelativePosition(int x, int y, int z) {
 		this.validatePosition(x, y, z);
 		return new BlockPosition(x - this.position.getX(), y - this.position.getY(), z - this.position.getZ());
+	}
+	
+	public void checkBlockOnFaces(int x, int y, int z, Consumer<Direction> consumer) {
+		
+		int rx = x - this.position.getX();
+		int ry = y - this.position.getY();
+		int rz = z - this.position.getZ();
+		
+		if (rx == 0) consumer.accept(Direction.SOUTH);
+		else if (rx == 15) consumer.accept(Direction.NORTH);
+		
+		if (ry == 0) consumer.accept(Direction.BOTTOM);
+		else if (ry == 15) consumer.accept(Direction.TOP);
+		
+		if (rz == 0) consumer.accept(Direction.WEST);
+		else if (rz == 15) consumer.accept(Direction.EAST);
+		
 	}
 	
 	/////////////////////

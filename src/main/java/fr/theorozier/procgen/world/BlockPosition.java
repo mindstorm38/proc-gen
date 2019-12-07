@@ -44,8 +44,12 @@ public class BlockPosition implements HorizontalPosition {
 		return new BlockPosition(this.x + x, this.y + y, this.z + z);
 	}
 	
+	public BlockPosition add(Direction dir, int factX, int factY, int factZ) {
+		return this.add(dir.rx * factX, dir.ry * factY, dir.rz * factZ);
+	}
+	
 	public BlockPosition add(Direction dir) {
-		return this.add(dir.rx, dir.ry, dir.rz);
+		return this.add(dir, 1, 1, 1);
 	}
 	
 	public float distSquared(float x, float y, float z) {

@@ -8,6 +8,8 @@ import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import fr.theorozier.procgen.world.chunk.*;
 import fr.theorozier.procgen.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
+import fr.theorozier.procgen.world.tick.WorldTickEntry;
+import fr.theorozier.procgen.world.tick.WorldTickList;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -19,22 +21,26 @@ public class World implements BiomeAccessor {
 	public static final int MAX_SECTION_HEIGHT = 16;
 	
 	private final long seed;
+	private final Random rand;
 	private final ChunkGenerator generator;
 	
 	private final Map<SectionPosition, Section> sections;
-	
-	// private final Map<BlockPosition, Chunk> chunks;
 	private final List<WorldChunkLoadedListener> chunkLoadedListeners;
+	
+	private final WorldTickList<Block> blockTickList;
+	private long time;
 	
 	public World(long seed, ChunkGeneratorProvider provider) {
 		
 		this.seed = seed;
+		this.rand = new Random(this.seed);
 		this.generator = provider.create(this);
 		
 		this.sections = new HashMap<>();
-		
-		// this.chunks = new HashMap<>();
 		this.chunkLoadedListeners = new ArrayList<>();
+		
+		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
+		this.time = 0L;
 		
 	}
 	
@@ -47,6 +53,62 @@ public class World implements BiomeAccessor {
 	 */
 	public long getSeed() {
 		return this.seed;
+	}
+	
+	/**
+	 * @return This world dynamic random, not the one for world generation,
+	 * but for example spawning creatures.
+	 */
+	public Random getRandom() {
+		return this.rand;
+	}
+	
+	/**
+	 * @return Current world game time.
+	 */
+	public long getTime() {
+		return this.time;
+	}
+	
+	////////////////////
+	// Update & Ticks //
+	////////////////////
+	
+	/**
+	 * Run a single tick in the world.
+	 */
+	public void update() {
+		
+		this.time++;
+		this.blockTickList.tick();
+		
+	}
+	
+	/**
+	 * Check if a tick can be triggered at a position.
+	 * @param pos The position to check.
+	 * @return True if you can tick at this position.
+	 */
+	public boolean canTickAt(BlockPosition pos) {
+		return this.getChunkAt(pos) != null;
+	}
+	
+	public WorldTickList<Block> getBlockTickList() {
+		return this.blockTickList;
+	}
+	
+	/**
+	 * Internal method to tick a block.
+	 * @param entry The tick entry from tick list.
+	 */
+	private void tickBlock(WorldTickEntry<Block> entry) {
+	
+		WorldBlock wb = this.getBlockAt(entry.getPosition());
+		
+		if (wb.getBlockType() == entry.getTarget()) {
+			entry.getTarget().tickBlock(wb, this.rand);
+		}
+	
 	}
 	
 	//////////////////

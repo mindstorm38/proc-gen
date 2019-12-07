@@ -5,7 +5,6 @@ import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.renderer.world.layer.ChunkLayerData;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.chunk.Chunk;
-import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.util.BufferUsage;
 import io.msengine.client.renderer.util.BufferUtils;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
@@ -17,32 +16,26 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChunkRenderer implements WorldChunkUpdatedListener {
+public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdatedListener {
 	
 	private final ChunkRenderManager renderManager;
 	private final WorldRenderer renderer;
 	private final Chunk chunk;
-	private final World world;
-	private final TextureMap terrainMap;
 	
 	private final Map<Integer, ChunkRenderer> neighbours;
-	private final boolean[] lastNeighbours;
 	
 	private final ChunkLayerData[] layers;
 	private final IndicesDrawBuffer[] drawBuffers;
 	
-	private float distanceToCameraSquared;
+	private int distanceToCameraSquared;
 	
 	ChunkRenderer(ChunkRenderManager renderManager, Chunk chunk) {
 		
 		this.renderManager = renderManager;
 		this.renderer = renderManager.getWorldRenderer();
 		this.chunk = chunk;
-		this.world = chunk.getWorld();
-		this.terrainMap = renderer.getTerrainMap();
 		
 		this.neighbours = new HashMap<>();
-		this.lastNeighbours = new boolean[Direction.values().length];
 		
 		this.layers = new ChunkLayerData[BlockRenderLayer.COUNT];
 		this.drawBuffers = new IndicesDrawBuffer[BlockRenderLayer.COUNT];
@@ -76,12 +69,15 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
 			this.drawBuffers[i] = this.renderer.getShaderManager().createBasicDrawBuffer(false, true);
-	
+		
+		this.setNeedUpdate(true);
 		this.chunk.addUpdatedListener(this);
 		
 	}
 	
 	void delete() {
+		
+		this.neighbours.forEach((i, cr) -> cr.removeNeighbour(Direction.values()[i].oposite()));
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
 			this.drawBuffers[i].delete();
@@ -90,7 +86,6 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 		
 	}
 	
-	/*
 	void setNeighbour(Direction face, ChunkRenderer cr) {
 		this.neighbours.put(face.ordinal(), cr);
 	}
@@ -99,53 +94,56 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 		this.neighbours.remove(face.ordinal());
 	}
 	
-	void checkLastNeighbours() {
-		
-		boolean neighbour;
-		boolean refresh = false;
-		
-		for (int i = 0; i < Direction.values().length; i++) {
-			
-			neighbour = this.neighbours.containsKey(i);
-			
-			if (!refresh && neighbour != this.lastNeighbours[i])
-				refresh = true;
-			
-			this.lastNeighbours[i] = neighbour;
-			
-		}
-		
-		if (refresh)
-			this.refreshBuffers();
-		
-	}
-	*/
-	
-	float updateDistanceToCamera(float x, float y, float z) {
-		return this.distanceToCameraSquared = this.chunk.getDistanceSquaredTo(x, y, z);
+	void setNeedUpdate(BlockRenderLayer layer, boolean needUpdate) {
+		this.getLayerData(layer).setNeedUpdate(needUpdate);
 	}
 	
-	float getDistanceToCameraSquared() {
-		return this.distanceToCameraSquared;
+	void setNeedUpdate(boolean needUpdate) {
+		
+		for (ChunkLayerData layerData : this.layers)
+			layerData.setNeedUpdate(needUpdate);
+		
 	}
 	
-	void render(float maxdist) {
+	void render(BlockRenderLayer layer, int maxdist) {
 		
 		if (this.distanceToCameraSquared <= maxdist)
-			render();
+			this.render(layer);
 		
 	}
 	
-	void render() {
+	void render(BlockRenderLayer layer) {
+		this.drawBuffers[layer.ordinal()].drawElements();
+	}
+	
+	void update() {
 		
-		for (int i = 0; i < this.drawBuffers.length; ++i)
-			this.drawBuffers[i].drawElements();
+		for (ChunkLayerData layerData : this.layers) {
+			if (layerData.doNeedUpdate()) {
+				
+				layerData.handleChunkUpdate(this.renderer);
+				this.uploadLayerData(layerData);
+				
+				layerData.setNeedUpdate(false);
+				
+			}
+		}
+	
+	}
+	
+	float updateDistanceToCamera(float x, float y, float z) {
+		return this.distanceToCameraSquared = (int) this.chunk.getDistanceSquaredTo(x, y, z);
+	}
+	
+	void updateViewPosition(int x, int y, int z) {
+		
+		for (ChunkLayerData layerData : this.layers) {
+			layerData.handleNewViewPosition(this.renderer, x, y, z);
+		}
 		
 	}
 	
-	private void uploadLayerData(BlockRenderLayer layer) {
-		
-		ChunkLayerData layerData = this.getLayerData(layer);
+	private void uploadLayerData(ChunkLayerData layerData) {
 		
 		FloatBuffer verticesBuf = null;
 		FloatBuffer texcoordsBuf = null;
@@ -153,9 +151,11 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 		
 		try {
 			
+			IndicesDrawBuffer drawBuffer = this.getDrawBuffer(layerData.getLayer());
+			
 			verticesBuf = MemoryUtil.memAllocFloat(layerData.getVertices().getSize());
 			texcoordsBuf = MemoryUtil.memAllocFloat(layerData.getTexcoords().getSize());
-			indicesBuf = MemoryUtil.memAllocInt(this.drawBuffers[0].setIndicesCount(layerData.getIndices().getSize()));
+			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(layerData.getIndices().getSize()));
 			
 			verticesBuf.put(layerData.getVertices().result());
 			texcoordsBuf.put(layerData.getTexcoords().result());
@@ -164,8 +164,6 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 			verticesBuf.flip();
 			texcoordsBuf.flip();
 			indicesBuf.flip();
-			
-			IndicesDrawBuffer drawBuffer = this.getDrawBuffer(layer);
 			
 			drawBuffer.bindVao();
 			drawBuffer.uploadVboData(BasicFormat.BASIC3D_POSITION, verticesBuf, BufferUsage.DYNAMIC_DRAW);
@@ -187,8 +185,17 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 		
 		if (this.chunk == chunk) {
 			
-			this.getLayerData(block.getRenderLayer()).handleChunkUpdate(this.renderer);
-			this.uploadLayerData(block.getRenderLayer());
+			chunk.checkBlockOnFaces(x, y, z, dir -> {
+				
+				ChunkRenderer neighbour = this.neighbours.get(dir.ordinal());
+				
+				if (neighbour != null)
+					neighbour.setNeedUpdate(true);
+				
+			});
+			
+			this.setNeedUpdate(block.getRenderLayer(), true);
+			
 			
 		}
 		
@@ -199,15 +206,29 @@ public class ChunkRenderer implements WorldChunkUpdatedListener {
 		
 		if (this.chunk == chunk) {
 			
-			for (ChunkLayerData layerData : this.layers) {
-				
-				layerData.handleChunkUpdate(this.renderer);
-				this.uploadLayerData(layerData.getLayer());
-				
-			}
+			this.neighbours.forEach((i, cr) -> cr.setNeedUpdate(true));
+			this.setNeedUpdate(true);
 			
 		}
 		
+	}
+	
+	@Override
+	public int compareTo(ChunkRenderer o) {
+		return o.distanceToCameraSquared - this.distanceToCameraSquared;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.chunk.getChunkPosition().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) return true;
+		if (obj.getClass() != getClass()) return true;
+		ChunkRenderer render = (ChunkRenderer) obj;
+		return this.chunk.getChunkPosition().equals(render.getChunkPosition());
 	}
 	
 }

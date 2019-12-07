@@ -46,10 +46,10 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		} else {
 			
 			// Temp : [-30; 60]
-			float temp = this.tempNoise.noise(x, z, 0.00005f) * 45f + 15f;
+			float temp = this.tempNoise.noise(x, z, 0.0005f) * 45f + 15f;
 			
 			// Humidity [-20; 120]
-			float humidity = this.humidityNoise.noise(x, z, 0.00005f) * 70f + 50f;
+			float humidity = this.humidityNoise.noise(x, z, 0.0005f) * 70f + 50f;
 			
 			List<Biome> biomes = this.biomesList.stream()
 					.filter(b -> b.getWeather().isInRange(temp, humidity))
@@ -58,7 +58,7 @@ public class WeatherBiomeProvider extends BiomeProvider {
 			if (biomes.isEmpty())
 				biomes = this.biomesList;
 			
-			return biomes.get((int) ((this.saltNoise.noise(x, z, 0.0001f) + 1f) / 2f * biomes.size()));
+			return biomes.get((int) (((this.saltNoise.noise(x, z, 0.0001f) + 1f) / 2f) * biomes.size()));
 			
 		}
 		

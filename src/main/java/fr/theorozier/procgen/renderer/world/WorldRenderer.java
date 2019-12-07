@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.renderer.world;
 
+import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.chunk.Chunk;
 import io.msengine.client.game.RenderGame;
@@ -7,10 +8,12 @@ import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.model.ModelApplyListener;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.TextureMap;
+import io.msengine.client.renderer.util.BlendMode;
 import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
 import io.msengine.client.util.camera.Camera3D;
+import io.sutil.lexer.TokenResult;
 import io.sutil.math.MathHelper;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -107,27 +110,37 @@ public class WorldRenderer implements ModelApplyListener,
 		if (!this.escaped) {
 			
 			float speedMult = alpha * 1.5f;
+			boolean changed = false;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
 				this.camera.addPosition((float) Math.cos(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult);
+				changed = true;
 			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_B)) {
 				this.camera.addPosition((float) Math.cos(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult);
+				changed = true;
 			}
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
 				this.camera.addPosition(0, speedMult, 0);
+				changed = true;
 			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_D)) {
 				this.camera.addPosition(0, -speedMult, 0);
+				changed = true;
 			}
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_C)) {
 				this.camera.addPosition((float) Math.cos(this.camera.getYaw() - Math.PI) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - Math.PI) * speedMult);
+				changed = true;
 			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_V)) {
 				this.camera.addPosition((float) Math.cos(this.camera.getYaw()) * speedMult, 0f, (float) Math.sin(this.camera.getYaw()) * speedMult);
+				changed = true;
 			}
 			
 			this.camera.updateViewMatrix();
-			this.chunkRenderManager.updateViewPosition(this.camera);
+			
+			if (changed) {
+				this.chunkRenderManager.updateViewPosition(this.camera);
+			}
 			
 		}
 		
@@ -136,26 +149,34 @@ public class WorldRenderer implements ModelApplyListener,
 		this.updateGlobalMatrix();
 		
 		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
 		
 		this.shaderManager.use();
 		this.renderSkyBox();
-		this.renderChunks(alpha);
+		this.renderChunks();
 		this.shaderManager.end();
 	
 	}
 	
-	private void renderChunks(float alpha) {
-		
-		glEnable(GL_DEPTH_TEST);
+	private void renderChunks() {
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
-		this.chunkRenderManager.render(alpha);
+		
+		glDisable(GL_BLEND);
+		glDepthMask(true);
+		this.chunkRenderManager.render(BlockRenderLayer.OPAQUE);
+		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT);
+		
+		glDepthMask(false);
+		glEnable(GL_BLEND);
+		BlendMode.TRANSPARENCY.use();
+		this.chunkRenderManager.render(BlockRenderLayer.TRANSPARENT);
+		
+		glDepthMask(true);
 		
 	}
 	
 	private void renderSkyBox() {
-		
-		glDisable(GL_DEPTH_TEST);
 		
 		this.shaderManager.setTextureSampler(null);
 		
@@ -165,7 +186,9 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	}
 	
-	public void update() { }
+	public void update() {
+		this.chunkRenderManager.update();
+	}
 	
 	/**
 	 * Start to render a new world, and stop currently rendering world.

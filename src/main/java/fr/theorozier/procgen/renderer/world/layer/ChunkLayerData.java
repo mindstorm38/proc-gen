@@ -21,6 +21,8 @@ public abstract class ChunkLayerData {
 	protected final BufferedFloatArray texcoords = new BufferedFloatArray();
 	protected final BufferedIntArray indices = new BufferedIntArray();
 	
+	private boolean needUpdate = false;
+	
 	public ChunkLayerData(Chunk chunk, BlockRenderLayer layer) {
 		
 		this.chunk = chunk;
@@ -31,6 +33,14 @@ public abstract class ChunkLayerData {
 	
 	public BlockRenderLayer getLayer() {
 		return this.layer;
+	}
+	
+	public boolean doNeedUpdate() {
+		return this.needUpdate;
+	}
+	
+	public void setNeedUpdate(boolean needUpdate) {
+		this.needUpdate = needUpdate;
 	}
 	
 	public abstract void handleNewViewPosition(WorldRenderer renderer, int x, int y, int z);

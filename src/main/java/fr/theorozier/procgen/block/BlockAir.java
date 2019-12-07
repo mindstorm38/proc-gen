@@ -6,8 +6,11 @@ public class BlockAir extends Block {
 		
 		super(uid, identifier);
 		
-		this.opaque = false;
-		
+	}
+	
+	@Override
+	public boolean isOpaque() {
+		return false;
 	}
 	
 	@Override

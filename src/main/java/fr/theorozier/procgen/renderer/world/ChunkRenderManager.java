@@ -5,23 +5,22 @@ import fr.theorozier.procgen.renderer.world.layer.ChunkDirectLayerData;
 import fr.theorozier.procgen.renderer.world.layer.ChunkLayerData;
 import fr.theorozier.procgen.renderer.world.layer.ChunkLayerDataProvider;
 import fr.theorozier.procgen.renderer.world.layer.ChunkSortedLayerData;
+import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.Chunk;
 import io.msengine.client.util.camera.Camera3D;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChunkRenderManager {
 	
 	// These distances are squared, for optimisation.
-	public static final int RENDER_DISTANCE = 16 * 16;
-	public static final int UNLOAD_DISTANCE = 16 * 32;
+	public static final int RENDER_DISTANCE = 16 * 12;
+	public static final int UNLOAD_DISTANCE = 16 * 16;
 	
 	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
 	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
@@ -29,6 +28,7 @@ public class ChunkRenderManager {
 	private final WorldRenderer renderer;
 	
 	private final Map<BlockPosition, ChunkRenderer> chunkRenderers;
+	private final List<ChunkRenderer> chunkRenderersList;
 	private final List<BlockPosition> unloadingChunkRenderers;
 	
 	private final ChunkLayerDataProvider[] layerHandlers;
@@ -42,11 +42,12 @@ public class ChunkRenderManager {
 		this.renderer = renderer;
 		
 		this.chunkRenderers = new HashMap<>();
+		this.chunkRenderersList = new ArrayList<>();
 		this.unloadingChunkRenderers = new ArrayList<>();
 		
 		this.layerHandlers = new ChunkLayerDataProvider[BlockRenderLayer.COUNT];
 		this.setLayerHandler(BlockRenderLayer.OPAQUE, ChunkDirectLayerData::new);
-		this.setLayerHandler(BlockRenderLayer.CUTOUT, ChunkSortedLayerData::new);
+		this.setLayerHandler(BlockRenderLayer.CUTOUT, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkSortedLayerData::new);
 		
 		this.chunkComputer = Executors.newFixedThreadPool(2);
@@ -65,26 +66,22 @@ public class ChunkRenderManager {
 		return this.layerHandlers[layer.ordinal()].provide(chunk, layer);
 	}
 	
-	void render(float alpha) {
-		
-		this.chunkRenderers.forEach((pos, cr) -> {
-			
-			// cr.checkLastNeighbours();
-			cr.render(RENDER_DISTANCE_SQUARED);
-			
-		});
+	private void resortChunkRenderers() {
+		this.chunkRenderersList.sort(ChunkRenderer::compareTo);
+	}
 	
+	void render(BlockRenderLayer layer) {
+		this.chunkRenderersList.forEach(cr -> cr.render(layer, RENDER_DISTANCE_SQUARED));
 	}
 	
 	void update() {
-	
-		
-	
+		this.chunkRenderersList.forEach(ChunkRenderer::update);
 	}
 	
 	void unload() {
 		
-		this.chunkRenderers.values().forEach(ChunkRenderer::delete);
+		this.chunkRenderersList.forEach(ChunkRenderer::delete);
+		this.chunkRenderersList.clear();
 		this.chunkRenderers.clear();
 		
 	}
@@ -96,10 +93,43 @@ public class ChunkRenderManager {
 		
 		if (cr == null) {
 			
+			//System.out.println("Loading chunk at " + pos);
+			
 			cr = new ChunkRenderer(this, chunk);
 			this.chunkRenderers.put(pos, cr);
+			this.chunkRenderersList.add(cr);
+			
+			this.resortChunkRenderers();
 			
 			cr.init();
+			
+			ChunkRenderer neighbour;
+			for (Direction dir : Direction.values()) {
+				if ((neighbour = this.chunkRenderers.get(pos.add(dir, 16, 16, 16))) != null) {
+					
+					neighbour.setNeedUpdate(true);
+					
+					neighbour.setNeighbour(dir.oposite(), cr);
+					cr.setNeighbour(dir, neighbour);
+					
+				}
+			}
+			
+		}
+		
+	}
+	
+	private void deleteChunkRenderer(BlockPosition pos) {
+		
+		ChunkRenderer cr = this.chunkRenderers.get(pos);
+		
+		if (cr != null) {
+			
+			//System.out.println("Unloading chunk at " + pos);
+			
+			this.chunkRenderers.remove(cr.getChunkPosition());
+			this.chunkRenderersList.remove(cr);
+			cr.delete();
 			
 		}
 		
@@ -115,21 +145,28 @@ public class ChunkRenderManager {
 		this.viewY = y;
 		this.viewZ = z;
 		
+		int ix = MathUtils.fastfloor(x);
+		int iy = MathUtils.fastfloor(y);
+		int iz = MathUtils.fastfloor(z);
+		
 		this.chunkRenderers.forEach((pos, cr) -> {
 			
-			if (cr.updateDistanceToCamera(x, y, z) > UNLOAD_DISTANCE_SQUARED)
+			if (cr.updateDistanceToCamera(x, y, z) > UNLOAD_DISTANCE_SQUARED) {
 				this.unloadingChunkRenderers.add(pos);
+			} else {
+				cr.updateViewPosition(ix, iy, iz);
+			}
 			
 		});
 		
 		if (!this.unloadingChunkRenderers.isEmpty()) {
-		
-			for (BlockPosition pos : this.unloadingChunkRenderers)
-				this.chunkRenderers.remove(pos).delete();
 			
+			this.unloadingChunkRenderers.forEach(this::deleteChunkRenderer);
 			this.unloadingChunkRenderers.clear();
 			
 		}
+		
+		this.resortChunkRenderers();
 		
 		World world = this.renderer.getRenderingWorld();
 		
@@ -154,16 +191,7 @@ public class ChunkRenderManager {
 	}
 	
 	void chunkUnloaded(Chunk chunk) {
-	
-		ChunkRenderer cr = this.chunkRenderers.get(chunk.getChunkPosition());
-		
-		if (cr != null) {
-		
-			this.chunkRenderers.remove(chunk.getChunkPosition());
-			cr.delete();
-		
-		}
-	
+		this.deleteChunkRenderer(chunk.getChunkPosition());
 	}
 	
 }

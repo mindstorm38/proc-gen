@@ -16,6 +16,9 @@ void main() {
 
 	frag_color = mix(vec4(1.0), texture(texture_sampler, out_tex_coord), texture_enabled) * out_color;
 
+	if (frag_color.a < 0.5)
+		discard;
+
 	// Compute fog
 	/*
 	if (fog_enabled == 1) {

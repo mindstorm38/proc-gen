@@ -51,7 +51,6 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.registerSceneClass("debug", DebugScene.class);
 		this.guiManager.loadScene("debug");
 		
-		glEnable(GL_BLEND);
 		glClearColor(0, 0, 0, 1);
 		
 	}
@@ -70,10 +69,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		glEnable(GL_DEPTH_TEST);
 		this.worldRenderer.render(alpha);
-		
-		glDisable(GL_DEPTH_TEST);
 		this.guiManager.render(alpha);
 		
 	}
@@ -83,6 +79,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		this.worldRenderer.update();
 		this.guiManager.update();
+		
+		if (this.testWorld != null)
+			this.testWorld.update();
 		
 	}
 	
