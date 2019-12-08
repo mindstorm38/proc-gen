@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.world.biome;
 
+import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.util.ErrorUtils;
 import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
@@ -10,9 +11,12 @@ import fr.theorozier.procgen.world.feature.PlacementFeature;
 import fr.theorozier.procgen.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.world.feature.config.OreFeatureConfig;
 import fr.theorozier.procgen.world.feature.config.PlacementFeatureConfig;
+import fr.theorozier.procgen.world.feature.config.PlantFeatureConfig;
 import fr.theorozier.procgen.world.feature.placement.ConfiguredPlacement;
 import fr.theorozier.procgen.world.feature.placement.Placement;
 import fr.theorozier.procgen.world.feature.placement.Placements;
+import fr.theorozier.procgen.world.feature.placement.config.ChanceCountConfig;
+import fr.theorozier.procgen.world.feature.placement.config.CountExtraConfig;
 import fr.theorozier.procgen.world.feature.placement.config.PlacementConfig;
 import fr.theorozier.procgen.world.feature.placement.config.UndergroundConfig;
 import io.sutil.StringUtils;
@@ -104,6 +108,39 @@ public abstract class Biome {
 				new OreFeatureConfig(Blocks.COAL_ORE, 10, 20)
 		);
 		
+	}
+	
+	public static void addNormalForest(Biome biome) {
+		
+		biome.addPlacedFeature(
+				Placements.SURFACE_COUNT_EXTRA,
+				new CountExtraConfig(10, 1, 0.2f),
+				Features.TREE,
+				FeatureConfig.EMPTY
+		);
+		
+	}
+	
+	public static void addBasicFlowers(Biome biome) {
+		
+		biome.addPlacedFeature(
+				Placements.SURFACE_CHANCE_MULTIPLE,
+				new ChanceCountConfig(10, 0.3f),
+				Features.PLANT,
+				new PlantFeatureConfig(Blocks.PLANT_POPPY, Biome::basicFlowersCanPlaceOn)
+		);
+		
+		biome.addPlacedFeature(
+				Placements.SURFACE_CHANCE_MULTIPLE,
+				new ChanceCountConfig(10, 0.3f),
+				Features.PLANT,
+				new PlantFeatureConfig(Blocks.PLANT_DANDELION, Biome::basicFlowersCanPlaceOn)
+		);
+		
+	}
+	
+	public static boolean basicFlowersCanPlaceOn(Block block) {
+		return block == Blocks.GRASS || block == Blocks.DIRT;
 	}
 	
 }

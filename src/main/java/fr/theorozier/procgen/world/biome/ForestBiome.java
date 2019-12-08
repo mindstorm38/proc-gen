@@ -1,8 +1,11 @@
 package fr.theorozier.procgen.world.biome;
 
+import fr.theorozier.procgen.block.Blocks;
 import fr.theorozier.procgen.world.feature.Features;
 import fr.theorozier.procgen.world.feature.config.FeatureConfig;
+import fr.theorozier.procgen.world.feature.config.PlantFeatureConfig;
 import fr.theorozier.procgen.world.feature.placement.Placements;
+import fr.theorozier.procgen.world.feature.placement.config.ChanceCountConfig;
 import fr.theorozier.procgen.world.feature.placement.config.CountExtraConfig;
 
 public class ForestBiome extends Biome {
@@ -13,13 +16,8 @@ public class ForestBiome extends Biome {
 		
 		super(uid, identifier, 0.29f, 12f, WEATHER, Biomes.GRASS_SURFACE);
 		
-		this.addPlacedFeature(
-				Placements.SURFACE_COUNT_EXTRA,
-				new CountExtraConfig(10, 1, 0.2f),
-				Features.TREE,
-				FeatureConfig.EMPTY
-		);
-		
+		addNormalForest(this);
+		addBasicFlowers(this);
 		addOres(this);
 		
 	}

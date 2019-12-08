@@ -12,7 +12,9 @@ public class BlockCubeRenderer extends BlockRenderer {
 	private final String mapTileIdentifier;
 	
 	public BlockCubeRenderer(String mapTileIdentifier) {
+		
 		this.mapTileIdentifier = mapTileIdentifier;
+		
 	}
 	
 	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {

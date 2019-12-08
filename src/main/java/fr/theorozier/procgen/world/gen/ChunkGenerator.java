@@ -70,9 +70,12 @@ public abstract class ChunkGenerator {
 		Biome biome = section.getBiomeAtRelative(7, 7);
 		Random random = new Random();
 		
+		long featureSeed = getFeatureSeed(this.seed, pos.getX(), pos.getZ());
+		int featureIdx = 0;
+		
 		for (ConfiguredFeature<?> feature : biome.getConfiguredFeatures()) {
 			
-			random.setSeed(getFeatureSeed(this.seed, pos.getX(), pos.getZ()));
+			random.setSeed(featureSeed * (++featureIdx));
 			feature.place(section.getWorld(), this, random, pos.getChunkPos(0));
 			
 		}

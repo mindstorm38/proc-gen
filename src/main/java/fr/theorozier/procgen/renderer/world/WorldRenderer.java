@@ -109,7 +109,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (!this.escaped) {
 			
-			float speedMult = alpha * 1.5f;
+			float speedMult = alpha * 0.4f;
 			boolean changed = false;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
@@ -222,121 +222,6 @@ public class WorldRenderer implements ModelApplyListener,
 	public World getRenderingWorld() {
 		return this.renderingWorld;
 	}
-	
-	/*
-	 * Internal method to get an existing chunk renderer.
-	 * @param at The absolute position of the chunk.
-	 * @return The chunk renderer, or Null if not existing.
-	 */
-	/*
-	private ChunkRenderer getChunkRenderer(BlockPosition at) {
-		return this.chunkRenderers.get(at);
-	}
-	*/
-	
-	/*
-	 * For each chunks near the camera ({@link #RENDER_DISTANCE}), load it if not already loaded.
-	 */
-	/*
-	private void refreshCameraRenderedChunks() {
-		
-		if (this.ready) {
-			
-			float cx = this.camera.getX();
-			float cy = this.camera.getY();
-			float cz = this.camera.getZ();
-			
-			this.renderingWorld.forEachChunkNear(cx, cy, cz, RENDER_DISTANCE, this::loadChunkRenderer);
-			
-			this.chunkRenderers.values().forEach(cr -> {
-				
-				if (cr.updateDistanceToCamera(cx, cy, cz) > UNLOAD_DISTANCE_SQUARED) {
-					// System.out.println("Unloading CR " + cr.getChunkPosition());
-					this.unloadingChunkRenderers.add(cr.getChunkPosition());
-				}
-				
-			});
-			
-			if (this.unloadingChunkRenderers.size() != 0) {
-				
-				for (BlockPosition pos : this.unloadingChunkRenderers)
-					this.chunkRenderers.remove(pos).delete();
-				
-				this.unloadingChunkRenderers.clear();
-				
-			}
-			
-		}
-		
-	}
-	*/
-	
-	/*
-	 * Load a chunk renderer if not already loaded.
-	 * @param chunk The chunk to load.
-	 */
-	/*
-	private void loadChunkRenderer(Chunk chunk) {
-		
-		BlockPosition pos = chunk.getChunkPosition();
-		ChunkRenderer cr = this.chunkRenderers.get(pos);
-		
-		if (cr == null) {
-			
-			cr = new ChunkRenderer(this, chunk);
-			this.chunkRenderers.put(chunk.getChunkPosition(), cr);
-			
-			cr.init();
-			
-			ChunkRenderer nb;
-			
-			for (Direction face : Direction.values()) {
-				if ((nb = this.getChunkRenderer(pos.add(face.rx * 16, face.ry * 16, face.rz * 16))) != null) {
-					
-					nb.setNeighbour(face.oposite(), cr);
-					cr.setNeighbour(face, nb);
-					
-				}
-			}
-			
-			// System.out.println("Loading CR " + pos);
-			
-		}
-		
-	}
-	*/
-	
-	/*
-	 * Load a chunk renderer if not already loaded only if the chunk
-	 * is near the camera ({@link #RENDER_DISTANCE}).
-	 * @param chunk The chunk to test.
-	 */
-	/*
-	private void checkChunkRenderer(Chunk chunk) {
-	
-		// Camera chunk position
-		BlockPosition camcp = World.getChunkPosition(
-				MathUtils.fastfloor(this.camera.getX()),
-				MathUtils.fastfloor(this.camera.getY()),
-				MathUtils.fastfloor(this.camera.getZ())
-		);
-		
-		int xmin = camcp.getX() - RENDER_DISTANCE;
-		int ymin = camcp.getY() - RENDER_DISTANCE;
-		int zmin = camcp.getZ() - RENDER_DISTANCE;
-		
-		int xmax = camcp.getX() + RENDER_DISTANCE;
-		int ymax = camcp.getY() + RENDER_DISTANCE;
-		int zmax = camcp.getZ() + RENDER_DISTANCE;
-		
-		BlockPosition cp = chunk.getChunkPosition();
-		
-		if (cp.getX() >= xmin && cp.getX() <= xmax && cp.getY() >= ymin && cp.getY() <= ymax && cp.getZ() >= zmin && cp.getZ() <= zmax) {
-			this.loadChunkRenderer(chunk);
-		}
-	
-	}
-	*/
 	
 	/**
 	 * Package private method.

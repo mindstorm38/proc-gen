@@ -27,6 +27,10 @@ public class BlockRenderers {
 		registerRenderer(Blocks.REDSTONE_ORE, new BlockCubeRenderer("redstone_ore"));
 		registerRenderer(Blocks.DIAMOND_ORE, new BlockCubeRenderer("diamond_ore"));
 		
+		registerRenderer(Blocks.PLANT_DEADBUSH, new BlockCrossRenderer("plant_deadbush"));
+		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy"));
+		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion"));
+		
 	}
 	
 	public static void registerRenderer(Block block, BlockRenderer renderer) {

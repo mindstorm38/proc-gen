@@ -1,6 +1,5 @@
 package fr.theorozier.procgen;
 
-import fr.theorozier.procgen.game.ProcGenGame;
 import io.msengine.client.game.RenderGameOptions;
 
 public class Main {

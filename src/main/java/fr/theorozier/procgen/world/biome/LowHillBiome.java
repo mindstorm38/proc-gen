@@ -9,6 +9,7 @@ public class LowHillBiome extends Biome {
 		super(uid, identifier, 0.30f, 24f, WEATHER, Biomes.GRASS_SURFACE);
 		
 		addOres(this);
+		addBasicFlowers(this);
 		
 	}
 	

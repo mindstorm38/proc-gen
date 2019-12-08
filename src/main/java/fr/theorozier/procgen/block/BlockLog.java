@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.block;
 
 import fr.theorozier.procgen.world.Axis;
+import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.common.osf.OSFNumber;
 
@@ -24,7 +25,7 @@ public class BlockLog extends Block {
 	}
 	
 	@Override
-	public void initBlock(WorldBlock block) {
+	public void initBlock(World world, WorldBlock block) {
 		this.setLogAxis(block, DEFAULT_AXIS);
 	}
 	

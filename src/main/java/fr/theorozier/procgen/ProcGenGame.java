@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.game;
+package fr.theorozier.procgen;
 
 import fr.theorozier.procgen.gui.DebugScene;
 import fr.theorozier.procgen.renderer.world.WorldRenderer;

@@ -6,8 +6,6 @@ public enum TickPriority {
 	NORMAL,
 	LOW;
 	
-	TickPriority() {
-	
-	}
+	TickPriority() {}
 
 }

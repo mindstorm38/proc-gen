@@ -266,7 +266,7 @@ public class Chunk implements BiomeAccessor {
 		} else {
 			
 			this.data[x][y][z] = block.getUid();
-			block.initBlock(this.getBlockAtRelative(x, y, z));
+			block.initBlock(this.world, this.getBlockAtRelative(x, y, z));
 			this.blocksCount++;
 			
 		}

@@ -24,6 +24,10 @@ public class Blocks {
 	public static final Block REDSTONE_ORE  = registerBlock(new Block(23, "redstone_ore"));
 	public static final Block DIAMOND_ORE   = registerBlock(new Block(24, "diamond_ore"));
 	
+	public static final BlockPlant PLANT_DEADBUSH  = registerBlock(new BlockPlant(30, "plant_deadbush"));
+	public static final BlockPlant PLANT_POPPY     = registerBlock(new BlockPlant(31, "plant_poppy"));
+	public static final BlockPlant PLANT_DANDELION = registerBlock(new BlockPlant(32, "plant_dandelion"));
+	
 	public static <T extends Block> T registerBlock(T block) {
 		
 		uidRegister.put(block.getUid(), block);

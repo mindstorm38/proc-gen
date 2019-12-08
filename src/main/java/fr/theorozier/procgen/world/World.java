@@ -106,7 +106,7 @@ public class World implements BiomeAccessor {
 		WorldBlock wb = this.getBlockAt(entry.getPosition());
 		
 		if (wb.getBlockType() == entry.getTarget()) {
-			entry.getTarget().tickBlock(wb, this.rand);
+			entry.getTarget().tickBlock(this, wb, this.rand);
 		}
 	
 	}

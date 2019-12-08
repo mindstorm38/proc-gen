@@ -22,6 +22,7 @@ public class PlainBiome extends Biome {
 		));
 		
 		addOres(this);
+		addBasicFlowers(this);
 		
 	}
 	

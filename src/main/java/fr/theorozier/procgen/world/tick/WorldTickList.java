@@ -33,7 +33,7 @@ public class WorldTickList<T> {
 		int remain = this.tickEntriesTree.size();
 	
 		if (remain != this.tickEntriesHashed.size())
-			throw new IllegalArgumentException("Tick entries not synced.");
+			throw new IllegalArgumentException("Tick entries not synced (" + remain + " != " + this.tickEntriesHashed.size() + ").");
 		
 		if (remain > MAX_TICK_COUNT)
 			remain = MAX_TICK_COUNT;

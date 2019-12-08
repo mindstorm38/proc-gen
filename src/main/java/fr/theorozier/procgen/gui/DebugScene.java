@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.gui;
 
-import fr.theorozier.procgen.game.ProcGenGame;
+import fr.theorozier.procgen.ProcGenGame;
 import fr.theorozier.procgen.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.util.MathUtils;
 import fr.theorozier.procgen.world.World;

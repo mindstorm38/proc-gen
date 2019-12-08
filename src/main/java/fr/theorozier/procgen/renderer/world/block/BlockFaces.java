@@ -5,7 +5,7 @@ import fr.theorozier.procgen.world.Direction;
 
 public class BlockFaces {
 
-	private byte data;
+	private byte data = 0;
 	
 	public void setFace(Direction dir, boolean b) {
 		if (b) this.data |= 1 << dir.ordinal();

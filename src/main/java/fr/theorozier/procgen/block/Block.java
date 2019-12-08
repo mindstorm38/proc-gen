@@ -49,12 +49,20 @@ public class Block {
 	
 	// Dynamic function for modifying the world
 	
-	public void initBlock(WorldBlock block) {}
+	public void initBlock(World world, WorldBlock block) {}
 	
-	public void tickBlock(WorldBlock block, Random rand) {}
+	public void tickBlock(World world, WorldBlock block, Random rand) {}
 	
 	@Override
 	public int hashCode() {
 		return this.getUid();
+	}
+	
+	@Override
+	public String toString() {
+		return "Block{" +
+				"uid=" + uid +
+				", identifier='" + identifier + '\'' +
+				'}';
 	}
 }
