@@ -23,6 +23,7 @@ public class World implements BiomeAccessor {
 	private final long seed;
 	private final Random rand;
 	private final ChunkGenerator generator;
+	private final short seaLevel;
 	
 	private final Map<SectionPosition, Section> sections;
 	private final List<WorldChunkLoadedListener> chunkLoadedListeners;
@@ -35,6 +36,7 @@ public class World implements BiomeAccessor {
 		this.seed = seed;
 		this.rand = new Random(this.seed);
 		this.generator = provider.create(this);
+		this.seaLevel = 63;
 		
 		this.sections = new HashMap<>();
 		this.chunkLoadedListeners = new ArrayList<>();
@@ -68,6 +70,13 @@ public class World implements BiomeAccessor {
 	 */
 	public long getTime() {
 		return this.time;
+	}
+	
+	/**
+	 * @return This world sea level.
+	 */
+	public int getSeaLevel() {
+		return this.seaLevel;
 	}
 	
 	////////////////////

@@ -109,7 +109,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (!this.escaped) {
 			
-			float speedMult = alpha * 0.4f;
+			float speedMult = alpha * 1.4f;
 			boolean changed = false;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {

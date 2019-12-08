@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.world.chunk;
 
+import fr.theorozier.procgen.block.Blocks;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -8,7 +10,8 @@ import java.util.function.Predicate;
 
 public class Heightmap {
 	
-	private static final Predicate<WorldBlock> IS_NOT_AIR = WorldBlock::isSet;
+	private static final Predicate<WorldBlock> IS_SET = WorldBlock::isSet;
+	private static final Predicate<WorldBlock> IS_SET_NOT_WATER = wb -> wb.isSet() && wb.getBlockType() != Blocks.WATER;
 	
 	private final Section section;
 	private final Predicate<WorldBlock> limitPredicate;
@@ -34,8 +37,10 @@ public class Heightmap {
 	
 	public enum Type {
 	
-		WORLD_BASE_SURFACE (IS_NOT_AIR),
-		WORLD_SURFACE (IS_NOT_AIR);
+		WORLD_BASE_SURFACE (IS_SET_NOT_WATER),
+		WORLD_BASE_WATER_SURFACE (IS_SET),
+		WORLD_SURFACE (IS_SET_NOT_WATER),
+		WORLD_WATER_SURFACE (IS_SET);
 	
 		public final Predicate<WorldBlock> limitPredicate;
 		

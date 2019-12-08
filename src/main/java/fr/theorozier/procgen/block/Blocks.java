@@ -28,6 +28,8 @@ public class Blocks {
 	public static final BlockPlant PLANT_POPPY     = registerBlock(new BlockPlant(31, "plant_poppy"));
 	public static final BlockPlant PLANT_DANDELION = registerBlock(new BlockPlant(32, "plant_dandelion"));
 	
+	public static final BlockFluid WATER = registerBlock(new BlockFluidWater(80, "water"));
+	
 	public static <T extends Block> T registerBlock(T block) {
 		
 		uidRegister.put(block.getUid(), block);

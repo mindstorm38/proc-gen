@@ -2,9 +2,7 @@ package fr.theorozier.procgen.world;
 
 public enum Axis {
 
-	X,
-	Y,
-	Z;
+	X, Y, Z;
 	
 	public final Direction[] directions = new Direction[2];
 	

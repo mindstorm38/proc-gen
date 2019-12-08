@@ -12,7 +12,7 @@ public class DesertBiome extends Biome {
 	
 	public DesertBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.28f, 8f, WEATHER, Biomes.DESERT_SURFACE);
+		super(uid, identifier, 0.28f, 8f, WEATHER, Biomes.DESERT_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		addOres(this);
 		

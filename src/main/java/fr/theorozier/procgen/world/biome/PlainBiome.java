@@ -14,7 +14,7 @@ public class PlainBiome extends Biome {
 	
 	public PlainBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.28f, 5f, WEATHER, Biomes.GRASS_SURFACE);
+		super(uid, identifier, 0.28f, 5f, WEATHER, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		this.addFeature(Features.PLACEMENT, new PlacementFeatureConfig(
 				new ConfiguredPlacement<>(Placements.SURFACE_CHANCE, new ChanceConfig(0.2f)),

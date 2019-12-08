@@ -39,6 +39,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
+		World world = chunk.getWorld();
 		
 		int maxHeight = chunk.getWorld().getWorldHeightLimit();
 		Biome biome;
@@ -100,6 +101,8 @@ public class BetaChunkGenerator extends ChunkGenerator {
 						block.setBlockType(Blocks.BEDROCK);
 					} else if (wy < noise) {
 						block.setBlockType(Blocks.STONE);
+					} else if (wy < world.getSeaLevel()) {
+						block.setBlockType(Blocks.WATER);
 					}
 					
 				}

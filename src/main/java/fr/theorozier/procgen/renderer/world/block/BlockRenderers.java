@@ -31,6 +31,8 @@ public class BlockRenderers {
 		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy"));
 		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion"));
 		
+		registerRenderer(Blocks.WATER, new BlockCubeRenderer("water_frame0"));
+		
 	}
 	
 	public static void registerRenderer(Block block, BlockRenderer renderer) {

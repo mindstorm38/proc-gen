@@ -2,6 +2,7 @@ package fr.theorozier.procgen.world.gen;
 
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.world.chunk.*;
 import fr.theorozier.procgen.world.biome.Biome;
@@ -32,7 +33,8 @@ public abstract class ChunkGenerator {
 	
 	public void genSurface(Section section, SectionPosition pos) {
 		
-		// TODO: Generate surface (sand, grass, stone) from biome preferences.
+		World world = section.getWorld();
+		int seaLimit = world.getSeaLevel() - 2;
 		
 		short height, baseHeight;
 		Biome biome;
@@ -44,8 +46,10 @@ public abstract class ChunkGenerator {
 			for (int z = 0; z < 16; ++z) {
 				
 				height = (short) (section.getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, x, z) - 1);
+				
 				biome = section.getBiomeAtRelative(x, z);
-				surface = biome.getSurface();
+				surface = height > seaLimit ? biome.getSurface() : biome.getUnderwaterSurface();
+				
 				baseHeight = surface.getBaseHeight();
 				
 				for (short y = 0; y < baseHeight; ++y) {

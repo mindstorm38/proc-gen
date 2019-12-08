@@ -33,9 +33,10 @@ public abstract class Biome {
 	private final float scale;
 	private final BiomeWeatherRange weather;
 	private final BiomeSurface surface;
+	private final BiomeSurface underwaterSurface;
 	private final List<ConfiguredFeature<?>> features;
 	
-	public Biome(int uid, String identifier, float depth, float scale, BiomeWeatherRange weather, BiomeSurface surface) {
+	public Biome(int uid, String identifier, float depth, float scale, BiomeWeatherRange weather, BiomeSurface surface, BiomeSurface underwaterSurface) {
 		
 		if (uid <= 0)
 			throw ErrorUtils.invalidUidArgument("Biome");
@@ -47,6 +48,7 @@ public abstract class Biome {
 		this.scale = scale;
 		this.weather = weather;
 		this.surface = surface;
+		this.underwaterSurface = underwaterSurface;
 		this.features = new ArrayList<>();
 		
 	}
@@ -73,6 +75,10 @@ public abstract class Biome {
 	
 	public BiomeSurface getSurface() {
 		return this.surface;
+	}
+	
+	public BiomeSurface getUnderwaterSurface() {
+		return this.underwaterSurface;
 	}
 	
 	public <C extends FeatureConfig> void addFeature(Feature<C> feature, C config) {
