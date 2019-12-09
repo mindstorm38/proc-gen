@@ -248,6 +248,11 @@ public class World implements BiomeAccessor {
 		return chunk == null ? null : chunk.getBlockAt(position);
 	}
 	
+	public WorldBlock getBlockAt(int x, int y, int z) {
+		Chunk chunk = this.getChunkAt(x, y, z);
+		return chunk == null ? null : chunk.getBlockAt(x, y, z);
+	}
+	
 	public Block getBlockTypeAt(int x, int y, int z) {
 		Chunk chunk = this.getChunkAt(x, y, z);
 		return chunk == null ? DEFAULT_BLOCK : chunk.getBlockTypeAt(x, y, z);

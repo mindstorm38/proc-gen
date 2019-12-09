@@ -22,6 +22,9 @@ public class TreeFeature extends Feature<FeatureConfig> {
 		if (!canGrowOn(world.getBlockTypeAt(at.getX(), at.getY() - 1, at.getZ())))
 			return false;
 		
+		if (world.getBlockTypeAt(at.getX(), at.getY() + 1, at.getZ()) != Blocks.AIR)
+			return false;
+		
 		int height = this.getRandomHeight(rand);
 		int safeHeight = height + 5;
 		

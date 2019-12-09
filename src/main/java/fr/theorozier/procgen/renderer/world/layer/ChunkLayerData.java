@@ -7,6 +7,8 @@ import fr.theorozier.procgen.renderer.world.block.BlockRenderer;
 import fr.theorozier.procgen.renderer.world.block.BlockRenderers;
 import fr.theorozier.procgen.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.util.array.BufferedIntArray;
+import fr.theorozier.procgen.world.Axis;
+import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.Chunk;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
@@ -115,28 +117,28 @@ public abstract class ChunkLayerData {
 						wz = cz + z;
 						
 						if (y < 15)
-							faces.topBlock(this.chunk.getBlockTypeAtRelative(x, y + 1, z));
-						else faces.topBlock(this.world.getBlockTypeAt(wx, wy + 1, wz));
+							faces.setFaceBlock(worldBlock, Direction.TOP, this.chunk.getBlockAtRelative(x, y + 1, z));
+						else faces.setFaceBlock(worldBlock, Direction.TOP, this.world.getBlockAt(wx, wy + 1, wz));
 						
 						if (y > 0)
-							faces.bottomBlock(this.chunk.getBlockTypeAtRelative(x, y - 1, z));
-						else faces.bottomBlock(this.world.getBlockTypeAt(wx, wy - 1, wz));
+							faces.setFaceBlock(worldBlock, Direction.BOTTOM, this.chunk.getBlockAtRelative(x, y - 1, z));
+						else faces.setFaceBlock(worldBlock, Direction.BOTTOM, this.world.getBlockAt(wx, wy - 1, wz));
 						
 						if (x < 15)
-							faces.northBlock(this.chunk.getBlockTypeAtRelative(x + 1, y, z));
-						else faces.northBlock(this.world.getBlockTypeAt(wx + 1, wy, wz));
+							faces.setFaceBlock(worldBlock, Direction.NORTH, this.chunk.getBlockAtRelative(x + 1, y, z));
+						else faces.setFaceBlock(worldBlock, Direction.NORTH, this.world.getBlockAt(wx + 1, wy, wz));
 						
 						if (x > 0)
-							faces.southBlock(this.chunk.getBlockTypeAtRelative(x - 1, y, z));
-						else faces.southBlock(this.world.getBlockTypeAt(wx - 1, wy, wz));
+							faces.setFaceBlock(worldBlock, Direction.SOUTH, this.chunk.getBlockAtRelative(x - 1, y, z));
+						else faces.setFaceBlock(worldBlock, Direction.SOUTH, this.world.getBlockAt(wx - 1, wy, wz));
 						
 						if (z < 15)
-							faces.eastBlock(this.chunk.getBlockTypeAtRelative(x, y, z + 1));
-						else faces.eastBlock(this.world.getBlockTypeAt(wx, wy, wz + 1));
+							faces.setFaceBlock(worldBlock, Direction.EAST, this.chunk.getBlockAtRelative(x, y, z + 1));
+						else faces.setFaceBlock(worldBlock, Direction.EAST, this.world.getBlockAt(wx, wy, wz + 1));
 						
 						if (z > 0)
-							faces.westBlock(this.chunk.getBlockTypeAtRelative(x, y, z - 1));
-						else faces.westBlock(this.world.getBlockTypeAt(wx, wy, wz - 1));
+							faces.setFaceBlock(worldBlock, Direction.WEST, this.chunk.getBlockAtRelative(x, y, z - 1));
+						else faces.setFaceBlock(worldBlock, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
 						
 						consumer.accept(wx, wy, wz, worldBlock, renderer, faces);
 						

@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.block;
 
 import fr.theorozier.procgen.util.ErrorUtils;
-import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.sutil.StringUtils;
@@ -37,6 +37,28 @@ public class Block {
 	
 	public boolean isOpaque() {
 		return true;
+	}
+	
+	public boolean mustRenderFace(WorldBlock wb, Direction otherDir, WorldBlock other) {
+		
+		if (other == null) {
+			return true;
+		} else {
+			
+			Block otherBlock = other.getBlockType();
+			
+			if (this != otherBlock) {
+				return !otherBlock.isOpaque();
+			} else {
+				return !this.isOpaque() && this.mustRenderSameBlockFaces();
+			}
+			
+		}
+		
+	}
+	
+	public boolean mustRenderSameBlockFaces() {
+		return false;
 	}
 	
 	public BlockRenderLayer getRenderLayer() {

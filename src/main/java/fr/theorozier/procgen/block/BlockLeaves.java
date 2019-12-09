@@ -14,6 +14,11 @@ public class BlockLeaves extends Block {
 	}
 	
 	@Override
+	public boolean mustRenderSameBlockFaces() {
+		return true;
+	}
+	
+	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}

@@ -25,8 +25,8 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	@Override
 	public void handleNewViewPosition(WorldRenderer renderer, int x, int y, int z) {
 		
-		this.sortCache(x, y, z);
-		this.rebuildData(renderer.getTerrainMap());
+		//this.sortCache(x, y, z);
+		//this.rebuildData(renderer.getTerrainMap());
 		
 	}
 	

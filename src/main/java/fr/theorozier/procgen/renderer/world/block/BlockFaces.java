@@ -2,6 +2,7 @@ package fr.theorozier.procgen.renderer.world.block;
 
 import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.world.Direction;
+import fr.theorozier.procgen.world.chunk.WorldBlock;
 
 public class BlockFaces {
 
@@ -46,6 +47,10 @@ public class BlockFaces {
 	
 	public boolean isWest() {
 		return this.getFace(Direction.WEST);
+	}
+	
+	public void setFaceBlock(WorldBlock wb, Direction otherDirection, WorldBlock other) {
+		this.setFace(otherDirection, wb.getBlockType().mustRenderFace(wb, otherDirection, other));
 	}
 	
 	public void topBlock(Block block) {

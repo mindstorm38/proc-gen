@@ -27,6 +27,7 @@ public class Blocks {
 	public static final BlockPlant PLANT_DEADBUSH  = registerBlock(new BlockPlant(30, "plant_deadbush"));
 	public static final BlockPlant PLANT_POPPY     = registerBlock(new BlockPlant(31, "plant_poppy"));
 	public static final BlockPlant PLANT_DANDELION = registerBlock(new BlockPlant(32, "plant_dandelion"));
+	public static final BlockPlant PLANT_OAK       = registerBlock(new BlockPlant(33, "plant_oak"));
 	
 	public static final BlockFluid WATER = registerBlock(new BlockFluidWater(80, "water"));
 	

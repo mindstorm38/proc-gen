@@ -30,8 +30,9 @@ public class BlockRenderers {
 		registerRenderer(Blocks.PLANT_DEADBUSH, new BlockCrossRenderer("plant_deadbush"));
 		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy"));
 		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion"));
+		registerRenderer(Blocks.PLANT_OAK, new BlockCrossRenderer("plant_oak"));
 		
-		registerRenderer(Blocks.WATER, new BlockCubeRenderer("water_flow"));
+		registerRenderer(Blocks.WATER, new BlockLegacyWaterRenderer());
 		
 	}
 	

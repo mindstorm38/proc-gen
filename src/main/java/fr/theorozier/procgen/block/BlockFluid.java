@@ -8,4 +8,14 @@ public abstract class BlockFluid extends Block {
 	
 	protected abstract int getFluidViscosity();
 	
+	@Override
+	public boolean isOpaque() {
+		return false;
+	}
+	
+	@Override
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.TRANSPARENT;
+	}
+	
 }

@@ -197,6 +197,10 @@ public class Chunk implements BiomeAccessor {
 		return new WorldBlock(this, position, this.getRelativePosition(position));
 	}
 	
+	public WorldBlock getBlockAt(int x, int y, int z) {
+		return new WorldBlock(this, new BlockPosition(x, y, z), new BlockPosition(x - this.position.getX(), y - this.position.getY(), z - this.position.getZ()));
+	}
+	
 	public WorldBlock getBlockAtRelative(int x, int y, int z) {
 		return new WorldBlock(this, new BlockPosition(this.position.getX() + x, this.position.getY() + y, this.position.getZ() + z), new BlockPosition(x, y, z));
 	}
