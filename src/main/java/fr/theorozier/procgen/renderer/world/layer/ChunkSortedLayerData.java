@@ -1,6 +1,8 @@
 package fr.theorozier.procgen.renderer.world.layer;
 
 import fr.theorozier.procgen.block.BlockRenderLayer;
+import fr.theorozier.procgen.renderer.world.ChunkRenderManager;
+import fr.theorozier.procgen.renderer.world.ChunkRenderer;
 import fr.theorozier.procgen.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.renderer.world.block.BlockFaces;
 import fr.theorozier.procgen.world.chunk.Chunk;
@@ -14,16 +16,16 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	
 	private final List<ChunkCompiledBlock> cache;
 	
-	public ChunkSortedLayerData(Chunk chunk, BlockRenderLayer layer) {
+	public ChunkSortedLayerData(Chunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
-		super(chunk, layer);
+		super(chunk, layer, renderManager);
 		
 		this.cache = new ArrayList<>();
 		
 	}
 	
 	@Override
-	public void handleNewViewPosition(WorldRenderer renderer, int x, int y, int z) {
+	public void handleNewViewPosition(ChunkRenderer cr, int x, int y, int z) {
 		
 		//this.sortCache(x, y, z);
 		//this.rebuildData(renderer.getTerrainMap());
@@ -31,10 +33,14 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	}
 	
 	@Override
-	public void handleChunkUpdate(WorldRenderer renderer) {
+	public void handleChunkUpdate(ChunkRenderer cr) {
+		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildCacheAndData);
+	}
+	
+	private void rebuildCacheAndData() {
 		
 		this.rebuildCache();
-		this.rebuildData(renderer.getTerrainMap());
+		this.rebuildData(this.renderManager.getWorldRenderer().getTerrainMap());
 		
 	}
 	
@@ -69,7 +75,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 				block = compiledBlock.getBlock();
 				compiledBlock.mutateBlockFaces(faces);
 				
-				lidx = compiledBlock.getRenderer().getRenderData(block, block.getX(), block.getY(), block.getZ(), lidx, faces, terrainMap, this.vertices, this.texcoords, this.indices);
+				lidx = compiledBlock.getRenderer().getRenderData(block, block.getX(), block.getY(), block.getZ(), lidx, faces, terrainMap, this.vertices, this.colors, this.indices, this.texcoords);
 				
 			}
 			

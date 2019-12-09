@@ -7,6 +7,6 @@ import io.msengine.client.renderer.texture.TextureMap;
 
 public abstract class BlockRenderer {
 	
-	public abstract int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray texcoords, BufferedIntArray indices);
+	public abstract int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords);
 	
 }

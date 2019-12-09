@@ -13,11 +13,9 @@ import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
 import io.msengine.client.util.camera.Camera3D;
-import io.sutil.lexer.TokenResult;
 import io.sutil.math.MathHelper;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
 

@@ -26,7 +26,7 @@ public class BlockCrossRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray texcoords, BufferedIntArray indices) {
+	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords) {
 		
 		//if (faces.isVisible()) {
 		

@@ -68,7 +68,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	void init() {
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
-			this.drawBuffers[i] = this.renderer.getShaderManager().createBasicDrawBuffer(false, true);
+			this.drawBuffers[i] = this.renderer.getShaderManager().createBasicDrawBuffer(true, true);
 		
 		this.setNeedUpdate(true);
 		this.chunk.addUpdatedListener(this);
@@ -121,9 +121,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 		for (ChunkLayerData layerData : this.layers) {
 			if (layerData.doNeedUpdate()) {
 				
-				layerData.handleChunkUpdate(this.renderer);
-				this.uploadLayerData(layerData);
-				
+				layerData.handleChunkUpdate(this);
 				layerData.setNeedUpdate(false);
 				
 			}
@@ -138,14 +136,22 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	void updateViewPosition(int x, int y, int z) {
 		
 		for (ChunkLayerData layerData : this.layers) {
-			layerData.handleNewViewPosition(this.renderer, x, y, z);
+			layerData.handleNewViewPosition(this, x, y, z);
 		}
+		
+	}
+	
+	void chunkUpdateDone(BlockRenderLayer layer) {
+		
+		ChunkLayerData data = this.getLayerData(layer);
+		if (data != null) this.uploadLayerData(data);
 		
 	}
 	
 	private void uploadLayerData(ChunkLayerData layerData) {
 		
 		FloatBuffer verticesBuf = null;
+		FloatBuffer colorsBuf = null;
 		FloatBuffer texcoordsBuf = null;
 		IntBuffer indicesBuf = null;
 		
@@ -154,25 +160,30 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 			IndicesDrawBuffer drawBuffer = this.getDrawBuffer(layerData.getLayer());
 			
 			verticesBuf = MemoryUtil.memAllocFloat(layerData.getVertices().getSize());
+			colorsBuf = MemoryUtil.memAllocFloat(layerData.getColors().getSize());
 			texcoordsBuf = MemoryUtil.memAllocFloat(layerData.getTexcoords().getSize());
 			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(layerData.getIndices().getSize()));
 			
 			verticesBuf.put(layerData.getVertices().result());
+			colorsBuf.put(layerData.getColors().result());
 			texcoordsBuf.put(layerData.getTexcoords().result());
 			indicesBuf.put(layerData.getIndices().result());
 			
 			verticesBuf.flip();
+			colorsBuf.flip();
 			texcoordsBuf.flip();
 			indicesBuf.flip();
 			
 			drawBuffer.bindVao();
 			drawBuffer.uploadVboData(BasicFormat.BASIC3D_POSITION, verticesBuf, BufferUsage.DYNAMIC_DRAW);
+			drawBuffer.uploadVboData(BasicFormat.BASIC_COLOR, colorsBuf, BufferUsage.DYNAMIC_DRAW);
 			drawBuffer.uploadVboData(BasicFormat.BASIC_TEX_COORD, texcoordsBuf, BufferUsage.DYNAMIC_DRAW);
 			drawBuffer.uploadIboData(indicesBuf, BufferUsage.DYNAMIC_DRAW);
 			
 		} finally {
 			
 			BufferUtils.safeFree(verticesBuf);
+			BufferUtils.safeFree(colorsBuf);
 			BufferUtils.safeFree(texcoordsBuf);
 			BufferUtils.safeFree(indicesBuf);
 			

@@ -46,7 +46,7 @@ public class WorldSkyBox {
 			vertices.put(+SKYBOX_RADIUS).put(+SKYBOX_RADIUS).put(+SKYBOX_RADIUS);
 			
 			for (int i = 0; i < 8; i++) {
-				colors.put(0.611764705f).put(0.917647058f).put(1f).put(1f);
+				colors.put(0.611764705f).put(0.917647058f).put(1f);
 			}
 			
 			indices.put(0).put(1).put(5);

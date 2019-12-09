@@ -1,6 +1,8 @@
 package fr.theorozier.procgen.renderer.world.layer;
 
 import fr.theorozier.procgen.block.BlockRenderLayer;
+import fr.theorozier.procgen.renderer.world.ChunkRenderManager;
+import fr.theorozier.procgen.renderer.world.ChunkRenderer;
 import fr.theorozier.procgen.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.renderer.world.block.BlockFaces;
 import fr.theorozier.procgen.renderer.world.block.BlockRenderer;
@@ -15,21 +17,24 @@ import fr.theorozier.procgen.world.chunk.WorldBlock;
 
 public abstract class ChunkLayerData {
 	
-	private final Chunk chunk;
-	private final World world;
-	private final BlockRenderLayer layer;
+	protected final Chunk chunk;
+	protected final World world;
+	protected final BlockRenderLayer layer;
+	protected final ChunkRenderManager renderManager;
 	
 	protected final BufferedFloatArray vertices = new BufferedFloatArray();
+	protected final BufferedFloatArray colors = new BufferedFloatArray();
 	protected final BufferedFloatArray texcoords = new BufferedFloatArray();
 	protected final BufferedIntArray indices = new BufferedIntArray();
 	
 	private boolean needUpdate = false;
 	
-	public ChunkLayerData(Chunk chunk, BlockRenderLayer layer) {
+	public ChunkLayerData(Chunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
 		this.chunk = chunk;
 		this.world = chunk.getWorld();
 		this.layer = layer;
+		this.renderManager = renderManager;
 		
 	}
 	
@@ -45,18 +50,20 @@ public abstract class ChunkLayerData {
 		this.needUpdate = needUpdate;
 	}
 	
-	public abstract void handleNewViewPosition(WorldRenderer renderer, int x, int y, int z);
-	public abstract void handleChunkUpdate(WorldRenderer renderer);
+	public abstract void handleNewViewPosition(ChunkRenderer cr, int x, int y, int z);
+	public abstract void handleChunkUpdate(ChunkRenderer cr);
 	
 	protected void rebuildArrays(Runnable run) {
 		
 		this.vertices.setSize(0);
+		this.colors.setSize(0);
 		this.texcoords.setSize(0);
 		this.indices.setSize(0);
 		
 		run.run();
 		
 		this.vertices.checkOverflow();
+		this.colors.checkOverflow();
 		this.texcoords.checkOverflow();
 		this.indices.checkOverflow();
 		
@@ -72,6 +79,10 @@ public abstract class ChunkLayerData {
 	
 	public BufferedFloatArray getVertices() {
 		return this.vertices;
+	}
+	
+	public BufferedFloatArray getColors() {
+		return this.colors;
 	}
 	
 	public BufferedFloatArray getTexcoords() {

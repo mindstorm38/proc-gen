@@ -13,8 +13,10 @@ import fr.theorozier.procgen.world.chunk.Chunk;
 import io.msengine.client.util.camera.Camera3D;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ChunkRenderManager {
 	
@@ -34,6 +36,8 @@ public class ChunkRenderManager {
 	private final ChunkLayerDataProvider[] layerHandlers;
 	
 	private final ExecutorService chunkComputer;
+	private final HashMap<ChunkUpdateDescriptor, Future<ChunkUpdateDescriptor>> chunkUpdates;
+	private final List<Future<ChunkUpdateDescriptor>> chunkUpdatesDescriptors;
 	
 	private float viewX, viewY, viewZ;
 	
@@ -51,6 +55,8 @@ public class ChunkRenderManager {
 		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkSortedLayerData::new);
 		
 		this.chunkComputer = Executors.newFixedThreadPool(2);
+		this.chunkUpdates = new HashMap<>();
+		this.chunkUpdatesDescriptors = new ArrayList<>();
 		
 	}
 	
@@ -63,7 +69,7 @@ public class ChunkRenderManager {
 	}
 	
 	public ChunkLayerData provideLayerData(BlockRenderLayer layer, Chunk chunk) {
-		return this.layerHandlers[layer.ordinal()].provide(chunk, layer);
+		return this.layerHandlers[layer.ordinal()].provide(chunk, layer, this);
 	}
 	
 	private void resortChunkRenderers() {
@@ -75,7 +81,40 @@ public class ChunkRenderManager {
 	}
 	
 	void update() {
+		
+		Iterator<Future<ChunkUpdateDescriptor>> chunkUpdatesIt = this.chunkUpdatesDescriptors.iterator();
+		Future<ChunkUpdateDescriptor> future;
+		ChunkUpdateDescriptor descriptor = null;
+		ChunkRenderer renderer;
+		
+		while (chunkUpdatesIt.hasNext()) {
+			
+			future = chunkUpdatesIt.next();
+			
+			if (future.isDone()) {
+				
+				try {
+					
+					descriptor = future.get();
+					renderer = this.chunkRenderers.get(descriptor.getChunkPosition());
+					renderer.chunkUpdateDone(descriptor.getRenderLayer());
+					
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+				
+				chunkUpdatesIt.remove();
+				
+				if (descriptor != null) {
+					this.chunkUpdates.remove(descriptor);
+				}
+				
+			}
+			
+		}
+		
 		this.chunkRenderersList.forEach(ChunkRenderer::update);
+		
 	}
 	
 	void unload() {
@@ -182,6 +221,24 @@ public class ChunkRenderManager {
 		}
 		
 	}
+	
+	// Update tasks
+	
+	public void scheduleUpdateTask(ChunkRenderer cr, BlockRenderLayer layer, Runnable action) {
+		
+		ChunkUpdateDescriptor descriptor = new ChunkUpdateDescriptor(cr.getChunkPosition(), layer);
+		
+		if (!this.chunkUpdates.containsKey(descriptor)) {
+			
+			Future<ChunkUpdateDescriptor> future = this.chunkComputer.submit(action, descriptor);
+			this.chunkUpdates.put(descriptor, future);
+			this.chunkUpdatesDescriptors.add(future);
+			
+		}
+		
+	}
+	
+	// Events //
 	
 	void chunkLoaded(Chunk chunk) {
 		

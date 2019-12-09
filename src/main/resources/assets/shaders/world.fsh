@@ -1,6 +1,6 @@
 #version 400
 
-in vec4 out_color;
+in vec3 out_color;
 in vec2 out_tex_coord;
 
 layout(location=0) out vec4 frag_color;
@@ -14,7 +14,7 @@ const float fog_density = 0.2;
 
 void main() {
 
-	frag_color = mix(vec4(1.0), texture(texture_sampler, out_tex_coord), texture_enabled) * out_color;
+	frag_color = mix(vec4(1.0), texture(texture_sampler, out_tex_coord), texture_enabled) * vec4(out_color, 1.0);
 
 	if (frag_color.a < 0.5)
 		discard;

@@ -77,7 +77,7 @@ public class Chunk implements BiomeAccessor {
 	 * @return The squared distance to the center of this chunk.
 	 */
 	public float getDistanceSquaredTo(float x, float y, float z) {
-		return this.position.distSquared(x + 7, y + 7, z + 7);
+		return this.position.distSquared(x + 7.5f, y + 7.5f, z + 7.5f);
 	}
 	
 	public ChunkStatus getStatus() {
