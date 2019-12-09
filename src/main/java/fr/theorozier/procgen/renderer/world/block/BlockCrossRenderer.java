@@ -28,7 +28,7 @@ public class BlockCrossRenderer extends BlockRenderer {
 	@Override
 	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray texcoords, BufferedIntArray indices) {
 		
-		if (faces.isVisible()) {
+		//if (faces.isVisible()) {
 		
 			TextureMapTile tile = this.getCrossTile(block, map);
 			
@@ -64,9 +64,9 @@ public class BlockCrossRenderer extends BlockRenderer {
 			
 			return idx + 8;
 			
-		}
+		//}
 		
-		return idx;
+		//return idx;
 		
 	}
 	

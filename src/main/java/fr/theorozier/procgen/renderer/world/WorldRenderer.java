@@ -144,7 +144,7 @@ public class WorldRenderer implements ModelApplyListener,
 			
 		}
 		
-		GL11.glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
+		glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
 		
 		this.updateGlobalMatrix();
 		
@@ -187,7 +187,10 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	public void update() {
+		
+		this.terrainMap.tick();
 		this.chunkRenderManager.update();
+		
 	}
 	
 	/**

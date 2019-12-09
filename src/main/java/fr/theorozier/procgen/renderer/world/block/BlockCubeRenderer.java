@@ -48,17 +48,17 @@ public class BlockCubeRenderer extends BlockRenderer {
 		}
 		
 		if (faces.isBottom()) {
-			// TODO: REDO
+			
 			tile = this.getFaceTile(block, map, Direction.BOTTOM);
 			
-			vertices.put(x    ).put(y).put(z    );
-			vertices.put(x + 1).put(y).put(z    );
-			vertices.put(x + 1).put(y).put(z + 1);
-			vertices.put(x    ).put(y).put(z + 1);
+			vertices.put(x    ).put(y    ).put(z + 1);
+			vertices.put(x    ).put(y    ).put(z    );
+			vertices.put(x + 1).put(y    ).put(z    );
+			vertices.put(x + 1).put(y    ).put(z + 1);
 			
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
 			texcoords.put(tile.x             ).put(tile.y              );
+			texcoords.put(tile.x             ).put(tile.y + tile.height);
+			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
 			indices.put(idx).put(idx + 1).put(idx + 2);
