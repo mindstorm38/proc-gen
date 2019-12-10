@@ -6,7 +6,7 @@ public class LowHillBiome extends Biome {
 	
 	public LowHillBiome(int uid, String identifier) {
 		
-		super(uid, identifier, /*0.30f*/ 0.20f, 24f, WEATHER, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.30f, 24f, WEATHER, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		addOres(this);
 		addBasicFlowers(this);

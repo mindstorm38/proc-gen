@@ -9,4 +9,8 @@ public abstract class BlockRenderer {
 	
 	public abstract int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords);
 	
+	protected static void addWhiteColor(BufferedFloatArray colors, int c) {
+		for (int i = 0; i < c; ++i) colors.put(1).put(1).put(1);
+	}
+	
 }

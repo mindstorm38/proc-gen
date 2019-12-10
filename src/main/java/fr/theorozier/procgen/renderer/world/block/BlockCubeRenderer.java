@@ -40,6 +40,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
+			addWhiteColor(colors, 4);
+			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
@@ -60,6 +62,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x             ).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
+			
+			addWhiteColor(colors, 4);
 			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
@@ -82,6 +86,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
+			addWhiteColor(colors, 4);
+			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
@@ -102,6 +108,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x             ).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
+			
+			addWhiteColor(colors, 4);
 			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
@@ -124,6 +132,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
+			addWhiteColor(colors, 4);
+			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
@@ -144,6 +154,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x             ).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
+			
+			addWhiteColor(colors, 4);
 			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);

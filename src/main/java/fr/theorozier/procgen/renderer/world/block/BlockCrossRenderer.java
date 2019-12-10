@@ -51,6 +51,8 @@ public class BlockCrossRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y);
 			texcoords.put(tile.x             ).put(tile.y);
 			texcoords.put(tile.x + tile.width).put(tile.y);
+		
+			addWhiteColor(colors, 8);
 			
 			indices.put(idx    ).put(idx + 3).put(idx + 7);
 			indices.put(idx    ).put(idx + 7).put(idx + 4);

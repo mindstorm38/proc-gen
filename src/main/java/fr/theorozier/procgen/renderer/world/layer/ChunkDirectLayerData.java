@@ -24,10 +24,7 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	}
 	
 	private void rebuildData() {
-		
 		this.rebuildData(this.renderManager.getWorldRenderer().getTerrainMap());
-		ThreadUtils.safesleep(1);
-		
 	}
 	
 	public void rebuildData(TextureMap terrainMap) {
