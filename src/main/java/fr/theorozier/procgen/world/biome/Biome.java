@@ -181,6 +181,17 @@ public abstract class Biome {
 		
 	}
 	
+	public static void addCactus(Biome biome) {
+		
+		biome.addPlacedFeature(
+				Placements.SURFACE_CHANCE_MULTIPLE,
+				new ChanceCountConfig(4, 0.2f),
+				Features.CACTUS,
+				FeatureConfig.EMPTY
+		);
+		
+	}
+	
 	public static boolean basicFlowersCanPlaceOn(Block block) {
 		return block == Blocks.GRASS || block == Blocks.DIRT;
 	}

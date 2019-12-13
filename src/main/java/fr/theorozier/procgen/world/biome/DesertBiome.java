@@ -17,6 +17,7 @@ public class DesertBiome extends Biome {
 		
 		addOres(this);
 		addDeadBushes(this);
+		addCactus(this);
 		
 	}
 	

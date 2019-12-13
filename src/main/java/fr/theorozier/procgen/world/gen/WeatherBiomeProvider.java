@@ -56,7 +56,8 @@ public class WeatherBiomeProvider extends BiomeProvider {
 	public Biome getBiomeAt(int x, int z) {
 		
 		// Temp : [0; 1]
-		float temp = (this.tempNoise.noise(x, z, 0.001f) + 1f) / 2f;
+		//float temp = (this.tempNoise.noise(x, z, 0.001f) + 1f) / 2f;
+		float temp = 1f;
 		
 		// Humidity [0; 1]
 		float humidity = (this.humidityNoise.noise(x, z, 0.001f) + 1f) / 2f;
