@@ -16,7 +16,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	
 	// Class //
 	
-	private final OctaveSimplexNoise surfaceNoise;
+	private final OctaveSimplexNoise baseNoise;
 	
 	private final int noiseHorizontalGranularity;
 	private final int noiseHorizontalSize;
@@ -25,7 +25,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		
 		super(seed, new BetaBiomeProvider(seed));
 		
-		this.surfaceNoise = new OctaveSimplexNoise(seed, 16, 0.4f, 2.0f);
+		this.baseNoise = new OctaveSimplexNoise(seed, 16, 0.4f, 2.0f);
 		
 		this.noiseHorizontalGranularity = 4;
 		this.noiseHorizontalSize = 16 / this.noiseHorizontalGranularity;
@@ -54,7 +54,7 @@ public class BetaChunkGenerator extends ChunkGenerator {
 				}
 				
 				randomMap[x][z] = (biome.getDepth() * maxHeight) +
-						this.surfaceNoise.noise(
+						this.baseNoise.noise(
 								chunkX * this.noiseHorizontalSize + x,
 								chunkZ * this.noiseHorizontalSize + z,
 								0.04f

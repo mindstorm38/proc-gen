@@ -7,6 +7,7 @@ import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.world.chunk.*;
 import fr.theorozier.procgen.world.biome.Biome;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
+import io.msengine.common.util.noise.OctaveSimplexNoise;
 
 import java.util.Random;
 
@@ -15,10 +16,14 @@ public abstract class ChunkGenerator {
 	protected final long seed;
 	protected final BiomeProvider biomeProvider;
 	
+	private final OctaveSimplexNoise surfaceNoise;
+	
 	public ChunkGenerator(long seed, BiomeProvider biomeProvider) {
 		
 		this.seed = seed;
 		this.biomeProvider = biomeProvider;
+		
+		this.surfaceNoise = new OctaveSimplexNoise(seed, 4, 0.4f, 2.0f);
 		
 	}
 	
@@ -42,6 +47,9 @@ public abstract class ChunkGenerator {
 		Block newBlock, block = null;
 		WorldBlock worldBlock;
 		
+		int sx = pos.getX();
+		int sz = pos.getZ();
+		
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
 				
@@ -50,7 +58,7 @@ public abstract class ChunkGenerator {
 				biome = section.getBiomeAtRelative(x, z);
 				surface = height > seaLimit ? biome.getSurface() : biome.getUnderwaterSurface();
 				
-				baseHeight = surface.getBaseHeight();
+				baseHeight = (short) (surface.getBaseHeight() + this.surfaceNoise.noise(sx + x, sz + z, 0.1f));
 				
 				for (short y = 0; y < baseHeight; ++y) {
 					
