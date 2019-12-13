@@ -6,4 +6,8 @@ public class BlockCactus extends Block {
 		super(uid, identifier);
 	}
 	
+	@Override
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT_NOT_CULLED;
+	}
 }

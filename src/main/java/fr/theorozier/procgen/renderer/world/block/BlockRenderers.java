@@ -33,6 +33,8 @@ public class BlockRenderers {
 		registerRenderer(Blocks.PLANT_OAK, new BlockCrossRenderer("plant_oak", false));
 		registerRenderer(Blocks.PLANT_GRASS, new BlockCrossRenderer("plant_grass", true));
 		
+		registerRenderer(Blocks.CACTUS, new BlockCactusRenderer());
+		
 		registerRenderer(Blocks.WATER, new BlockLegacyWaterRenderer());
 		
 	}

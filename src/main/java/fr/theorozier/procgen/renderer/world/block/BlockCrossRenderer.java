@@ -45,7 +45,7 @@ public class BlockCrossRenderer extends BlockRenderer {
 		dataArray.vertex(x + OFFSET, y + HEIGHT, z + OFFSET);
 		dataArray.vertex(x + OFFSET, y, z + OFFSET);
 		dataArray.vertex(x + OFFSIZE, y, z + OFFSIZE);
-		dataArray.vertex(x + OFFSIZE, y + HEIGHT, z + OFFSET);
+		dataArray.vertex(x + OFFSIZE, y + HEIGHT, z + OFFSIZE);
 		
 		dataArray.vertex(x + OFFSET, y + HEIGHT, z + OFFSIZE);
 		dataArray.vertex(x + OFFSET, y, z + OFFSIZE);

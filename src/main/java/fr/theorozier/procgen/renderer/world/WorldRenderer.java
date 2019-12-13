@@ -162,11 +162,16 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
 		
+		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 		glDepthMask(true);
 		this.chunkRenderManager.render(BlockRenderLayer.OPAQUE);
 		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT);
 		
+		glDisable(GL_CULL_FACE);
+		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT_NOT_CULLED);
+		
+		glEnable(GL_CULL_FACE);
 		glDepthMask(false);
 		glEnable(GL_BLEND);
 		BlendMode.TRANSPARENCY.use();
