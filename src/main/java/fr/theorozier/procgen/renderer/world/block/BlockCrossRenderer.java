@@ -33,6 +33,10 @@ public class BlockCrossRenderer extends BlockRenderer {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
+		int rand = posRand(x, y, z);
+		x += (rand % 3) * 0.1f;
+		z += ((rand >> 2) % 3) * 0.1f;
+		
 		vertices.put(x + OFFSET ).put(y).put(z + OFFSET );
 		vertices.put(x + OFFSIZE).put(y).put(z + OFFSET );
 		vertices.put(x + OFFSET ).put(y).put(z + OFFSIZE);

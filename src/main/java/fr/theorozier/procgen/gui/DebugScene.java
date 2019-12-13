@@ -48,6 +48,8 @@ public class DebugScene extends GuiScene {
 		
 		if (biome != null) {
 			this.posTexts[3].setText("Biome : " + biome.getIdentifier());
+		} else {
+			this.posTexts[3].setText("");
 		}
 		
 	}

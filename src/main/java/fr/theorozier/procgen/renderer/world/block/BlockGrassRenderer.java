@@ -9,7 +9,18 @@ import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
 
+import java.util.function.BiConsumer;
+
 public class BlockGrassRenderer extends BlockRenderer {
+	
+	private interface TexcoordsApplier extends BiConsumer<BufferedFloatArray, TextureMapTile> {}
+	
+	private static final TexcoordsApplier[] TOP_TEXCOORDS_APPLIERS = {
+			(texcoords, tile) -> texcoords.put(tile.x             ).put(tile.y              ),
+			(texcoords, tile) -> texcoords.put(tile.x             ).put(tile.y + tile.height),
+			(texcoords, tile) -> texcoords.put(tile.x + tile.width).put(tile.y + tile.height),
+			(texcoords, tile) -> texcoords.put(tile.x + tile.width).put(tile.y              )
+	};
 	
 	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {
 		
@@ -43,10 +54,10 @@ public class BlockGrassRenderer extends BlockRenderer {
 			vertices.put(x + 1).put(y + 1).put(z + 1);
 			vertices.put(x + 1).put(y + 1).put(z    );
 			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
+			int offset = posRand(x, y, z);
+			
+			for (int i = 0; i < TOP_TEXCOORDS_APPLIERS.length; ++i)
+				TOP_TEXCOORDS_APPLIERS[(i + offset) & 3].accept(texcoords, tile);
 			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);

@@ -23,4 +23,8 @@ public abstract class BlockRenderer {
 		colors.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
 	}
 	
+	protected static int posRand(float x, float y, float z) {
+		return (int) (Math.sin(x * 12.9898f + y * 53.5014f + z * 78.233f) * 43758.5453123f);
+	}
+	
 }
