@@ -10,11 +10,9 @@ import fr.theorozier.procgen.world.feature.placement.config.ChanceConfig;
 
 public class LowHillBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(0.65f, 0.7f);
-	
 	public LowHillBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.30f, 18f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.27f, 14f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		this.addFeature(Features.PLACEMENT, new PlacementFeatureConfig(
 				new ConfiguredPlacement<>(Placements.SURFACE_CHANCE, new ChanceConfig(0.2f)),
@@ -22,6 +20,7 @@ public class LowHillBiome extends Biome {
 		));
 		
 		addOres(this);
+		addPlantGrass(this);
 		addBasicFlowers(this);
 		
 	}

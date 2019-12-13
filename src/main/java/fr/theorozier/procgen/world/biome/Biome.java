@@ -7,7 +7,6 @@ import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.world.feature.Feature;
 import fr.theorozier.procgen.world.feature.Features;
-import fr.theorozier.procgen.world.feature.PlacementFeature;
 import fr.theorozier.procgen.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.world.feature.config.OreFeatureConfig;
 import fr.theorozier.procgen.world.feature.config.PlacementFeatureConfig;
@@ -51,8 +50,8 @@ public abstract class Biome {
 		this.underwaterSurface = underwaterSurface;
 		this.features = new ArrayList<>();
 		
-		this.foliageColor = new Color(90, 172, 66);
-		this.grassColor = new Color(90, 172, 66);
+		this.foliageColor = new Color(98, 198, 75);
+		this.grassColor = new Color(98, 198, 75);
 		this.waterColor = new Color(63, 118, 228);
 		
 	}
@@ -143,23 +142,38 @@ public abstract class Biome {
 		
 		biome.addPlacedFeature(
 				Placements.SURFACE_CHANCE_MULTIPLE,
-				new ChanceCountConfig(10, 0.2f),
+				new ChanceCountConfig(10, 0.1f),
 				Features.PLANT,
 				new PlantFeatureConfig(Blocks.PLANT_POPPY, Biome::basicFlowersCanPlaceOn)
 		);
 		
 		biome.addPlacedFeature(
 				Placements.SURFACE_CHANCE_MULTIPLE,
-				new ChanceCountConfig(10, 0.2f),
+				new ChanceCountConfig(10, 0.1f),
 				Features.PLANT,
 				new PlantFeatureConfig(Blocks.PLANT_DANDELION, Biome::basicFlowersCanPlaceOn)
 		);
+		
+	}
+	
+	public static void addPlantGrass(Biome biome) {
 		
 		biome.addPlacedFeature(
 				Placements.SURFACE_COUNT,
 				new CountConfig(30),
 				Features.PLANT,
 				new PlantFeatureConfig(Blocks.PLANT_GRASS, Biome::basicFlowersCanPlaceOn)
+		);
+		
+	}
+	
+	public static void addDeadBushes(Biome biome) {
+		
+		biome.addPlacedFeature(
+				Placements.SURFACE_CHANCE_MULTIPLE,
+				new ChanceCountConfig(10, 0.3f),
+				Features.PLANT,
+				new PlantFeatureConfig(Blocks.PLANT_DEADBUSH, block -> block == Blocks.SAND)
 		);
 		
 	}

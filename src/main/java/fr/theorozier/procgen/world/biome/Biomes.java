@@ -1,9 +1,6 @@
 package fr.theorozier.procgen.world.biome;
 
-import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
-import fr.theorozier.procgen.world.biome.surface.DesertSurface;
-import fr.theorozier.procgen.world.biome.surface.GrassSurface;
-import fr.theorozier.procgen.world.biome.surface.UnderwaterDirtSurface;
+import fr.theorozier.procgen.world.biome.surface.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +13,7 @@ public class Biomes {
 	public static final GrassSurface                    GRASS_SURFACE = new GrassSurface();
 	public static final DesertSurface                  DESERT_SURFACE = new DesertSurface();
 	public static final UnderwaterDirtSurface UNDERWATER_DIRT_SURFACE = new UnderwaterDirtSurface();
+	public static final UnderwaterSandSurface UNDERWATER_SAND_SURFACE = new UnderwaterSandSurface();
 	
 	public static final EmptyBiome            EMPTY = registerBiome(new EmptyBiome(1, "empty"));
 	public static final PlainBiome            PLAIN = registerBiome(new PlainBiome(2, "plain"));

@@ -4,9 +4,13 @@ public class SavannaBiome extends Biome {
 	
 	public SavannaBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.26f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.26f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_SAND_SURFACE);
 		
-		this.getFoliageColor().setAll(164 / 255f, 164 / 255f, 52 / 255f);
+		this.getFoliageColor().setAll(DesertBiome.FOLIAGE_COLOR);
+		this.getGrassColor().setAll(DesertBiome.GRASS_COLOR);
+		
+		addOres(this);
+		addPlantGrass(this);
 		
 	}
 	

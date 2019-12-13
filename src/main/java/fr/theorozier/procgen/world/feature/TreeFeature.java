@@ -19,7 +19,9 @@ public class TreeFeature extends Feature<FeatureConfig> {
 	@Override
 	public boolean place(World world, ChunkGenerator generator, Random rand, BlockPosition at, FeatureConfig config) {
 		
-		if (!canGrowOn(world.getBlockTypeAt(at.getX(), at.getY() - 1, at.getZ())))
+		WorldBlock bottomBlock = world.getBlockAt(at.getX(), at.getY() - 1, at.getZ());
+		
+		if (!canGrowOn(bottomBlock.getBlockType()))
 			return false;
 		
 		if (world.getBlockTypeAt(at.getX(), at.getY() + 1, at.getZ()) != Blocks.AIR)
@@ -35,6 +37,8 @@ public class TreeFeature extends Feature<FeatureConfig> {
 				for (int y = 0; y < safeHeight; ++y)
 					if (world.getBlockTypeAt(at.add(x, y, z)) == Blocks.LOG)
 						return false;
+		
+		bottomBlock.setBlockType(Blocks.DIRT);
 		
 		for (int y = 0; y < height; y++)
 			if ((block = world.getBlockAt(at.add(0, y, 0))) != null)

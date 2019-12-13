@@ -6,7 +6,11 @@ public class TaigaBiome extends Biome {
 		
 		super(uid, identifier, 0.25f, 12f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
-		this.getFoliageColor().setAll(110 / 255f, 152 / 255f, 143 / 255f);
+		this.getFoliageColor().setAll(103, 164, 103);
+		this.getGrassColor().setAll(103, 164, 103);
+		
+		addOres(this);
+		addPlantGrass(this);
 		
 	}
 	

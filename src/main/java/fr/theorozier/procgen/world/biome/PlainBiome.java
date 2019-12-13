@@ -10,8 +10,6 @@ import fr.theorozier.procgen.world.feature.placement.config.ChanceConfig;
 
 public class PlainBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(0.65f, 0.7f);
-	
 	public PlainBiome(int uid, String identifier) {
 		
 		super(uid, identifier, 0.26f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
@@ -22,6 +20,7 @@ public class PlainBiome extends Biome {
 		));
 		
 		addOres(this);
+		addPlantGrass(this);
 		addBasicFlowers(this);
 		
 	}

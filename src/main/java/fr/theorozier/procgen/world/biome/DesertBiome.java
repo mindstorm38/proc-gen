@@ -1,27 +1,21 @@
 package fr.theorozier.procgen.world.biome;
 
-import fr.theorozier.procgen.block.Blocks;
-import fr.theorozier.procgen.world.feature.Features;
-import fr.theorozier.procgen.world.feature.config.PlantFeatureConfig;
-import fr.theorozier.procgen.world.feature.placement.Placements;
-import fr.theorozier.procgen.world.feature.placement.config.ChanceCountConfig;
+import io.msengine.common.util.Color;
 
 public class DesertBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(0.95f, 0.05f);
+	public static final Color FOLIAGE_COLOR = new Color(164, 164, 52);
+	public static final Color GRASS_COLOR = new Color(164, 164, 52);
 	
 	public DesertBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.25f, 8f, Biomes.DESERT_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.25f, 8f, Biomes.DESERT_SURFACE, Biomes.UNDERWATER_SAND_SURFACE);
+		
+		this.getFoliageColor().setAll(FOLIAGE_COLOR);
+		this.getGrassColor().setAll(GRASS_COLOR);
 		
 		addOres(this);
-		
-		this.addPlacedFeature(
-				Placements.SURFACE_CHANCE_MULTIPLE,
-				new ChanceCountConfig(10, 0.3f),
-				Features.PLANT,
-				new PlantFeatureConfig(Blocks.PLANT_DEADBUSH, block -> block == Blocks.SAND)
-		);
+		addDeadBushes(this);
 		
 	}
 	

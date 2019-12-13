@@ -6,7 +6,10 @@ public class JungleBiome extends Biome {
 		
 		super(uid, identifier, 0.26f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
-		this.getFoliageColor().setAll(38 / 255f, 162 / 255f, 73 / 255f);
+		this.getFoliageColor().setAll(57, 183, 23);
+		this.getGrassColor().setAll(57, 183, 23);
+		
+		addPlantGrass(this);
 		
 	}
 	

@@ -3,8 +3,6 @@ package fr.theorozier.procgen.renderer.world.block;
 import fr.theorozier.procgen.renderer.world.ColorMapManager;
 import fr.theorozier.procgen.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.util.array.BufferedIntArray;
-import fr.theorozier.procgen.world.biome.Biome;
-import fr.theorozier.procgen.world.biome.BiomeWeatherRange;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
