@@ -8,6 +8,7 @@ public class DesertHillBiome extends Biome {
 		
 		this.getFoliageColor().setAll(DesertBiome.FOLIAGE_COLOR);
 		this.getGrassColor().setAll(DesertBiome.GRASS_COLOR);
+		this.getWaterColor().setAll(WARM_WATER_COLOR);
 		
 		addOres(this);
 		addDeadBushes(this);

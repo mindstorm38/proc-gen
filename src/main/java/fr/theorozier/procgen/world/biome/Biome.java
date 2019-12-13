@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Biome {
+	
+	public static final Color COLD_WATER_COLOR = new Color(61, 87, 214);
+	public static final Color WARM_WATER_COLOR = new Color(67, 213, 238);
 
 	private final short uid;
 	private final String identifier;

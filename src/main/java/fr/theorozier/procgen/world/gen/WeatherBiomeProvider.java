@@ -10,11 +10,6 @@ public class WeatherBiomeProvider extends BiomeProvider {
 	private final OctaveSimplexNoise humidityNoise;
 	private final OctaveSimplexNoise saltNoise;
 	
-	// private final Map<Biome, Byte> biomes;
-	// private final List<Biome> biomesList;
-	
-	// private final List<WeatherSortedBiome> biomesSorting;
-	
 	private Biome[][] map;
 	private float[] tempRanges;
 	private float[] humidityRanges;
@@ -26,11 +21,6 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		this.tempNoise = new OctaveSimplexNoise(getTempSeed(seed), 4, 0.4f, 2f);
 		this.humidityNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.4f, 2f);
 		this.saltNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.4f, 2f);
-		
-		// this.biomes = new HashMap<>();
-		// this.biomesList = new ArrayList<>();
-		
-		// this.biomesSorting = new ArrayList<>();
 		
 		this.setWeatherMap(new float[0], new float[0], new Biome[][]{{Biomes.EMPTY}});
 		
@@ -62,24 +52,14 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		
 	}
 	
-	/*protected void addBiome(Biome biome, int priority) {
-		
-		this.biomes.put(biome, (byte) priority);
-		this.biomesList.add(biome);
-		
-		this.biomesSorting.add(new WeatherSortedBiome(biome));
-		
-	}
-	*/
-	
 	@Override
 	public Biome getBiomeAt(int x, int z) {
 		
 		// Temp : [0; 1]
-		float temp = (this.tempNoise.noise(x, z, 0.01f) + 1f) / 2f;
+		float temp = (this.tempNoise.noise(x, z, 0.001f) + 1f) / 2f;
 		
 		// Humidity [0; 1]
-		float humidity = (this.humidityNoise.noise(x, z, 0.01f) + 1f) / 2f;
+		float humidity = (this.humidityNoise.noise(x, z, 0.001f) + 1f) / 2f;
 		
 		int tl = this.tempRanges.length;
 		int hl = this.humidityRanges.length;
@@ -104,29 +84,6 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		}
 		
 		return biome == null ? Biomes.EMPTY : biome;
-		
-		/*
-		if (this.biomes.isEmpty()) {
-			
-			return Biomes.EMPTY;
-			
-		} else {
-			
-			// Temp : [0; 1]
-			float temp = (this.tempNoise.noise(x, z, 0.002f) + 1f) / 2f;
-			
-			// Humidity [0; 1]
-			float humidity = (this.humidityNoise.noise(x, z, 0.0008f) * + 1f) / 2f;
-			
-			for (WeatherSortedBiome sortedBiome : this.biomesSorting)
-				sortedBiome.recompute(temp, humidity);
-			
-			this.biomesSorting.sort(WeatherSortedBiome::compareTo);
-			
-			return this.biomesSorting.get(0).biome;
-			
-		}
-		*/
 		
 	}
 	

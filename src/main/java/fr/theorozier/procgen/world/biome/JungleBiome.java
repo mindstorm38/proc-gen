@@ -8,6 +8,7 @@ public class JungleBiome extends Biome {
 		
 		this.getFoliageColor().setAll(57, 183, 23);
 		this.getGrassColor().setAll(57, 183, 23);
+		this.getWaterColor().setAll(WARM_WATER_COLOR);
 		
 		addPlantGrass(this);
 		

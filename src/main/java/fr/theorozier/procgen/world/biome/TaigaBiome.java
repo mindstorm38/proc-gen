@@ -8,6 +8,7 @@ public class TaigaBiome extends Biome {
 		
 		this.getFoliageColor().setAll(103, 164, 103);
 		this.getGrassColor().setAll(103, 164, 103);
+		this.getWaterColor().setAll(COLD_WATER_COLOR);
 		
 		addOres(this);
 		addPlantGrass(this);
