@@ -150,44 +150,8 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	
 	private void uploadLayerData(ChunkLayerData layerData) {
 		
-		FloatBuffer verticesBuf = null;
-		FloatBuffer colorsBuf = null;
-		FloatBuffer texcoordsBuf = null;
-		IntBuffer indicesBuf = null;
-		
-		try {
-			
-			IndicesDrawBuffer drawBuffer = this.getDrawBuffer(layerData.getLayer());
-			
-			verticesBuf = MemoryUtil.memAllocFloat(layerData.getVertices().getSize());
-			colorsBuf = MemoryUtil.memAllocFloat(layerData.getColors().getSize());
-			texcoordsBuf = MemoryUtil.memAllocFloat(layerData.getTexcoords().getSize());
-			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(layerData.getIndices().getSize()));
-			
-			layerData.getVertices().resultToBuffer(verticesBuf);
-			layerData.getColors().resultToBuffer(colorsBuf);
-			layerData.getTexcoords().resultToBuffer(texcoordsBuf);
-			layerData.getIndices().resultToBuffer(indicesBuf);
-			
-			verticesBuf.flip();
-			colorsBuf.flip();
-			texcoordsBuf.flip();
-			indicesBuf.flip();
-			
-			drawBuffer.bindVao();
-			drawBuffer.uploadVboData(BasicFormat.BASIC3D_POSITION, verticesBuf, BufferUsage.DYNAMIC_DRAW);
-			drawBuffer.uploadVboData(BasicFormat.BASIC_COLOR, colorsBuf, BufferUsage.DYNAMIC_DRAW);
-			drawBuffer.uploadVboData(BasicFormat.BASIC_TEX_COORD, texcoordsBuf, BufferUsage.DYNAMIC_DRAW);
-			drawBuffer.uploadIboData(indicesBuf, BufferUsage.DYNAMIC_DRAW);
-			
-		} finally {
-			
-			BufferUtils.safeFree(verticesBuf);
-			BufferUtils.safeFree(colorsBuf);
-			BufferUtils.safeFree(texcoordsBuf);
-			BufferUtils.safeFree(indicesBuf);
-			
-		}
+		IndicesDrawBuffer drawBuffer = this.getDrawBuffer(layerData.getLayer());
+		layerData.getDataArray().uploadToDrawBuffer(drawBuffer);
 	
 	}
 	

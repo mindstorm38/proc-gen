@@ -19,7 +19,7 @@ public class BlockPlant extends Block {
 	
 	@Override
 	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
+		return BlockRenderLayer.CUTOUT_NOT_CULLED;
 	}
 	
 	@Override

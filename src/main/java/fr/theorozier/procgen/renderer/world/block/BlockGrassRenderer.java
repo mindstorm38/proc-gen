@@ -1,8 +1,7 @@
 package fr.theorozier.procgen.renderer.world.block;
 
-import fr.theorozier.procgen.renderer.world.ColorMapManager;
+import fr.theorozier.procgen.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.util.array.BufferedFloatArray;
-import fr.theorozier.procgen.util.array.BufferedIntArray;
 import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
@@ -38,206 +37,92 @@ public class BlockGrassRenderer extends BlockRenderer {
 		return map.getTile("grass_side_color");
 	}
 	
+	public Color getColorization(WorldBlock block) {
+		return block.getBiome().getFoliageColor();
+	}
+	
 	@Override
-	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, ColorMapManager colorMap, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords, BufferedFloatArray vertices) {
+	public void getRenderData(WorldBlock block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		TextureMapTile tile;
-		
-		Color grassColor = block.getBiome().getGrassColor();
+		Color color = this.getColorization(block);
+		TextureMapTile sideTile = this.getSideColorTile(map);
 		
 		if (faces.isTop()) {
 			
-			tile = this.getFaceTile(block, map, Direction.TOP);
-			
-			vertices.put(x    ).put(y + 1).put(z    );
-			vertices.put(x    ).put(y + 1).put(z + 1);
-			vertices.put(x + 1).put(y + 1).put(z + 1);
-			vertices.put(x + 1).put(y + 1).put(z    );
-			
-			int offset = posRand(x, y, z);
-			
-			for (int i = 0; i < TOP_TEXCOORDS_APPLIERS.length; ++i)
-				TOP_TEXCOORDS_APPLIERS[(i + offset) & 3].accept(texcoords, tile);
-			
-			indices.put(idx).put(idx + 1).put(idx + 2);
-			indices.put(idx).put(idx + 2).put(idx + 3);
-			
-			idx += 4;
-			addColor(colors, grassColor, 4);
+			dataArray.faceTop(x, y + 1, z, 1, 1);
+			dataArray.faceColor(color);
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP));
+			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isBottom()) {
 			
-			tile = this.getFaceTile(block, map, Direction.BOTTOM);
-			
-			vertices.put(x    ).put(y    ).put(z + 1);
-			vertices.put(x    ).put(y    ).put(z    );
-			vertices.put(x + 1).put(y    ).put(z    );
-			vertices.put(x + 1).put(y    ).put(z + 1);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			indices.put(idx).put(idx + 1).put(idx + 2);
-			indices.put(idx).put(idx + 2).put(idx + 3);
-			
-			idx += 4;
-			addWhiteColor(colors, 4);
+			dataArray.faceBottom(x, y, z, 1, 1);
+			dataArray.faceColorWhite();
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.BOTTOM));
+			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isNorth()) {
 			
-			vertices.put(x + 1).put(y + 1).put(z + 1);
-			vertices.put(x + 1).put(y    ).put(z + 1);
-			vertices.put(x + 1).put(y    ).put(z    );
-			vertices.put(x + 1).put(y + 1).put(z    );
-			
-			vertices.put(x + 1).put(y + 1).put(z + 1);
-			vertices.put(x + 1).put(y    ).put(z + 1);
-			vertices.put(x + 1).put(y    ).put(z    );
-			vertices.put(x + 1).put(y + 1).put(z    );
-			
-			tile = this.getFaceTile(block, map, Direction.NORTH);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			tile = this.getSideColorTile(map);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			indices.put(idx).put(idx + 1).put(idx + 2);
-			indices.put(idx).put(idx + 2).put(idx + 3);
-			indices.put(idx + 4).put(idx + 5).put(idx + 6);
-			indices.put(idx + 4).put(idx + 6).put(idx + 7);
-			
-			idx += 8;
-			addWhiteColor(colors, 4);
-			addColor(colors, grassColor, 4);
+			dataArray.faceNorth(x + 1, y, z, 1, 1);
+			dataArray.faceNorth(x + 1, y, z, 1, 1);
+			dataArray.faceColorWhite();
+			dataArray.faceColor(color);
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.NORTH));
+			dataArray.faceTexcoords(sideTile);
+			dataArray.faceIndices();
+			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isSouth()) {
 			
-			vertices.put(x).put(y + 1).put(z    );
-			vertices.put(x).put(y    ).put(z    );
-			vertices.put(x).put(y    ).put(z + 1);
-			vertices.put(x).put(y + 1).put(z + 1);
-			
-			vertices.put(x).put(y + 1).put(z    );
-			vertices.put(x).put(y    ).put(z    );
-			vertices.put(x).put(y    ).put(z + 1);
-			vertices.put(x).put(y + 1).put(z + 1);
-			
-			tile = this.getFaceTile(block, map, Direction.SOUTH);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			tile = this.getSideColorTile(map);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			indices.put(idx).put(idx + 1).put(idx + 2);
-			indices.put(idx).put(idx + 2).put(idx + 3);
-			indices.put(idx + 4).put(idx + 5).put(idx + 6);
-			indices.put(idx + 4).put(idx + 6).put(idx + 7);
-			
-			idx += 8;
-			addWhiteColor(colors, 4);
-			addColor(colors, grassColor, 4);
+			dataArray.faceSouth(x, y, z, 1, 1);
+			dataArray.faceSouth(x, y, z, 1, 1);
+			dataArray.faceColorWhite();
+			dataArray.faceColor(color);
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.SOUTH));
+			dataArray.faceTexcoords(sideTile);
+			dataArray.faceIndices();
+			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isEast()) {
 			
-			vertices.put(x    ).put(y + 1).put(z + 1);
-			vertices.put(x    ).put(y    ).put(z + 1);
-			vertices.put(x + 1).put(y    ).put(z + 1);
-			vertices.put(x + 1).put(y + 1).put(z + 1);
-			
-			vertices.put(x    ).put(y + 1).put(z + 1);
-			vertices.put(x    ).put(y    ).put(z + 1);
-			vertices.put(x + 1).put(y    ).put(z + 1);
-			vertices.put(x + 1).put(y + 1).put(z + 1);
-			
-			tile = this.getFaceTile(block, map, Direction.EAST);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			tile = this.getSideColorTile(map);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			indices.put(idx).put(idx + 1).put(idx + 2);
-			indices.put(idx).put(idx + 2).put(idx + 3);
-			indices.put(idx + 4).put(idx + 5).put(idx + 6);
-			indices.put(idx + 4).put(idx + 6).put(idx + 7);
-			
-			idx += 8;
-			addWhiteColor(colors, 4);
-			addColor(colors, grassColor, 4);
+			dataArray.faceEast(x, y, z + 1, 1, 1);
+			dataArray.faceEast(x, y, z + 1, 1, 1);
+			dataArray.faceColorWhite();
+			dataArray.faceColor(color);
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.EAST));
+			dataArray.faceTexcoords(sideTile);
+			dataArray.faceIndices();
+			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isWest()) {
 			
-			vertices.put(x + 1).put(y + 1).put(z);
-			vertices.put(x + 1).put(y    ).put(z);
-			vertices.put(x    ).put(y    ).put(z);
-			vertices.put(x    ).put(y + 1).put(z);
-			
-			vertices.put(x + 1).put(y + 1).put(z);
-			vertices.put(x + 1).put(y    ).put(z);
-			vertices.put(x    ).put(y    ).put(z);
-			vertices.put(x    ).put(y + 1).put(z);
-			
-			tile = this.getFaceTile(block, map, Direction.WEST);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			tile = this.getSideColorTile(map);
-			
-			texcoords.put(tile.x             ).put(tile.y              );
-			texcoords.put(tile.x             ).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-			texcoords.put(tile.x + tile.width).put(tile.y              );
-			
-			indices.put(idx).put(idx + 1).put(idx + 2);
-			indices.put(idx).put(idx + 2).put(idx + 3);
-			indices.put(idx + 4).put(idx + 5).put(idx + 6);
-			indices.put(idx + 4).put(idx + 6).put(idx + 7);
-			
-			idx += 8;
-			addWhiteColor(colors, 4);
-			addColor(colors, grassColor, 4);
+			dataArray.faceWest(x, y, z, 1, 1);
+			dataArray.faceWest(x, y, z, 1, 1);
+			dataArray.faceColorWhite();
+			dataArray.faceColor(color);
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.WEST));
+			dataArray.faceTexcoords(sideTile);
+			dataArray.faceIndices();
+			dataArray.faceIndices();
 			
 		}
 		
-		return idx;
+		/*
+		int offset = posRand(x, y, z);
+			
+			for (int i = 0; i < TOP_TEXCOORDS_APPLIERS.length; ++i)
+				TOP_TEXCOORDS_APPLIERS[(i + offset) & 3].accept(texcoords, tile);
+		 */
 		
 	}
 	

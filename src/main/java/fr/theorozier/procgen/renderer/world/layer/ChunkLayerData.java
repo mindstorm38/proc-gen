@@ -3,6 +3,7 @@ package fr.theorozier.procgen.renderer.world.layer;
 import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.renderer.world.ChunkRenderer;
+import fr.theorozier.procgen.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.renderer.world.block.BlockFaces;
 import fr.theorozier.procgen.renderer.world.block.BlockRenderer;
@@ -22,10 +23,7 @@ public abstract class ChunkLayerData {
 	protected final BlockRenderLayer layer;
 	protected final ChunkRenderManager renderManager;
 	
-	protected final BufferedFloatArray vertices = new BufferedFloatArray();
-	protected final BufferedFloatArray colors = new BufferedFloatArray();
-	protected final BufferedFloatArray texcoords = new BufferedFloatArray();
-	protected final BufferedIntArray indices = new BufferedIntArray();
+	protected final WorldRenderDataArray dataArray;
 	
 	private boolean needUpdate = false;
 	
@@ -35,6 +33,8 @@ public abstract class ChunkLayerData {
 		this.world = chunk.getWorld();
 		this.layer = layer;
 		this.renderManager = renderManager;
+		
+		this.dataArray = new WorldRenderDataArray();
 		
 	}
 	
@@ -55,42 +55,14 @@ public abstract class ChunkLayerData {
 	
 	protected void rebuildArrays(Runnable run) {
 		
-		this.vertices.setSize(0);
-		this.colors.setSize(0);
-		this.texcoords.setSize(0);
-		this.indices.setSize(0);
-		
+		this.dataArray.resetBuffers();
 		run.run();
-		
-		this.vertices.checkOverflow();
-		this.colors.checkOverflow();
-		this.texcoords.checkOverflow();
-		this.indices.checkOverflow();
+		this.dataArray.checkOverflows();
 		
 	}
 	
-	public boolean isEmpty() {
-		return this.indices.getSize() == 0;
-	}
-	
-	public int getIndicesCount() {
-		return this.indices.getSize();
-	}
-	
-	public BufferedFloatArray getVertices() {
-		return this.vertices;
-	}
-	
-	public BufferedFloatArray getColors() {
-		return this.colors;
-	}
-	
-	public BufferedFloatArray getTexcoords() {
-		return this.texcoords;
-	}
-	
-	public BufferedIntArray getIndices() {
-		return this.indices;
+	public WorldRenderDataArray getDataArray() {
+		return this.dataArray;
 	}
 	
 	// Utils //

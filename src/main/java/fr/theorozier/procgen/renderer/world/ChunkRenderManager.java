@@ -52,6 +52,7 @@ public class ChunkRenderManager {
 		this.layerHandlers = new ChunkLayerDataProvider[BlockRenderLayer.COUNT];
 		this.setLayerHandler(BlockRenderLayer.OPAQUE, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.CUTOUT, ChunkDirectLayerData::new);
+		this.setLayerHandler(BlockRenderLayer.CUTOUT_NOT_CULLED, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkSortedLayerData::new);
 		
 		this.chunkComputer = Executors.newFixedThreadPool(2);

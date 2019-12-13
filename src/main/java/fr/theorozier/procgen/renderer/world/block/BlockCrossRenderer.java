@@ -1,11 +1,10 @@
 package fr.theorozier.procgen.renderer.world.block;
 
-import fr.theorozier.procgen.renderer.world.ColorMapManager;
-import fr.theorozier.procgen.util.array.BufferedFloatArray;
-import fr.theorozier.procgen.util.array.BufferedIntArray;
+import fr.theorozier.procgen.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
+import io.msengine.common.util.Color;
 
 public class BlockCrossRenderer extends BlockRenderer {
 	
@@ -15,12 +14,12 @@ public class BlockCrossRenderer extends BlockRenderer {
 	private static final float HEIGHT  = 1f;
 	
 	private final String mapTileIdentifier;
-	private final boolean needFoliageColorization;
+	private final boolean needColorization;
 	
-	public BlockCrossRenderer(String mapTileIdentifier, boolean needFoliageColorization) {
+	public BlockCrossRenderer(String mapTileIdentifier, boolean needColorization) {
 		
 		this.mapTileIdentifier = mapTileIdentifier;
-		this.needFoliageColorization = needFoliageColorization;
+		this.needColorization = needColorization;
 		
 	}
 	
@@ -28,15 +27,41 @@ public class BlockCrossRenderer extends BlockRenderer {
 		return map.getTile(this.mapTileIdentifier);
 	}
 	
+	public Color getColorization(WorldBlock block) {
+		return block.getBiome().getFoliageColor();
+	}
+	
 	@Override
-	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, ColorMapManager colorMap, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords, BufferedFloatArray vertices) {
+	public void getRenderData(WorldBlock block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
+		
+		Color color = this.needColorization ? this.getColorization(block) : Color.WHITE;
 		
 		int rand = posRand(x, y, z);
 		x += (rand % 3) * 0.1f;
 		z += ((rand >> 2) % 3) * 0.1f;
 		
+		dataArray.vertex(x + OFFSET, y + HEIGHT, z + OFFSET);
+		dataArray.vertex(x + OFFSET, y, z + OFFSET);
+		dataArray.vertex(x + OFFSIZE, y, z + OFFSIZE);
+		dataArray.vertex(x + OFFSIZE, y + HEIGHT, z + OFFSET);
+		
+		dataArray.vertex(x + OFFSET, y + HEIGHT, z + OFFSIZE);
+		dataArray.vertex(x + OFFSET, y, z + OFFSIZE);
+		dataArray.vertex(x + OFFSIZE, y, z + OFFSET);
+		dataArray.vertex(x + OFFSIZE, y + HEIGHT, z + OFFSET);
+		
+		for (int i = 0; i < 8; ++i)
+			dataArray.color(color);
+		
+		dataArray.faceTexcoords(tile);
+		dataArray.faceTexcoords(tile);
+		
+		dataArray.faceIndices();
+		dataArray.faceIndices();
+		
+		/*
 		vertices.put(x + OFFSET ).put(y).put(z + OFFSET );
 		vertices.put(x + OFFSIZE).put(y).put(z + OFFSET );
 		vertices.put(x + OFFSET ).put(y).put(z + OFFSIZE);
@@ -74,7 +99,8 @@ public class BlockCrossRenderer extends BlockRenderer {
 		indices.put(idx + 1).put(idx + 6).put(idx + 5);
 		
 		return idx + 8;
-			
+		*/
+		
 	}
 	
 }

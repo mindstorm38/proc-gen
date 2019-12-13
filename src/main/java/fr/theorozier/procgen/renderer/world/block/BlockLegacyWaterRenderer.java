@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.renderer.world.block;
 
-import fr.theorozier.procgen.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
+import io.msengine.common.util.Color;
 
 public class BlockLegacyWaterRenderer extends BlockCubeRenderer {
 	
@@ -24,8 +24,8 @@ public class BlockLegacyWaterRenderer extends BlockCubeRenderer {
 	}
 	
 	@Override
-	public void colorize(BufferedFloatArray colors, WorldBlock block, int count) {
-		addColor(colors, block.getBiome().getWaterColor(), count);
+	public Color getColorization(WorldBlock block) {
+		return block.getBiome().getWaterColor();
 	}
 	
 }

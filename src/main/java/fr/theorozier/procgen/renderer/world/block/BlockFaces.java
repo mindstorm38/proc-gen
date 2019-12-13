@@ -1,6 +1,5 @@
 package fr.theorozier.procgen.renderer.world.block;
 
-import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 
@@ -52,32 +51,6 @@ public class BlockFaces {
 	public void setFaceBlock(WorldBlock wb, Direction otherDirection, WorldBlock other) {
 		this.setFace(otherDirection, wb.getBlockType().mustRenderFace(wb, otherDirection, other));
 	}
-	
-	/*
-	public void topBlock(Block block) {
-		this.setFace(Direction.TOP, !block.isOpaque());
-	}
-	
-	public void bottomBlock(Block block) {
-		this.setFace(Direction.BOTTOM, !block.isOpaque());
-	}
-	
-	public void northBlock(Block block) {
-		this.setFace(Direction.NORTH, !block.isOpaque());
-	}
-	
-	public void southBlock(Block block) {
-		this.setFace(Direction.SOUTH, !block.isOpaque());
-	}
-	
-	public void eastBlock(Block block) {
-		this.setFace(Direction.EAST, !block.isOpaque());
-	}
-	
-	public void westBlock(Block block) {
-		this.setFace(Direction.WEST, !block.isOpaque());
-	}
-	*/
 	
 	public byte toByte() {
 		return this.data;

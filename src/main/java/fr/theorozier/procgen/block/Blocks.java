@@ -30,6 +30,8 @@ public class Blocks {
 	public static final BlockPlant PLANT_OAK       = registerBlock(new BlockPlant(33, "plant_oak"));
 	public static final BlockPlant PLANT_GRASS     = registerBlock(new BlockPlant(34, "plant_grass"));
 	
+	public static final BlockCactus CACTUS  = registerBlock(new BlockCactus(40, "cactus"));
+	
 	public static final BlockFluid WATER = registerBlock(new BlockFluidWater(80, "water"));
 	
 	public static <T extends Block> T registerBlock(T block) {
