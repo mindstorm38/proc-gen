@@ -1,16 +1,14 @@
 package fr.theorozier.procgen.world.biome;
 
-import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.world.HorizontalPosition;
 import fr.theorozier.procgen.world.chunk.Section;
-import fr.theorozier.procgen.world.chunk.SectionPosition;
 
 public interface BiomeAccessor {
 
 	Biome getBiomeAt(int x, int z);
-	Biome getBiomeAt(SectionPosition pos);
 	
-	default Biome getBiomeAt(BlockPosition pos) {
-		return this.getBiomeAt(pos.toSectionPosition());
+	default Biome getBiomeAt(HorizontalPosition pos) {
+		return this.getBiomeAt(pos.getX(), pos.getZ());
 	}
 	
 	default Biome[] getBiomes(int x, int z, int dx, int dz) {

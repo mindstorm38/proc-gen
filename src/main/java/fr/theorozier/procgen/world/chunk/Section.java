@@ -189,10 +189,4 @@ public class Section implements BiomeAccessor {
 		return this.getBiomeAtRelative(x - this.position.getX(), z - this.position.getZ());
 	}
 	
-	@Override
-	public Biome getBiomeAt(SectionPosition pos) {
-		this.validatePosition(pos);
-		return this.getBiomeAtRelative(pos.getX() - this.position.getX(), pos.getZ() - this.position.getZ());
-	}
-	
 }

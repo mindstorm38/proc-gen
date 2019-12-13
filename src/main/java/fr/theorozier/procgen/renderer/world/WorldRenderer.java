@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.renderer.world;
 
+import fr.theorozier.procgen.ProcGenGame;
 import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.chunk.Chunk;
@@ -44,6 +45,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private boolean init = false;
 	private boolean ready = false;
 	
+	private final ColorMapManager colorMapManager;
 	private final ChunkRenderManager chunkRenderManager;
 	
 	public WorldRenderer() {
@@ -60,6 +62,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.globalMatrix = new Matrix4f();
 		this.projectionMatrix = new Matrix4f();
 		
+		this.colorMapManager = new ColorMapManager(ProcGenGame.getCurrent().getResourceManager());
 		this.chunkRenderManager = new ChunkRenderManager(this);
 		
 	}
@@ -75,7 +78,9 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.window.addMousePositionEventListener(this);
 		
+		// Textures
 		RenderGame.getCurrentRender().getTextureManager().loadTexture(this.terrainMap);
+		this.colorMapManager.refresh();
 		
 		this.shaderManager.build();
 		this.skyBox.init();
@@ -234,6 +239,10 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	public TextureMap getTerrainMap() {
 		return this.terrainMap;
+	}
+	
+	public ColorMapManager getColorMap() {
+		return this.colorMapManager;
 	}
 	
 	/**

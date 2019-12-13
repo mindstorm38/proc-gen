@@ -10,11 +10,11 @@ import fr.theorozier.procgen.world.feature.placement.config.ChanceConfig;
 
 public class PlainBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(20f, 30f, 50f, 90f);
+	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(0.65f, 0.7f);
 	
 	public PlainBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.28f, 5f, WEATHER, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.26f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		this.addFeature(Features.PLACEMENT, new PlacementFeatureConfig(
 				new ConfiguredPlacement<>(Placements.SURFACE_CHANCE, new ChanceConfig(0.2f)),

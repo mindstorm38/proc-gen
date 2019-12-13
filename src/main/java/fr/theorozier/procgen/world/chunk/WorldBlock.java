@@ -4,6 +4,7 @@ import fr.theorozier.procgen.block.Block;
 import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.world.World;
+import fr.theorozier.procgen.world.biome.Biome;
 import io.msengine.common.osf.OSFObject;
 
 public class WorldBlock {
@@ -32,6 +33,10 @@ public class WorldBlock {
 	
 	public BlockPosition getPosition() {
 		return this.position;
+	}
+	
+	public Biome getBiome() {
+		return this.chunk.getBiomeAt(this.position);
 	}
 	
 	public int getX() {

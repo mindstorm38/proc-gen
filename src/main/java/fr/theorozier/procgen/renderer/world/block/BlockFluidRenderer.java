@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.renderer.world.block;
 
+import fr.theorozier.procgen.renderer.world.ColorMapManager;
 import fr.theorozier.procgen.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.util.array.BufferedIntArray;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
@@ -17,7 +18,7 @@ public class BlockFluidRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords) {
+	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, ColorMapManager colorMap, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords, BufferedFloatArray vertices) {
 		
 		TextureMapTile tile = null;
 		

@@ -23,4 +23,5 @@ public class BlockGrassRenderer extends BlockCubeRenderer {
 		}
 		
 	}
+	
 }

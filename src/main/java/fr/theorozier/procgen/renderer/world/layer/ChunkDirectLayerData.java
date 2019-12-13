@@ -3,9 +3,10 @@ package fr.theorozier.procgen.renderer.world.layer;
 import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.renderer.world.ChunkRenderer;
+import fr.theorozier.procgen.renderer.world.ColorMapManager;
+import fr.theorozier.procgen.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.world.chunk.Chunk;
 import io.msengine.client.renderer.texture.TextureMap;
-import io.sutil.ThreadUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,9 +33,10 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 		this.rebuildArrays(() -> {
 			
 			final AtomicInteger lidx = new AtomicInteger(0);
+			final ColorMapManager colorMap = this.renderManager.getWorldRenderer().getColorMap();
 			
 			this.foreachBlocks((x, y, z, block, renderer, faces) -> {
-				lidx.set(renderer.getRenderData(block, x, y, z, lidx.get(), faces, terrainMap, this.vertices, this.colors, this.indices, this.texcoords));
+				lidx.set(renderer.getRenderData(block, x, y, z, lidx.get(), faces, terrainMap, colorMap, this.colors, this.indices, this.texcoords, this.vertices));
 			});
 			
 		});

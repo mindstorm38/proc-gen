@@ -180,7 +180,7 @@ public class Chunk implements BiomeAccessor {
 	}
 	
 	@Override
-	public Biome getBiomeAt(SectionPosition pos) {
+	public Biome getBiomeAt(HorizontalPosition pos) {
 		return this.section.getBiomeAt(pos);
 	}
 	

@@ -23,6 +23,10 @@ public class Biomes {
 	public static final LowHillBiome       LOW_HILL = registerBiome(new LowHillBiome(4, "low_hill"));
 	public static final DesertBiome          DESERT = registerBiome(new DesertBiome(5, "desert"));
 	public static final DesertHillBiome DESERT_HILL = registerBiome(new DesertHillBiome(6, "desert_hill"));
+	public static final BiomeRiver            RIVER = registerBiome(new BiomeRiver(7, "river"));
+	public static final SavannaBiome        SAVANNA = registerBiome(new SavannaBiome(8, "savanna"));
+	public static final TaigaBiome            TAIGA = registerBiome(new TaigaBiome(9, "taiga"));
+	public static final JungleBiome          JUNGLE = registerBiome(new JungleBiome(10, "jungle"));
 	
 	public static <B extends Biome> B registerBiome(B biome) {
 	

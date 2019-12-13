@@ -8,11 +8,11 @@ import fr.theorozier.procgen.world.feature.placement.config.ChanceCountConfig;
 
 public class DesertBiome extends Biome {
 	
-	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(40f, 45f, 0f, 10f);
+	private static final BiomeWeatherRange WEATHER = new BiomeWeatherRange(0.95f, 0.05f);
 	
 	public DesertBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.28f, 8f, WEATHER, Biomes.DESERT_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.25f, 8f, Biomes.DESERT_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		addOres(this);
 		
@@ -20,7 +20,7 @@ public class DesertBiome extends Biome {
 				Placements.SURFACE_CHANCE_MULTIPLE,
 				new ChanceCountConfig(10, 0.3f),
 				Features.PLANT,
-				new PlantFeatureConfig(Blocks.PLANT_DEADBUSH, block -> block == Blocks.GRASS)
+				new PlantFeatureConfig(Blocks.PLANT_DEADBUSH, block -> block == Blocks.SAND)
 		);
 		
 	}

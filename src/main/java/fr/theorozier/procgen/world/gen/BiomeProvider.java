@@ -18,10 +18,5 @@ public abstract class BiomeProvider implements BiomeAccessor {
 	
 	@Override
 	public abstract Biome getBiomeAt(int x, int z);
-	
-	@Override
-	public Biome getBiomeAt(SectionPosition pos) {
-		return this.getBiomeAt(pos.getX(), pos.getZ());
-	}
 
 }

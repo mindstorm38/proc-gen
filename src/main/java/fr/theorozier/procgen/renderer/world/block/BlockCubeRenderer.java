@@ -1,8 +1,10 @@
 package fr.theorozier.procgen.renderer.world.block;
 
+import fr.theorozier.procgen.renderer.world.ColorMapManager;
 import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.util.array.BufferedIntArray;
+import fr.theorozier.procgen.world.biome.BiomeWeatherRange;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
@@ -10,11 +12,17 @@ import io.msengine.client.renderer.texture.TextureMapTile;
 public class BlockCubeRenderer extends BlockRenderer {
 	
 	private final String mapTileIdentifier;
+	private final boolean needColorization;
 	
-	public BlockCubeRenderer(String mapTileIdentifier) {
+	public BlockCubeRenderer(String mapTileIdentifier, boolean needColorization) {
 		
 		this.mapTileIdentifier = mapTileIdentifier;
+		this.needColorization = needColorization;
 		
+	}
+	
+	public BlockCubeRenderer(String mapTileIdentifier) {
+		this(mapTileIdentifier, false);
 	}
 	
 	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {
@@ -22,9 +30,10 @@ public class BlockCubeRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, BufferedFloatArray vertices, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords) {
+	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, ColorMapManager colorMap, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords, BufferedFloatArray vertices) {
 		
 		TextureMapTile tile;
+		int colorsCount = 0;
 		
 		if (faces.isTop()) {
 			
@@ -40,12 +49,11 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
-			addWhiteColor(colors, 4);
-			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
 			idx += 4;
+			colorsCount += 4;
 			
 		}
 		
@@ -63,12 +71,11 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
-			addWhiteColor(colors, 4);
-			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
 			idx += 4;
+			colorsCount += 4;
 			
 		}
 		
@@ -86,12 +93,11 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
-			addWhiteColor(colors, 4);
-			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
 			idx += 4;
+			colorsCount += 4;
 			
 		}
 		
@@ -109,12 +115,11 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
-			addWhiteColor(colors, 4);
-			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
 			idx += 4;
+			colorsCount += 4;
 			
 		}
 		
@@ -132,12 +137,11 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
-			addWhiteColor(colors, 4);
-			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
 			idx += 4;
+			colorsCount += 4;
 			
 		}
 		
@@ -155,13 +159,27 @@ public class BlockCubeRenderer extends BlockRenderer {
 			texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
 			texcoords.put(tile.x + tile.width).put(tile.y              );
 			
-			addWhiteColor(colors, 4);
-			
 			indices.put(idx).put(idx + 1).put(idx + 2);
 			indices.put(idx).put(idx + 2).put(idx + 3);
 			
 			idx += 4;
+			colorsCount += 4;
 			
+		}
+		
+		if (this.needColorization) {
+			
+			/*
+			int finalColorsCount = colorsCount;
+			
+			BiomeWeatherRange biome = block.getBiome().getWeather();
+			colorMap.getFoliageColor(color -> addColor(colors, color, finalColorsCount), biome.getTypicalTemp(), biome.getTypicalHumidity());
+			*/
+			
+			addColor(colors, block.getBiome().getFoliageColor(), colorsCount);
+			
+		} else {
+			addWhiteColor(colors, colorsCount);
 		}
 		
 		return idx;

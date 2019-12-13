@@ -15,10 +15,8 @@ import fr.theorozier.procgen.world.feature.config.PlantFeatureConfig;
 import fr.theorozier.procgen.world.feature.placement.ConfiguredPlacement;
 import fr.theorozier.procgen.world.feature.placement.Placement;
 import fr.theorozier.procgen.world.feature.placement.Placements;
-import fr.theorozier.procgen.world.feature.placement.config.ChanceCountConfig;
-import fr.theorozier.procgen.world.feature.placement.config.CountExtraConfig;
-import fr.theorozier.procgen.world.feature.placement.config.PlacementConfig;
-import fr.theorozier.procgen.world.feature.placement.config.UndergroundConfig;
+import fr.theorozier.procgen.world.feature.placement.config.*;
+import io.msengine.common.util.Color;
 import io.sutil.StringUtils;
 
 import java.util.ArrayList;
@@ -31,12 +29,14 @@ public abstract class Biome {
 	
 	private final float depth;
 	private final float scale;
-	private final BiomeWeatherRange weather;
 	private final BiomeSurface surface;
 	private final BiomeSurface underwaterSurface;
 	private final List<ConfiguredFeature<?>> features;
 	
-	public Biome(int uid, String identifier, float depth, float scale, BiomeWeatherRange weather, BiomeSurface surface, BiomeSurface underwaterSurface) {
+	private final Color foliageColor;
+	private final Color grassColor;
+	
+	public Biome(int uid, String identifier, float depth, float scale, BiomeSurface surface, BiomeSurface underwaterSurface) {
 		
 		if (uid <= 0)
 			throw ErrorUtils.invalidUidArgument("Biome");
@@ -46,10 +46,12 @@ public abstract class Biome {
 		
 		this.depth = depth;
 		this.scale = scale;
-		this.weather = weather;
 		this.surface = surface;
 		this.underwaterSurface = underwaterSurface;
 		this.features = new ArrayList<>();
+		
+		this.foliageColor = new Color(90, 172, 66);
+		this.grassColor = new Color(90, 172, 66);
 		
 	}
 	
@@ -69,16 +71,20 @@ public abstract class Biome {
 		return this.scale;
 	}
 	
-	public BiomeWeatherRange getWeather() {
-		return this.weather;
-	}
-	
 	public BiomeSurface getSurface() {
 		return this.surface;
 	}
 	
 	public BiomeSurface getUnderwaterSurface() {
 		return this.underwaterSurface;
+	}
+	
+	public Color getFoliageColor() {
+		return this.foliageColor;
+	}
+	
+	public Color getGrassColor() {
+		return this.grassColor;
 	}
 	
 	public <C extends FeatureConfig> void addFeature(Feature<C> feature, C config) {
@@ -131,16 +137,23 @@ public abstract class Biome {
 		
 		biome.addPlacedFeature(
 				Placements.SURFACE_CHANCE_MULTIPLE,
-				new ChanceCountConfig(10, 0.3f),
+				new ChanceCountConfig(10, 0.2f),
 				Features.PLANT,
 				new PlantFeatureConfig(Blocks.PLANT_POPPY, Biome::basicFlowersCanPlaceOn)
 		);
 		
 		biome.addPlacedFeature(
 				Placements.SURFACE_CHANCE_MULTIPLE,
-				new ChanceCountConfig(10, 0.3f),
+				new ChanceCountConfig(10, 0.2f),
 				Features.PLANT,
 				new PlantFeatureConfig(Blocks.PLANT_DANDELION, Biome::basicFlowersCanPlaceOn)
+		);
+		
+		biome.addPlacedFeature(
+				Placements.SURFACE_COUNT,
+				new CountConfig(30),
+				Features.PLANT,
+				new PlantFeatureConfig(Blocks.PLANT_GRASS, Biome::basicFlowersCanPlaceOn)
 		);
 		
 	}

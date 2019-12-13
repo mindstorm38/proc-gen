@@ -17,7 +17,7 @@ public class BlockRenderers {
 		registerRenderer(Blocks.GRASS, new BlockGrassRenderer());
 		registerRenderer(Blocks.BEDROCK, new BlockCubeRenderer("bedrock"));
 		registerRenderer(Blocks.LOG, new BlockLogRenderer());
-		registerRenderer(Blocks.LEAVES, new BlockCubeRenderer("leaves_fancy"));
+		registerRenderer(Blocks.LEAVES, new BlockCubeRenderer("leaves_fancy", true));
 		registerRenderer(Blocks.SAND, new BlockCubeRenderer("sand"));
 		registerRenderer(Blocks.SANDSTONE, new BlockSandstoneRenderer());
 		
@@ -27,10 +27,11 @@ public class BlockRenderers {
 		registerRenderer(Blocks.REDSTONE_ORE, new BlockCubeRenderer("redstone_ore"));
 		registerRenderer(Blocks.DIAMOND_ORE, new BlockCubeRenderer("diamond_ore"));
 		
-		registerRenderer(Blocks.PLANT_DEADBUSH, new BlockCrossRenderer("plant_deadbush"));
-		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy"));
-		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion"));
-		registerRenderer(Blocks.PLANT_OAK, new BlockCrossRenderer("plant_oak"));
+		registerRenderer(Blocks.PLANT_DEADBUSH, new BlockCrossRenderer("plant_deadbush", false));
+		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy", false));
+		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion", false));
+		registerRenderer(Blocks.PLANT_OAK, new BlockCrossRenderer("plant_oak", false));
+		registerRenderer(Blocks.PLANT_GRASS, new BlockCrossRenderer("plant_grass", true));
 		
 		registerRenderer(Blocks.WATER, new BlockLegacyWaterRenderer());
 		

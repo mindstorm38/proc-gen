@@ -24,6 +24,10 @@ public class BiomeWeatherRange {
 		
 	}
 	
+	public BiomeWeatherRange(float typicalTemp, float typicalHumidity) {
+		this(typicalTemp, typicalTemp, typicalHumidity, typicalHumidity);
+	}
+	
 	public float getTempInf() {
 		return this.tempInf;
 	}

@@ -3,7 +3,7 @@ package fr.theorozier.procgen.renderer.world.layer;
 import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.renderer.world.ChunkRenderer;
-import fr.theorozier.procgen.renderer.world.WorldRenderer;
+import fr.theorozier.procgen.renderer.world.ColorMapManager;
 import fr.theorozier.procgen.renderer.world.block.BlockFaces;
 import fr.theorozier.procgen.world.chunk.Chunk;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
@@ -65,6 +65,8 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 		
 		this.rebuildArrays(() -> {
 			
+			final ColorMapManager colorMap = this.renderManager.getWorldRenderer().getColorMap();
+			
 			int lidx = 0;
 			
 			BlockFaces faces = new BlockFaces();
@@ -75,7 +77,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 				block = compiledBlock.getBlock();
 				compiledBlock.mutateBlockFaces(faces);
 				
-				lidx = compiledBlock.getRenderer().getRenderData(block, block.getX(), block.getY(), block.getZ(), lidx, faces, terrainMap, this.vertices, this.colors, this.indices, this.texcoords);
+				lidx = compiledBlock.getRenderer().getRenderData(block, block.getX(), block.getY(), block.getZ(), lidx, faces, terrainMap, colorMap, this.colors, this.indices, this.texcoords, this.vertices);
 				
 			}
 			

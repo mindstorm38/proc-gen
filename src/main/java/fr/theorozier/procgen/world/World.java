@@ -269,7 +269,7 @@ public class World implements BiomeAccessor {
 	}
 	
 	@Override
-	public Biome getBiomeAt(SectionPosition pos) {
+	public Biome getBiomeAt(HorizontalPosition pos) {
 		Section section = this.getSectionAt(pos);
 		return section == null ? null : section.getBiomeAt(pos);
 	}
