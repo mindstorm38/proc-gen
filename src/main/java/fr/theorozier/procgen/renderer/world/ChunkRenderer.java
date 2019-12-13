@@ -164,10 +164,10 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 			texcoordsBuf = MemoryUtil.memAllocFloat(layerData.getTexcoords().getSize());
 			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(layerData.getIndices().getSize()));
 			
-			verticesBuf.put(layerData.getVertices().result());
-			colorsBuf.put(layerData.getColors().result());
-			texcoordsBuf.put(layerData.getTexcoords().result());
-			indicesBuf.put(layerData.getIndices().result());
+			layerData.getVertices().resultToBuffer(verticesBuf);
+			layerData.getColors().resultToBuffer(colorsBuf);
+			layerData.getTexcoords().resultToBuffer(texcoordsBuf);
+			layerData.getIndices().resultToBuffer(indicesBuf);
 			
 			verticesBuf.flip();
 			colorsBuf.flip();

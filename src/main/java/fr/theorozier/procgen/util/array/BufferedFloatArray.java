@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.util.array;
 
+import java.nio.FloatBuffer;
+
 public class BufferedFloatArray {
 	
 	public static final int DEFAULT_GROW = 1024;
@@ -53,6 +55,12 @@ public class BufferedFloatArray {
 		System.arraycopy(this.arr, 0, result, 0, this.size);
 		return result;
 		
+	}
+	
+	public void resultToBuffer(FloatBuffer buffer) {
+		for (int i = 0; i < this.size; ++i) {
+			buffer.put(this.arr[i]);
+		}
 	}
 	
 	public BufferedFloatArray put(float value) {
