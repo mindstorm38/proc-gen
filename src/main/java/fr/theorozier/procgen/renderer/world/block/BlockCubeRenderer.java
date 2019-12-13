@@ -29,6 +29,10 @@ public class BlockCubeRenderer extends BlockRenderer {
 		return map.getTile(this.mapTileIdentifier);
 	}
 	
+	public void colorize(BufferedFloatArray colors, WorldBlock block, int count) {
+		addColor(colors, block.getBiome().getFoliageColor(), count);
+	}
+	
 	@Override
 	public int getRenderData(WorldBlock block, float x, float y, float z, int idx, BlockFaces faces, TextureMap map, ColorMapManager colorMap, BufferedFloatArray colors, BufferedIntArray indices, BufferedFloatArray texcoords, BufferedFloatArray vertices) {
 		
@@ -168,16 +172,7 @@ public class BlockCubeRenderer extends BlockRenderer {
 		}
 		
 		if (this.needColorization) {
-			
-			/*
-			int finalColorsCount = colorsCount;
-			
-			BiomeWeatherRange biome = block.getBiome().getWeather();
-			colorMap.getFoliageColor(color -> addColor(colors, color, finalColorsCount), biome.getTypicalTemp(), biome.getTypicalHumidity());
-			*/
-			
-			addColor(colors, block.getBiome().getFoliageColor(), colorsCount);
-			
+			this.colorize(colors, block, colorsCount);
 		} else {
 			addWhiteColor(colors, colorsCount);
 		}

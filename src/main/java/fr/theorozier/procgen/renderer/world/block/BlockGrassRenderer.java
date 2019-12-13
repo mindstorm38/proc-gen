@@ -8,7 +8,7 @@ import io.msengine.client.renderer.texture.TextureMapTile;
 public class BlockGrassRenderer extends BlockCubeRenderer {
 	
 	public BlockGrassRenderer() {
-		super(null);
+		super(null, true);
 	}
 	
 	@Override

@@ -35,6 +35,7 @@ public abstract class Biome {
 	
 	private final Color foliageColor;
 	private final Color grassColor;
+	private final Color waterColor;
 	
 	public Biome(int uid, String identifier, float depth, float scale, BiomeSurface surface, BiomeSurface underwaterSurface) {
 		
@@ -52,6 +53,7 @@ public abstract class Biome {
 		
 		this.foliageColor = new Color(90, 172, 66);
 		this.grassColor = new Color(90, 172, 66);
+		this.waterColor = new Color(63, 118, 228);
 		
 	}
 	
@@ -85,6 +87,10 @@ public abstract class Biome {
 	
 	public Color getGrassColor() {
 		return this.grassColor;
+	}
+	
+	public Color getWaterColor() {
+		return this.waterColor;
 	}
 	
 	public <C extends FeatureConfig> void addFeature(Feature<C> feature, C config) {

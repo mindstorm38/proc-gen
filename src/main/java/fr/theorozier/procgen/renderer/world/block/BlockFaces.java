@@ -53,6 +53,7 @@ public class BlockFaces {
 		this.setFace(otherDirection, wb.getBlockType().mustRenderFace(wb, otherDirection, other));
 	}
 	
+	/*
 	public void topBlock(Block block) {
 		this.setFace(Direction.TOP, !block.isOpaque());
 	}
@@ -76,6 +77,7 @@ public class BlockFaces {
 	public void westBlock(Block block) {
 		this.setFace(Direction.WEST, !block.isOpaque());
 	}
+	*/
 	
 	public byte toByte() {
 		return this.data;
