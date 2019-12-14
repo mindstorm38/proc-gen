@@ -13,7 +13,7 @@ public class BlockCactus extends Block {
 	
 	@Override
 	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_NOT_CULLED;
+		return BlockRenderLayer.CUTOUT;
 	}
 	
 }
