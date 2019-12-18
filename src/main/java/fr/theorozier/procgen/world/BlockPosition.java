@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.world;
 
 import fr.theorozier.procgen.world.chunk.SectionPosition;
+import fr.theorozier.procgen.world.util.Direction;
 
 public class BlockPosition implements HorizontalPosition {
 	

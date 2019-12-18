@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.world.chunk;
 
-import fr.theorozier.procgen.block.Blocks;
+import fr.theorozier.procgen.common.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.List;

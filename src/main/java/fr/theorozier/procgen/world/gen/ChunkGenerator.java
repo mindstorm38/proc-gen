@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.world.gen;
 
-import fr.theorozier.procgen.block.Block;
+import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.biome.surface.BiomeSurface;

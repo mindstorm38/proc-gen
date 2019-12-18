@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.world.chunk;
 
-import fr.theorozier.procgen.block.Block;
-import fr.theorozier.procgen.block.BlockRenderLayer;
+import fr.theorozier.procgen.common.block.Block;
+import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.biome.Biome;

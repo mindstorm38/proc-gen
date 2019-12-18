@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.world.biome;
 
-import fr.theorozier.procgen.block.Block;
-import fr.theorozier.procgen.block.Blocks;
-import fr.theorozier.procgen.util.ErrorUtils;
+import fr.theorozier.procgen.common.block.Block;
+import fr.theorozier.procgen.common.block.Blocks;
+import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.world.feature.Feature;

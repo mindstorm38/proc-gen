@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.world.feature;
 
-import fr.theorozier.procgen.block.Blocks;
+import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.world.BlockPosition;
-import fr.theorozier.procgen.world.Direction;
+import fr.theorozier.procgen.world.util.Direction;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
 import fr.theorozier.procgen.world.feature.config.OreFeatureConfig;

@@ -1,6 +1,5 @@
 package fr.theorozier.procgen.world.chunk;
 
-import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.world.HorizontalPosition;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.biome.Biome;

@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.world.biome.surface;
 
-import fr.theorozier.procgen.block.Block;
+import fr.theorozier.procgen.common.block.Block;
 
 import java.util.HashMap;
 import java.util.Map;

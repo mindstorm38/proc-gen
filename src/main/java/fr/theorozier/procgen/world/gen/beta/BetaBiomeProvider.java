@@ -22,15 +22,6 @@ public class BetaBiomeProvider extends WeatherBiomeProvider {
 		
 		this.setWeatherMap(tempRanges, humidityRanges, biomesMap);
 		
-		/*
-		this.addBiome(Biomes.PLAIN, 1);
-		this.addBiome(Biomes.FOREST, 2);
-		this.addBiome(Biomes.LOW_HILL, 3);
-		this.addBiome(Biomes.DESERT, 4);
-		this.addBiome(Biomes.DESERT_HILL, 5);
-		this.addBiome(Biomes.RIVER, 6);
-		*/
-		
 	}
 	
 }

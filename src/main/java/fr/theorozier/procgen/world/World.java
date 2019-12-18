@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.world;
 
-import fr.theorozier.procgen.block.Block;
-import fr.theorozier.procgen.block.Blocks;
-import fr.theorozier.procgen.util.MathUtils;
+import fr.theorozier.procgen.common.block.Block;
+import fr.theorozier.procgen.common.block.Blocks;
+import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.world.biome.Biome;
 import fr.theorozier.procgen.world.biome.BiomeAccessor;
 import fr.theorozier.procgen.world.chunk.*;
