@@ -11,6 +11,7 @@ public class JungleBiome extends Biome {
 		this.getWaterColor().setAll(WARM_WATER_COLOR);
 		
 		addPlantGrass(this);
+		addNormalForest(this);
 		
 	}
 	

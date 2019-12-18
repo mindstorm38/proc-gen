@@ -5,14 +5,8 @@ import fr.theorozier.procgen.block.BlockRenderLayer;
 import fr.theorozier.procgen.renderer.world.layer.ChunkLayerData;
 import fr.theorozier.procgen.world.*;
 import fr.theorozier.procgen.world.chunk.Chunk;
-import io.msengine.client.renderer.util.BufferUsage;
-import io.msengine.client.renderer.util.BufferUtils;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
-import io.msengine.client.renderer.vertex.type.BasicFormat;
-import org.lwjgl.system.MemoryUtil;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 

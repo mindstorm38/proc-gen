@@ -17,6 +17,8 @@ public class Chunk implements BiomeAccessor {
 	private final BlockPosition position;
 	private final int ex, ey, ez;
 	
+	
+	
 	private final short[][][] data;
 	private int blocksCount;
 	

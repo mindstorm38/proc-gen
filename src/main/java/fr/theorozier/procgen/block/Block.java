@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.block;
 
+import fr.theorozier.procgen.block.state.BlockState;
+import fr.theorozier.procgen.block.state.BlockStateContainer;
 import fr.theorozier.procgen.util.ErrorUtils;
 import fr.theorozier.procgen.world.Direction;
 import fr.theorozier.procgen.world.World;
@@ -10,8 +12,11 @@ import java.util.Random;
 
 public class Block {
 	
-	private final short uid;
-	private final String identifier;
+	protected final short uid;
+	protected final String identifier;
+	
+	protected final BlockStateContainer stateContainer;
+	private BlockState defaultState;
 	
 	public Block(int uid, String identifier) {
 		
@@ -20,6 +25,12 @@ public class Block {
 		
 		this.uid = (short) uid;
 		this.identifier = StringUtils.requireNonNullAndEmpty(identifier, "Block's identifier can't be null or empty.");
+		
+		BlockStateContainer.Builder containerBuilder = new BlockStateContainer.Builder(this);
+		this.registerStateContainerProperties(containerBuilder);
+		this.stateContainer = containerBuilder.build();
+		
+		this.setDefaultState(this.stateContainer.getBaseState());
 		
 	}
 	
@@ -67,6 +78,16 @@ public class Block {
 	
 	public boolean isTickable() {
 		return true;
+	}
+	
+	public void registerStateContainerProperties(BlockStateContainer.Builder builder) {}
+	
+	public void setDefaultState(BlockState defaultState) {
+		this.defaultState = defaultState;
+	}
+	
+	public final BlockState getDefaultState() {
+		return this.defaultState;
 	}
 	
 	// Dynamic function for modifying the world

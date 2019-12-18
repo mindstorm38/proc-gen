@@ -12,6 +12,7 @@ public class SavannaBiome extends Biome {
 		
 		addOres(this);
 		addPlantGrass(this);
+		addNormalForest(this);
 		
 	}
 	
