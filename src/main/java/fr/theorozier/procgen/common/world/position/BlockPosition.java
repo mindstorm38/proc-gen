@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.common.world.position;
 
+import java.util.Objects;
+
 /**
  *
  * A class for mutable block position in world, with integer coordinates.
@@ -80,6 +82,16 @@ public class BlockPosition implements BlockPositioned {
 	
 	public void sub(SectionPositioned sectionPos) {
 		this.sub(sectionPos.getX(), 0, sectionPos.getZ());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return BlockPositioned.areEquals(this, o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return BlockPositioned.hashCode(this);
 	}
 	
 }

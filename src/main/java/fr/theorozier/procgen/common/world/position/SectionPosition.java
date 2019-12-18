@@ -62,4 +62,13 @@ public class SectionPosition implements SectionPositioned {
 		this.sub(sectionPos.getX(), sectionPos.getZ());
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return SectionPositioned.areEquals(this, o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return SectionPositioned.hashCode(this);
+	}
 }

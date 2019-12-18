@@ -39,4 +39,14 @@ public class ImmutableBlockPosition implements BlockPositioned {
 		return 0;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return BlockPositioned.areEquals(this, o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return BlockPositioned.hashCode(this);
+	}
+	
 }

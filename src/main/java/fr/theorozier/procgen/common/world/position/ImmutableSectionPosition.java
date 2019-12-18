@@ -29,4 +29,14 @@ public class ImmutableSectionPosition implements SectionPositioned {
 		return this.z;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return SectionPositioned.areEquals(this, o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return SectionPositioned.hashCode(this);
+	}
+	
 }
