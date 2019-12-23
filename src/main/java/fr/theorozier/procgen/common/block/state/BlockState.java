@@ -14,16 +14,30 @@ public class BlockState {
 	private final Block owner;
 	private final ImmutableMap<BlockStateProperty<?>, ?> properties;
 	private Table<BlockStateProperty<?>, ?, BlockState> statesByValues;
+	private short uid;
 	
 	public BlockState(Block owner, ImmutableMap<BlockStateProperty<?>, ?> properties) {
 		
 		this.owner = owner;
 		this.properties = properties;
+		this.uid = 0;
 		
 	}
 	
 	public Block getBlock() {
 		return this.owner;
+	}
+	
+	public boolean isBlock(Block block) {
+		return this.owner == block;
+	}
+	
+	public short getUid() {
+		return this.uid;
+	}
+	
+	public void setUid(short uid) {
+		this.uid = uid;
 	}
 	
 	public void setAllStates(Map<ImmutableMap<BlockStateProperty<?>, ?>, BlockState> states) {

@@ -4,7 +4,7 @@ import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.biome.Biome;
+import fr.theorozier.procgen.common.world.biome.Biome;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextBase;
 import io.msengine.client.util.camera.Camera3D;

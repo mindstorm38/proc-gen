@@ -3,11 +3,12 @@ package fr.theorozier.procgen.world;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.world.biome.Biome;
-import fr.theorozier.procgen.world.biome.BiomeAccessor;
+import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.biome.BiomeAccessor;
+import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.world.chunk.*;
-import fr.theorozier.procgen.world.gen.ChunkGenerator;
-import fr.theorozier.procgen.world.gen.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
 import fr.theorozier.procgen.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.world.tick.WorldTickList;
 

@@ -25,6 +25,16 @@ public class ImmutableBlockPosition implements BlockPositioned {
 	}
 	
 	@Override
+	public ImmutableBlockPosition immutableBlockPos() {
+		return this;
+	}
+	
+	@Override
+	public ImmutableSectionPosition immutableSectionPos() {
+		return new ImmutableSectionPosition(this.x, this.z);
+	}
+	
+	@Override
 	public int getX() {
 		return 0;
 	}

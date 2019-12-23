@@ -4,6 +4,8 @@ public interface BlockPositioned extends SectionPositioned {
 	
 	int getY();
 	
+	ImmutableBlockPosition immutableBlockPos();
+	
 	default float distSquared(float x, float y, float z) {
 		float dx = this.getX() - x;
 		float dy = this.getY() - y;

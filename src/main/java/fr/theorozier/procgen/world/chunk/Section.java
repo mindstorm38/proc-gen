@@ -1,11 +1,12 @@
 package fr.theorozier.procgen.world.chunk;
 
+import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.world.HorizontalPosition;
 import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.biome.Biome;
-import fr.theorozier.procgen.world.biome.BiomeAccessor;
-import fr.theorozier.procgen.world.biome.Biomes;
-import fr.theorozier.procgen.world.gen.ChunkGenerator;
+import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.biome.BiomeAccessor;
+import fr.theorozier.procgen.common.world.biome.Biomes;
+import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
 
 import java.util.*;
 

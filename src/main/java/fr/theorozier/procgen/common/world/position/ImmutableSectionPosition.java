@@ -20,6 +20,11 @@ public class ImmutableSectionPosition implements SectionPositioned {
 	}
 	
 	@Override
+	public ImmutableSectionPosition immutableSectionPos() {
+		return this;
+	}
+	
+	@Override
 	public int getX() {
 		return this.x;
 	}

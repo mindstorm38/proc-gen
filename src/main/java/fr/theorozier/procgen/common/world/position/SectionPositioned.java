@@ -5,6 +5,8 @@ public interface SectionPositioned {
 	int getX();
 	int getZ();
 	
+	ImmutableSectionPosition immutableSectionPos();
+	
 	default float distSquared(float x, float z) {
 		float dx = this.getX() - x;
 		float dz = this.getZ() - z;

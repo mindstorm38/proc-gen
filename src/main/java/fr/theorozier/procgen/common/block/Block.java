@@ -3,6 +3,8 @@ package fr.theorozier.procgen.common.block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateContainer;
 import fr.theorozier.procgen.common.util.ErrorUtils;
+import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.world.util.Direction;
 import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.world.chunk.WorldBlock;
@@ -96,9 +98,9 @@ public class Block {
 	
 	// Dynamic function for modifying the world
 	
-	public void initBlock(World world, WorldBlock block) {}
+	public void initBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
 	
-	public void tickBlock(World world, WorldBlock block, Random rand) {}
+	public void tickBlock(WorldServer world, BlockPositioned pos, BlockState block, Random rand) {}
 	
 	@Override
 	public int hashCode() {

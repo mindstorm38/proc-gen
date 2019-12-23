@@ -53,6 +53,7 @@ public class Blocks {
 		for (Block block : uidRegister.values()) {
 			for (BlockState state : block.getStateContainer().getStates()) {
 				uidStateRegister.put(++idx, state);
+				state.setUid(idx);
 			}
 		}
 		

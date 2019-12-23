@@ -11,6 +11,8 @@ public class SectionPosition implements SectionPositioned {
 
 	private int x, z;
 	
+	public SectionPosition() {}
+	
 	public SectionPosition(int x, int z) {
 		
 		this.x = x;
@@ -31,6 +33,11 @@ public class SectionPosition implements SectionPositioned {
 	}
 	
 	@Override
+	public ImmutableSectionPosition immutableSectionPos() {
+		return this.immutable();
+	}
+	
+	@Override
 	public int getX() {
 		return this.x;
 	}
@@ -38,6 +45,13 @@ public class SectionPosition implements SectionPositioned {
 	@Override
 	public int getZ() {
 		return this.z;
+	}
+	
+	public void set(int x, int z) {
+		
+		this.x = x;
+		this.z = z;
+		
 	}
 	
 	public void add(int x, int z) {

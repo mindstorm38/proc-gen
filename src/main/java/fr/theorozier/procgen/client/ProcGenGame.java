@@ -4,7 +4,7 @@ import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.gen.beta.BetaChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
 import io.msengine.client.renderer.texture.TextureMap;
