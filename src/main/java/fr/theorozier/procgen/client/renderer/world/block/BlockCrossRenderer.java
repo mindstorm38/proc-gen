@@ -35,6 +35,11 @@ public class BlockCrossRenderer extends BlockRenderer {
 	}
 	
 	@Override
+	public boolean needFaces() {
+		return false;
+	}
+	
+	@Override
 	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);

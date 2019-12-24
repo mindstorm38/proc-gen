@@ -27,4 +27,8 @@ public abstract class BlockRenderer {
 		return (int) (Math.sin(x * 12.9898f + y * 53.5014f + z * 78.233f) * 43758.5453123f);
 	}
 	
+	public boolean needFaces() {
+		return true;
+	}
+	
 }

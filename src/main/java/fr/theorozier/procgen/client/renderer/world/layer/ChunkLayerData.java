@@ -93,29 +93,33 @@ public abstract class ChunkLayerData {
 						wy = cy + y;
 						wz = cz + z;
 						
-						if (y < 15)
-							faces.setFaceBlock(state, Direction.TOP, this.chunk.getBlockAt(x, y + 1, z));
-						else faces.setFaceBlock(state, Direction.TOP, this.world.getBlockAt(wx, wy + 1, wz));
-						
-						if (y > 0)
-							faces.setFaceBlock(state, Direction.BOTTOM, this.chunk.getBlockAt(x, y - 1, z));
-						else faces.setFaceBlock(state, Direction.BOTTOM, this.world.getBlockAt(wx, wy - 1, wz));
-						
-						if (x < 15)
-							faces.setFaceBlock(state, Direction.NORTH, this.chunk.getBlockAt(x + 1, y, z));
-						else faces.setFaceBlock(state, Direction.NORTH, this.world.getBlockAt(wx + 1, wy, wz));
-						
-						if (x > 0)
-							faces.setFaceBlock(state, Direction.SOUTH, this.chunk.getBlockAt(x - 1, y, z));
-						else faces.setFaceBlock(state, Direction.SOUTH, this.world.getBlockAt(wx - 1, wy, wz));
-						
-						if (z < 15)
-							faces.setFaceBlock(state, Direction.EAST, this.chunk.getBlockAt(x, y, z + 1));
-						else faces.setFaceBlock(state, Direction.EAST, this.world.getBlockAt(wx, wy, wz + 1));
-						
-						if (z > 0)
-							faces.setFaceBlock(state, Direction.WEST, this.chunk.getBlockAt(x, y, z - 1));
-						else faces.setFaceBlock(state, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
+						if (renderer.needFaces()) {
+							
+							if (y < 15)
+								faces.setFaceBlock(state, Direction.TOP, this.chunk.getBlockAt(x, y + 1, z));
+							else faces.setFaceBlock(state, Direction.TOP, this.world.getBlockAt(wx, wy + 1, wz));
+							
+							if (y > 0)
+								faces.setFaceBlock(state, Direction.BOTTOM, this.chunk.getBlockAt(x, y - 1, z));
+							else faces.setFaceBlock(state, Direction.BOTTOM, this.world.getBlockAt(wx, wy - 1, wz));
+							
+							if (x < 15)
+								faces.setFaceBlock(state, Direction.NORTH, this.chunk.getBlockAt(x + 1, y, z));
+							else faces.setFaceBlock(state, Direction.NORTH, this.world.getBlockAt(wx + 1, wy, wz));
+							
+							if (x > 0)
+								faces.setFaceBlock(state, Direction.SOUTH, this.chunk.getBlockAt(x - 1, y, z));
+							else faces.setFaceBlock(state, Direction.SOUTH, this.world.getBlockAt(wx - 1, wy, wz));
+							
+							if (z < 15)
+								faces.setFaceBlock(state, Direction.EAST, this.chunk.getBlockAt(x, y, z + 1));
+							else faces.setFaceBlock(state, Direction.EAST, this.world.getBlockAt(wx, wy, wz + 1));
+							
+							if (z > 0)
+								faces.setFaceBlock(state, Direction.WEST, this.chunk.getBlockAt(x, y, z - 1));
+							else faces.setFaceBlock(state, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
+							
+						}
 						
 						consumer.accept(wx, wy, wz, state, renderer, faces);
 						
