@@ -3,26 +3,13 @@ package fr.theorozier.procgen.client.renderer.world.block;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
 
-import java.util.function.BiConsumer;
-
 public class BlockGrassRenderer extends BlockRenderer {
-	
-	private interface TexcoordsApplier extends BiConsumer<BufferedFloatArray, TextureMapTile> {}
-	
-	private static final TexcoordsApplier[] TOP_TEXCOORDS_APPLIERS = {
-			(texcoords, tile) -> texcoords.put(tile.x             ).put(tile.y              ),
-			(texcoords, tile) -> texcoords.put(tile.x             ).put(tile.y + tile.height),
-			(texcoords, tile) -> texcoords.put(tile.x + tile.width).put(tile.y + tile.height),
-			(texcoords, tile) -> texcoords.put(tile.x + tile.width).put(tile.y              )
-	};
 	
 	public TextureMapTile getFaceTile(BlockState block, TextureMap map, Direction face) {
 		
@@ -41,8 +28,7 @@ public class BlockGrassRenderer extends BlockRenderer {
 	}
 	
 	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
-		Biome biome = world.getBiomeAt(x, z);
-		return biome == null ? Color.WHITE : biome.getFoliageColor();
+		return world.getBiomeAt(x, z).getFoliageColor();
 	}
 	
 	@Override
@@ -55,7 +41,7 @@ public class BlockGrassRenderer extends BlockRenderer {
 			
 			dataArray.faceTop(x, y + 1, z, 1, 1);
 			dataArray.faceColor(color);
-			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP));
+			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP), posRand(x, y, z) % 4);
 			dataArray.faceIndices();
 			
 		}
@@ -120,13 +106,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 			dataArray.faceIndices();
 			
 		}
-		
-		/*
-		int offset = posRand(x, y, z);
-			
-			for (int i = 0; i < TOP_TEXCOORDS_APPLIERS.length; ++i)
-				TOP_TEXCOORDS_APPLIERS[(i + offset) & 3].accept(texcoords, tile);
-		 */
 		
 	}
 	

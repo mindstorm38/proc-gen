@@ -121,6 +121,8 @@ public class WorldRenderDataArray {
 		
 	}
 	
+	// Faces Vertices //
+	
 	// Origins of faces are always possible to reach with
 	// translation of only one axis for a straight cube.
 	// This is used to reduce computation
@@ -179,6 +181,8 @@ public class WorldRenderDataArray {
 		
 	}
 	
+	// Face Colors //
+	
 	public void faceColor(float r, float g, float b) {
 		
 		colors.put(r).put(g).put(b);
@@ -192,22 +196,80 @@ public class WorldRenderDataArray {
 		this.faceColor(1, 1, 1);
 	}
 	
+	public void faceColorGray(float f) {
+		this.faceColor(f, f, f);
+	}
+	
 	public void faceColor(Color color) {
 		this.faceColor(color.getRed(), color.getGreen(), color.getBlue());
 	}
 	
-	public void faceTexcoords(float u, float v, float w, float h) {
-		
+	public void faceColor(Color color, float f) {
+		this.faceColor(color.getRed() * f, color.getGreen() * f, color.getBlue() * f);
+	}
+	
+	// Face Texcoords //
+	
+	public void faceTexCoordsRot0(float u, float v, float w, float h) {
 		texcoords.put(u    ).put(v    );
 		texcoords.put(u    ).put(v + h);
 		texcoords.put(u + w).put(v + h);
 		texcoords.put(u + w).put(v    );
+	}
+	
+	public void faceTexCoordsRot1(float u, float v, float w, float h) {
+		texcoords.put(u    ).put(v + h);
+		texcoords.put(u + w).put(v + h);
+		texcoords.put(u + w).put(v    );
+		texcoords.put(u    ).put(v    );
+	}
+	
+	public void faceTexCoordsRot2(float u, float v, float w, float h) {
+		texcoords.put(u + w).put(v + h);
+		texcoords.put(u + w).put(v    );
+		texcoords.put(u    ).put(v    );
+		texcoords.put(u    ).put(v + h);
+	}
+	
+	public void faceTexCoordsRot3(float u, float v, float w, float h) {
+		texcoords.put(u + w).put(v    );
+		texcoords.put(u    ).put(v    );
+		texcoords.put(u    ).put(v + h);
+		texcoords.put(u + w).put(v + h);
+	}
+	
+	public void faceTexcoords(float u, float v, float w, float h) {
+		this.faceTexCoordsRot0(u, v, w, h);
+	}
+	
+	public void faceTexcoords(float u, float v, float w, float h, int rotation) {
+		
+		switch (rotation) {
+			case 0:
+				this.faceTexCoordsRot0(u, v, w, h);
+				break;
+			case 1:
+				this.faceTexCoordsRot1(u, v, w, h);
+				break;
+			case 2:
+				this.faceTexCoordsRot2(u, v, w, h);
+				break;
+			default:
+				this.faceTexCoordsRot3(u, v, w, h);
+				break;
+		}
 		
 	}
 	
 	public void faceTexcoords(TextureMapTile tile) {
 		this.faceTexcoords(tile.x, tile.y, tile.width, tile.height);
 	}
+	
+	public void faceTexcoords(TextureMapTile tile, int rotation) {
+		this.faceTexcoords(tile.x, tile.y, tile.width, tile.height, rotation);
+	}
+	
+	// Face Indices //
 	
 	public void faceIndices() {
 		this.rect(0, 1, 2, 3);

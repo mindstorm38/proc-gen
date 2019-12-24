@@ -31,8 +31,7 @@ public class BlockCubeRenderer extends BlockRenderer {
 	}
 	
 	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
-		Biome biome = world.getBiomeAt(x, z);
-		return biome == null ? Color.WHITE : biome.getFoliageColor();
+		return world.getBiomeAt(x, z).getFoliageColor();
 	}
 	
 	@Override

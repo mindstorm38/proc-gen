@@ -27,8 +27,7 @@ public class BlockLegacyWaterRenderer extends BlockCubeRenderer {
 	
 	@Override
 	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
-		Biome biome = world.getBiomeAt(x, z);
-		return biome == null ? Color.WHITE : biome.getWaterColor();
+		return world.getBiomeAt(x, z).getWaterColor();
 	}
 	
 }
