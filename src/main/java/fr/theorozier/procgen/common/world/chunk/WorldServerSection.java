@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
@@ -8,7 +9,6 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 public class WorldServerSection extends WorldSection {
@@ -23,8 +23,8 @@ public class WorldServerSection extends WorldSection {
 		
 	}
 	
-	public WorldServer getWorldServer() {
-		return (WorldServer) this.getWorld();
+	public WorldServer getWorld() {
+		return (WorldServer) super.getWorld();
 	}
 	
 	// CHUNKS //
@@ -58,6 +58,8 @@ public class WorldServerSection extends WorldSection {
 		if (map == null) {
 			
 			map = new Heightmap(this, type);
+			this.heightmaps.put(type, map);
+			
 			Heightmap.updateSectionHeightmaps(this, EnumSet.of(type));
 			
 		}
@@ -69,7 +71,7 @@ public class WorldServerSection extends WorldSection {
 	// FIXME TEMP MONO THREAD WORLD GENERATION METHOD
 	public void generate() {
 		
-		ChunkGenerator generator = this.getWorldServer().getChunkManager().getGenerator();
+		ChunkGenerator generator = this.getWorld().getChunkManager().getGenerator();
 		WorldServerChunk chunk;
 		
 		ImmutableSectionPosition pos = this.getSectionPos();
@@ -77,7 +79,7 @@ public class WorldServerSection extends WorldSection {
 		
 		for (int y = 0; y < this.getWorld().getVerticalChunkCount(); ++y) {
 		
-			chunk = new WorldServerChunk(this.getWorldServer(), this, new ImmutableBlockPosition(pos, y << 4));
+			chunk = new WorldServerChunk(this.getWorld(), this, new ImmutableBlockPosition(pos, y));
 			this.setChunkAt(y, chunk);
 			
 			generator.genBase(chunk, chunk.getChunkPos());
@@ -86,6 +88,12 @@ public class WorldServerSection extends WorldSection {
 	
 		generator.genSurface(this, pos);
 		generator.genFeatures(this, pos);
+		
+		this.forEachChunk(loadedChunk -> {
+			this.getWorld().getEventManager().fireListeners(WorldLoadingListener.class, l -> {
+				l.worldChunkLoaded(this.getWorld(), loadedChunk);
+			});
+		});
 		
 	}
 	

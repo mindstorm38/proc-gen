@@ -1,6 +1,4 @@
-package fr.theorozier.procgen.world.util;
-
-import fr.theorozier.procgen.world.BlockPosition;
+package fr.theorozier.procgen.common.world.position;
 
 public enum Direction {
 	

@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.world.biome;
 
-import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.Blocks;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
@@ -176,7 +176,7 @@ public abstract class Biome {
 				Placements.SURFACE_CHANCE_MULTIPLE,
 				new ChanceCountConfig(10, 0.3f),
 				Features.PLANT,
-				new PlantFeatureConfig(Blocks.PLANT_DEADBUSH, block -> block == Blocks.SAND)
+				new PlantFeatureConfig(Blocks.PLANT_DEADBUSH, block -> block.isBlock(Blocks.SAND))
 		);
 		
 	}
@@ -192,8 +192,8 @@ public abstract class Biome {
 		
 	}
 	
-	public static boolean basicFlowersCanPlaceOn(Block block) {
-		return block == Blocks.GRASS || block == Blocks.DIRT;
+	public static boolean basicFlowersCanPlaceOn(BlockState block) {
+		return block.isBlock(Blocks.GRASS) || block.isBlock(Blocks.DIRT);
 	}
 	
 }

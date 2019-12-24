@@ -1,15 +1,13 @@
 package fr.theorozier.procgen.common.block;
 
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateContainer;
 import fr.theorozier.procgen.common.block.state.DefaultProperties;
-import fr.theorozier.procgen.world.util.Axis;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
-import io.msengine.common.osf.OSFNumber;
+import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.position.Axis;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
 
 public class BlockLog extends Block {
-	
-	private static final Axis DEFAULT_AXIS = Axis.Y;
 	
 	public BlockLog(int uid, String identifier) {
 		
@@ -24,20 +22,9 @@ public class BlockLog extends Block {
 		builder.register(DefaultProperties.AXIS);
 	}
 	
-	public void setLogAxis(WorldBlock block, Axis axis) {
-		block.getMetadata().set("axis", new OSFNumber((byte) axis.ordinal()));
-	}
-	
-	public Axis getLogAxis(WorldBlock block) {
-		
-		final int id = block.getMetadata().getByte("axis", (byte) -1);
-		return id >= 0 && id < Axis.values().length ? Axis.values()[id] : DEFAULT_AXIS;
-		
-	}
-	
 	@Override
-	public void initBlock(World world, WorldBlock block) {
-		this.setLogAxis(block, DEFAULT_AXIS);
+	public void initBlock(WorldServer world, BlockPositioned pos, BlockState block) {
+	
 	}
 	
 }

@@ -1,15 +1,18 @@
 package fr.theorozier.procgen.client.renderer.world;
 
+import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkDirectLayerData;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerData;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerDataProvider;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkSortedLayerData;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.world.BlockPosition;
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.position.BlockPosition;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.Direction;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.util.camera.Camera3D;
 
 import java.util.*;
@@ -21,17 +24,22 @@ import java.util.concurrent.Future;
 public class ChunkRenderManager {
 	
 	// These distances are squared, for optimisation.
-	public static final int RENDER_DISTANCE = 16 * 12;
-	public static final int UNLOAD_DISTANCE = 16 * 16;
+	public static final int RENDER_DISTANCE_CHUNKS = 12;
+	public static final int UNLOAD_DISTANCE_CHUNKS = 16;
+	
+	public static final int RENDER_DISTANCE = RENDER_DISTANCE_CHUNKS * 16;
+	public static final int UNLOAD_DISTANCE = UNLOAD_DISTANCE_CHUNKS * 16;
 	
 	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
 	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
 	
 	private final WorldRenderer renderer;
 	
-	private final Map<BlockPosition, ChunkRenderer> chunkRenderers;
+	private final BlockPosition cachedBlockPos;
+	
+	private final Map<BlockPositioned, ChunkRenderer> chunkRenderers;
 	private final List<ChunkRenderer> chunkRenderersList;
-	private final List<BlockPosition> unloadingChunkRenderers;
+	private final List<ImmutableBlockPosition> unloadingChunkRenderers;
 	
 	private final ChunkLayerDataProvider[] layerHandlers;
 	
@@ -44,6 +52,8 @@ public class ChunkRenderManager {
 	ChunkRenderManager(WorldRenderer renderer) {
 		
 		this.renderer = renderer;
+		
+		this.cachedBlockPos = new BlockPosition();
 		
 		this.chunkRenderers = new HashMap<>();
 		this.chunkRenderersList = new ArrayList<>();
@@ -69,7 +79,7 @@ public class ChunkRenderManager {
 		this.layerHandlers[layer.ordinal()] = handler;
 	}
 	
-	public ChunkLayerData provideLayerData(BlockRenderLayer layer, Chunk chunk) {
+	public ChunkLayerData provideLayerData(BlockRenderLayer layer, WorldChunk chunk) {
 		return this.layerHandlers[layer.ordinal()].provide(chunk, layer, this);
 	}
 	
@@ -126,14 +136,16 @@ public class ChunkRenderManager {
 		
 	}
 	
-	private void loadChunkRenderer(Chunk chunk) {
+	private void loadChunkRenderer(WorldChunk chunk) {
 		
-		BlockPosition pos = chunk.getChunkPosition();
+		ImmutableBlockPosition pos = chunk.getChunkPos();
 		ChunkRenderer cr = this.chunkRenderers.get(pos);
 		
 		if (cr == null) {
 			
 			//System.out.println("Loading chunk at " + pos);
+			
+			//System.out.println("Loading chunk at " + pos + " (chunk in the middle : " + chunk.getBlockAt(7, 7, 7) + ")");
 			
 			cr = new ChunkRenderer(this, chunk);
 			this.chunkRenderers.put(pos, cr);
@@ -145,7 +157,7 @@ public class ChunkRenderManager {
 			
 			ChunkRenderer neighbour;
 			for (Direction dir : Direction.values()) {
-				if ((neighbour = this.chunkRenderers.get(pos.add(dir, 16, 16, 16))) != null) {
+				if ((neighbour = this.chunkRenderers.get(this.cachedBlockPos.set(pos, dir.rx, dir.ry, dir.rz))) != null) {
 					
 					neighbour.setNeedUpdate(true);
 					
@@ -159,7 +171,7 @@ public class ChunkRenderManager {
 		
 	}
 	
-	private void deleteChunkRenderer(BlockPosition pos) {
+	private void deleteChunkRenderer(ImmutableBlockPosition pos) {
 		
 		ChunkRenderer cr = this.chunkRenderers.get(pos);
 		
@@ -192,7 +204,7 @@ public class ChunkRenderManager {
 		this.chunkRenderers.forEach((pos, cr) -> {
 			
 			if (cr.updateDistanceToCamera(x, y, z) > UNLOAD_DISTANCE_SQUARED) {
-				this.unloadingChunkRenderers.add(pos);
+				this.unloadingChunkRenderers.add(pos.immutableBlockPos());
 			} else {
 				cr.updateViewPosition(ix, iy, iz);
 			}
@@ -208,13 +220,13 @@ public class ChunkRenderManager {
 		
 		this.resortChunkRenderers();
 		
-		World world = this.renderer.getRenderingWorld();
+		WorldClient world = this.renderer.getRenderingWorld();
 		
 		if (world != null) {
 			
-			world.forEachChunkNear(x, y, z, RENDER_DISTANCE, chunk -> {
+			world.forEachChunkNear(x, y, z, RENDER_DISTANCE_CHUNKS, chunk -> {
 			
-				if (chunk.getDistanceSquaredTo(x, y, z) <= RENDER_DISTANCE_SQUARED)
+				if (chunk.getDistSquaredTo(x, y, z) <= RENDER_DISTANCE_SQUARED)
 					this.loadChunkRenderer(chunk);
 			
 			});
@@ -241,15 +253,29 @@ public class ChunkRenderManager {
 	
 	// Events //
 	
-	void chunkLoaded(Chunk chunk) {
+	void chunkLoaded(WorldChunk chunk) {
 		
-		if (chunk.getDistanceSquaredTo(this.viewX, this.viewY, this.viewZ) <= RENDER_DISTANCE_SQUARED)
+		if (chunk.getDistSquaredTo(this.viewX, this.viewY, this.viewZ) <= RENDER_DISTANCE_SQUARED)
 			this.loadChunkRenderer(chunk);
 		
 	}
 	
-	void chunkUnloaded(Chunk chunk) {
-		this.deleteChunkRenderer(chunk.getChunkPosition());
+	void chunkUnloaded(ImmutableBlockPosition pos) {
+		this.deleteChunkRenderer(pos);
+	}
+	
+	void chunkUpdated(WorldChunk chunk) {
+		
+		ChunkRenderer renderer = this.chunkRenderers.get(chunk.getChunkPos());
+		if (renderer != null) renderer.chunkUpdated(chunk);
+		
+	}
+	
+	void blockUpdated(WorldChunk chunk, BlockPositioned pos, BlockState state) {
+		
+		ChunkRenderer renderer = this.chunkRenderers.get(chunk.getChunkPos());
+		if (renderer != null) renderer.blockUpdated(chunk, pos, state);
+		
 	}
 	
 }

@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.world.util;
+package fr.theorozier.procgen.common.world.position;
 
 public enum Axis {
 

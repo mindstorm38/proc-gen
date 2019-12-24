@@ -1,15 +1,19 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.util.MathUtils;
+import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
-import fr.theorozier.procgen.common.world.position.BlockPosition;
-import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.position.SectionPosition;
-import fr.theorozier.procgen.common.world.position.SectionPositioned;
+import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
+import fr.theorozier.procgen.common.world.position.*;
+import io.msengine.common.util.event.MethodEventManager;
+import io.sutil.pool.FixedObjectPool;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  *
@@ -23,12 +27,16 @@ public abstract class WorldBase {
 	protected final Map<SectionPositioned, WorldSection> sections = new HashMap<>();
 	protected long time;
 	
-	protected final SectionPosition cachedSectionPos = new SectionPosition();
-	protected final BlockPosition cachedBlockPos = new BlockPosition();
+	protected final MethodEventManager eventManager;
 	
 	public WorldBase() {
 		
 		this.time = 0L;
+		
+		this.eventManager = new MethodEventManager(
+				WorldChunkListener.class,
+				WorldLoadingListener.class
+		);
 		
 	}
 	
@@ -62,6 +70,10 @@ public abstract class WorldBase {
 		return this.getVerticalChunkCount() * 16;
 	}
 	
+	public MethodEventManager getEventManager() {
+		return this.eventManager;
+	}
+	
 	// SECTIONS //
 	
 	/**
@@ -71,8 +83,9 @@ public abstract class WorldBase {
 	 * @return Section at this position, or <b>NULL</b> if no section there.
 	 */
 	protected WorldSection getSectionAt(int x, int z) {
-		this.cachedSectionPos.set(x, z);
-		return this.sections.get(this.cachedSectionPos);
+		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
+			return this.sections.get(pos.get().set(x, z));
+		}
 	}
 	
 	protected WorldSection getSectionAtBlock(int x, int z) {
@@ -101,6 +114,17 @@ public abstract class WorldBase {
 		return this.getChunkAtBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
+	// BIOMES //
+	
+	public Biome getBiomeAt(int x, int z) {
+		WorldSection section = this.getSectionAtBlock(x, z);
+		return section == null ? null : section.getBiomeAtBlock(x, z);
+	}
+	
+	public Biome getBiomeAt(SectionPositioned pos) {
+		return this.getBiomeAt(pos.getX(), pos.getZ());
+	}
+	
 	// BLOCKS //
 	
 	public BlockState getBlockAt(int x, int y, int z) {
@@ -115,6 +139,55 @@ public abstract class WorldBase {
 	public void setBlockAt(int x, int y, int z, BlockState state) {
 		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
 		if (chunk != null) chunk.setBlockAt(x & 15, y & 15, z & 15, state);
+	}
+	
+	public void setBlockAt(BlockPositioned pos, BlockState state) {
+		this.setBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
+	}
+	
+	// UTILITES //
+	
+	public void forEachChunkPosNear(float x, float y, float z, int range, boolean wholeY, Consumer<BlockPosition> consumer) {
+		
+		ImmutableBlockPosition chunkPos = new ImmutableBlockPosition(MathUtils.fastfloor(x) >> 4, MathUtils.fastfloor(y) >> 4, MathUtils.fastfloor(z) >> 4);
+		BlockPosition minPos = new BlockPosition(chunkPos).sub(range, range, range);
+		
+		int xmax = chunkPos.getX() + range;
+		int ymax = wholeY ? this.getVerticalChunkCount() : chunkPos.getY() + range;
+		int zmax = chunkPos.getZ() + range;
+		
+		BlockPosition temp = new BlockPosition();
+		
+		for (int xv = minPos.getX(); xv <= xmax; ++xv)
+			for (int yv = (wholeY ? 0 : minPos.getY()); yv <= ymax; ++yv)
+				for (int zv = minPos.getZ(); zv <= zmax; ++zv)
+					consumer.accept(temp.set(xv, yv, zv));
+		
+	}
+	
+	public void forEachChunkNear(float x, float y, float z, int range, Consumer<WorldChunk> consumer) {
+		
+		this.forEachChunkPosNear(x, y, z, range, false, pos -> {
+			WorldChunk ck = this.getChunkAt(pos.getX(), pos.getY(), pos.getZ());
+			if (ck != null) consumer.accept(ck);
+		});
+		
+	}
+	
+	public void forEachSectionPosNear(float x, float z, int range, Consumer<SectionPosition> consumer) {
+		
+		ImmutableSectionPosition sectionPos = new ImmutableSectionPosition(MathUtils.fastfloor(x) >> 4, MathUtils.fastfloor(z) >> 4);
+		SectionPosition minPos = new SectionPosition(sectionPos).sub(range, range);
+		
+		int xmax = sectionPos.getX() + range;
+		int zmax = sectionPos.getZ() + range;
+		
+		SectionPosition temp = new SectionPosition();
+		
+		for (int xv = minPos.getX(); xv <= xmax; ++xv)
+			for (int zv = minPos.getZ(); zv <= zmax; ++zv)
+				consumer.accept(temp.set(xv, zv));
+		
 	}
 	
 }

@@ -15,6 +15,8 @@ import java.nio.IntBuffer;
 
 /**
  *
+ * Mon petit bijoux de simplification.
+ *
  * @author Theo Rozier
  *
  */

@@ -1,14 +1,15 @@
 package fr.theorozier.procgen.client.renderer.world.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.world.WorldBase;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.common.util.Color;
 
 public abstract class BlockRenderer {
 	
-	public abstract void getRenderData(WorldBlock block, float x, float y, float z, BlockFaces face, TextureMap map, WorldRenderDataArray dataArray);
+	public abstract void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces face, TextureMap map, WorldRenderDataArray dataArray);
 	
 	protected static void addWhiteColor(BufferedFloatArray colors, int c) {
 		for (int i = 0; i < c; ++i) colors.put(1).put(1).put(1);

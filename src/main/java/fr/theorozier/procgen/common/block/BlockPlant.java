@@ -1,8 +1,9 @@
 package fr.theorozier.procgen.common.block;
 
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
-import fr.theorozier.procgen.world.tick.TickPriority;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.tick.TickPriority;
 
 import java.util.Random;
 
@@ -23,12 +24,12 @@ public class BlockPlant extends Block {
 	}
 	
 	@Override
-	public void initBlock(World world, WorldBlock block) {
-		world.getBlockTickList().scheduleTick(this, block.getPosition(), 100, TickPriority.NORMAL);
+	public void initBlock(WorldServer world, BlockPositioned pos, BlockState block) {
+		world.getBlockTickList().scheduleTick(this, pos.immutableBlockPos(), 100, TickPriority.NORMAL);
 	}
 	
 	@Override
-	public void tickBlock(World world, WorldBlock block, Random rand) {
+	public void tickBlock(WorldServer world, BlockPositioned pos, BlockState block, Random rand) {
 	
 		/*
 		if (rand.nextFloat() < 0.05f) {

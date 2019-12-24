@@ -18,6 +18,7 @@ public class WorldChunk {
 	private final WorldBase world;
 	private final WorldSection section;
 	private final ImmutableBlockPosition position;
+	private final ImmutableBlockPosition centerBlockPosition;
 	
 	private final short[] data;
 	
@@ -26,6 +27,7 @@ public class WorldChunk {
 		this.world = world;
 		this.section = section;
 		this.position = position;
+		this.centerBlockPosition = new ImmutableBlockPosition((position.getX() << 4) + 7, (position.getY() << 4) + 7, (position.getZ() << 4) + 7);
 		
 		this.data = new short[4096];
 		
@@ -43,6 +45,10 @@ public class WorldChunk {
 	
 	public final ImmutableBlockPosition getChunkPos() {
 		return this.position;
+	}
+	
+	public float getDistSquaredTo(float x, float y, float z) {
+		return this.centerBlockPosition.distSquared(x, y, z);
 	}
 	
 	// BIOMES //
@@ -68,6 +74,8 @@ public class WorldChunk {
 	public void setBlockAt(int x, int y, int z, BlockState state) {
 		this.data[getBlockIndex(x, y, z)] = state.getBlock().isUnsavable() ? 0 : state.getUid();
 	}
+	
+	// UTILS //
 	
 	public static int getBlockIndex(int x, int y, int z) {
 		return x * 256 + y * 16 + z;

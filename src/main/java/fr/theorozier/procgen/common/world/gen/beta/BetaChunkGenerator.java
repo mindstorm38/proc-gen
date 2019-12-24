@@ -1,11 +1,12 @@
 package fr.theorozier.procgen.common.world.gen.beta;
 
 import fr.theorozier.procgen.common.block.Blocks;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.world.*;
+import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.biome.Biome;
-import fr.theorozier.procgen.world.chunk.Chunk;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
 import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
@@ -13,6 +14,10 @@ import io.msengine.common.util.noise.OctaveSimplexNoise;
 public class BetaChunkGenerator extends ChunkGenerator {
 	
 	public static final ChunkGeneratorProvider PROVIDER = world -> new BetaChunkGenerator(world.getSeed());
+	
+	private static final BlockState BEDROCK_STATE = Blocks.BEDROCK.getDefaultState();
+	private static final BlockState STONE_STATE = Blocks.STONE.getDefaultState();
+	private static final BlockState WATER_STATE = Blocks.WATER.getDefaultState();
 	
 	// Class //
 	
@@ -33,30 +38,31 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	}
 	
 	@Override
-	public void genBase(Chunk chunk, BlockPosition pos) {
+	public void genBase(WorldServerChunk chunk, BlockPositioned pos) {
 		
 		float[][] randomMap = new float[this.noiseHorizontalSize + 1][this.noiseHorizontalSize + 1];
 		
-		int chunkX = pos.getX() >> 4;
-		int chunkZ = pos.getZ() >> 4;
-		World world = chunk.getWorld();
+		int chunkX = pos.getX() << 4;
+		int chunkY = pos.getY() << 4;
+		int chunkZ = pos.getZ() << 4;
+		WorldServer world = chunk.getWorld();
 		
-		int maxHeight = chunk.getWorld().getWorldHeightLimit();
+		int maxHeight = world.getHeightLimit();
 		Biome biome;
 		
 		for (int x = 0; x <= this.noiseHorizontalSize; ++x) {
 			for (int z = 0; z <= this.noiseHorizontalSize; ++z) {
 				
 				if (x == this.noiseHorizontalSize || z == this.noiseHorizontalSize) {
-					biome = this.biomeProvider.getBiomeAt(pos.getX() + x * this.noiseHorizontalGranularity, pos.getZ() + z * this.noiseHorizontalGranularity);
+					biome = this.biomeProvider.getBiomeAt(chunkX + x * this.noiseHorizontalGranularity, chunkZ + z * this.noiseHorizontalGranularity);
 				} else {
-					biome = chunk.getSection().getBiomeAtRelative(x * this.noiseHorizontalGranularity, z * this.noiseHorizontalGranularity);
+					biome = chunk.getBiomeAt(x * this.noiseHorizontalGranularity, z * this.noiseHorizontalGranularity);
 				}
 				
 				randomMap[x][z] = (biome.getDepth() * maxHeight) +
 						this.baseNoise.noise(
-								chunkX * this.noiseHorizontalSize + x,
-								chunkZ * this.noiseHorizontalSize + z,
+								pos.getX() * this.noiseHorizontalSize + x,
+								pos.getZ() * this.noiseHorizontalSize + z,
 								0.04f
 						) * biome.getScale();
 			
@@ -68,7 +74,6 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		float noise1, noise2, noise3, noise4;
 		float noiseInt1, noiseInt2, noise;
 		
-		WorldBlock block;
 		int wy;
 		
 		for (int x = 0; x < 16; ++x) {
@@ -93,16 +98,14 @@ public class BetaChunkGenerator extends ChunkGenerator {
 				
 				for (int y = 0; y < 16; ++y) {
 					
-					wy = pos.getY() + y;
-					
-					block = chunk.getBlockAtRelative(x, y, z);
+					wy = chunkY + y;
 					
 					if (wy == 0) {
-						block.setBlockType(Blocks.BEDROCK);
+						chunk.setBlockAt(x, y, z, BEDROCK_STATE);
 					} else if (wy < noise) {
-						block.setBlockType(Blocks.STONE);
+						chunk.setBlockAt(x, y, z, STONE_STATE);
 					} else if (wy < world.getSeaLevel()) {
-						block.setBlockType(Blocks.WATER);
+						chunk.setBlockAt(x, y, z, WATER_STATE);
 					}
 					
 				}

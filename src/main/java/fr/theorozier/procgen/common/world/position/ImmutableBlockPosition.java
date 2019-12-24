@@ -36,17 +36,17 @@ public class ImmutableBlockPosition implements BlockPositioned {
 	
 	@Override
 	public int getX() {
-		return 0;
+		return this.x;
 	}
 	
 	@Override
 	public int getY() {
-		return 0;
+		return this.y;
 	}
 	
 	@Override
 	public int getZ() {
-		return 0;
+		return this.z;
 	}
 	
 	@Override
@@ -57,6 +57,11 @@ public class ImmutableBlockPosition implements BlockPositioned {
 	@Override
 	public int hashCode() {
 		return BlockPositioned.hashCode(this);
+	}
+	
+	@Override
+	public String toString() {
+		return BlockPositioned.toString(this);
 	}
 	
 }

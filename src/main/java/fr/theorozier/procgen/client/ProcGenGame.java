@@ -1,9 +1,11 @@
 package fr.theorozier.procgen.client;
 
+import fr.theorozier.procgen.client.world.WorldClient;
+import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
-import fr.theorozier.procgen.world.World;
+import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
@@ -18,7 +20,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements WindowKeyEventListener {
 	
 	private final WorldRenderer worldRenderer;
-	private final World testWorld;
+	private final WorldClient testWorld;
 	
 	private boolean escaped = false;
 	
@@ -27,7 +29,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		super(options);
 		
 		this.worldRenderer = new WorldRenderer();
-		this.testWorld = new World(BetaChunkGenerator.PROVIDER);
+		this.testWorld = new WorldSinglePlayer(new WorldServer(BetaChunkGenerator.PROVIDER));
 		
 	}
 	
@@ -107,7 +109,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		} else if (key == GLFW.GLFW_KEY_L && action == GLFW.GLFW_PRESS) {
 			
 			Camera3D cam = this.worldRenderer.getCamera();
-			this.testWorld.loadNear(cam.getX(), cam.getZ());
+			
+			if (this.testWorld instanceof WorldSinglePlayer)
+				((WorldSinglePlayer) this.testWorld).getServerWorld().loadNear(cam.getX(), cam.getZ());
 		
 		}
 		

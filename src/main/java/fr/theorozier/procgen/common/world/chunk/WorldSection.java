@@ -7,6 +7,7 @@ import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  *
@@ -63,6 +64,14 @@ public class WorldSection {
 	
 	public void setChunkAt(int y, WorldChunk chunk) {
 		this.chunks[y] = chunk;
+	}
+	
+	protected void forEachChunk(Consumer<WorldChunk> cons) {
+		
+		for (int y = 0; y < this.chunks.length; y++)
+			if (this.chunks[y] != null)
+				cons.accept(this.chunks[y]);
+			
 	}
 	
 	// BIOMES //
@@ -126,7 +135,7 @@ public class WorldSection {
 	// UTILS //
 	
 	public static int getSectionIndex(int x, int z) {
-		return z * 16 + z;
+		return x * 16 + z;
 	}
 	
 }

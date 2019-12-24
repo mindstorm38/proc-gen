@@ -31,7 +31,7 @@ public abstract class ChunkGenerator {
 	
 	public void genBiomes(WorldServerSection section, SectionPositioned pos) {
 		
-		Biome[] biomes = this.biomeProvider.getBiomes(pos.getX(), pos.getZ(), 16, 16);
+		Biome[] biomes = this.biomeProvider.getBiomes(pos.getX() << 4, pos.getZ() << 4, 16, 16);
 		section.setBiomes(biomes);
 		
 	}
@@ -40,7 +40,7 @@ public abstract class ChunkGenerator {
 	
 	public void genSurface(WorldServerSection section, SectionPositioned pos) {
 		
-		WorldServer world = section.getWorldServer();
+		WorldServer world = section.getWorld();
 		int seaLimit = world.getSeaLevel() - 2;
 		
 		short height, baseHeight;
@@ -48,8 +48,8 @@ public abstract class ChunkGenerator {
 		BiomeSurface surface;
 		BlockState newBlock, block = null;
 		
-		int sx = pos.getX();
-		int sz = pos.getZ();
+		int sx = pos.getX() << 4;
+		int sz = pos.getZ() << 4;
 		
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
@@ -85,12 +85,12 @@ public abstract class ChunkGenerator {
 		long featureSeed = getFeatureSeed(this.seed, pos.getX(), pos.getZ());
 		int featureIdx = 0;
 		
-		ImmutableBlockPosition at = new ImmutableBlockPosition(pos, 0);
+		ImmutableBlockPosition at = new ImmutableBlockPosition(pos.getX() << 4, 0, pos.getZ() << 4);
 		
 		for (ConfiguredFeature<?> feature : biome.getConfiguredFeatures()) {
 			
 			random.setSeed(featureSeed * (++featureIdx));
-			feature.place(section.getWorldServer(), this, random, at);
+			feature.place(section.getWorld(), this, random, at);
 			
 		}
 		

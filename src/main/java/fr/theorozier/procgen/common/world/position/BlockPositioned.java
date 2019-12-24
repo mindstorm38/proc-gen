@@ -27,4 +27,8 @@ public interface BlockPositioned extends SectionPositioned {
 		return pos.getX() == that.getX() && pos.getY() == that.getY() && pos.getZ() == that.getZ();
 	}
 	
+	static String toString(BlockPositioned pos) {
+		return "<" + pos.getX() + "/" + pos.getY() + "/" + pos.getZ() + ">";
+	}
+	
 }

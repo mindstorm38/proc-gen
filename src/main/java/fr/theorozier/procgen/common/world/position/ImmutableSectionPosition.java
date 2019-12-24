@@ -44,4 +44,9 @@ public class ImmutableSectionPosition implements SectionPositioned {
 		return SectionPositioned.hashCode(this);
 	}
 	
+	@Override
+	public String toString() {
+		return SectionPositioned.toString(this);
+	}
+	
 }

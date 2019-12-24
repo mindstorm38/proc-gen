@@ -1,9 +1,9 @@
 package fr.theorozier.procgen.common.world.gen;
 
-import fr.theorozier.procgen.world.World;
+import fr.theorozier.procgen.common.world.WorldServer;
 
 public interface ChunkGeneratorProvider {
 
-	ChunkGenerator create(World world);
+	ChunkGenerator create(WorldServer world);
 	
 }

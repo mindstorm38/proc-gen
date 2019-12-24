@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world.block;
 
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.position.Direction;
 
 public class BlockFaces {
 
@@ -48,8 +48,8 @@ public class BlockFaces {
 		return this.getFace(Direction.WEST);
 	}
 	
-	public void setFaceBlock(WorldBlock wb, Direction otherDirection, WorldBlock other) {
-		this.setFace(otherDirection, wb.getBlockType().mustRenderFace(wb, otherDirection, other));
+	public void setFaceBlock(BlockState state, Direction otherDirection, BlockState other) {
+		this.setFace(otherDirection, state.getBlock().mustRenderFace(state, otherDirection, other));
 	}
 	
 	public byte toByte() {

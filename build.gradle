@@ -12,6 +12,14 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            exclude 'fr/theorozier/procgen/world/**'
+        }
+    }
+}
+
 dependencies {
 
     compile project(':sutil')

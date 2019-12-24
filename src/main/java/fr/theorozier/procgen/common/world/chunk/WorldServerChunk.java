@@ -9,12 +9,12 @@ public class WorldServerChunk extends WorldChunk {
 		super(world, section, position);
 	}
 	
-	public WorldServer getWorldServer() {
-		return (WorldServer) this.getWorld();
+	public WorldServer getWorld() {
+		return (WorldServer) super.getWorld();
 	}
 	
-	public WorldServerSection getServerSection() {
-		return (WorldServerSection) this.getSection();
+	public WorldServerSection getSection() {
+		return (WorldServerSection) super.getSection();
 	}
 	
 }

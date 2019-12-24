@@ -3,12 +3,12 @@ package fr.theorozier.procgen.client.renderer.world.layer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
-import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
 
 public class ChunkDirectLayerData extends ChunkLayerData {
 	
-	public ChunkDirectLayerData(Chunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
+	public ChunkDirectLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		super(chunk, layer, renderManager);
 	}
 	
@@ -27,11 +27,9 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	public void rebuildData(TextureMap terrainMap) {
 		
 		this.rebuildArrays(() -> {
-			
 			this.foreachBlocks((x, y, z, block, renderer, faces) -> {
-				renderer.getRenderData(block, x, y, z, faces, terrainMap, this.dataArray);
+				renderer.getRenderData(this.world, block, x, y, z, faces, terrainMap, this.dataArray);
 			});
-			
 		});
 		
 	}

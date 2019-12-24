@@ -1,14 +1,15 @@
 package fr.theorozier.procgen.client.renderer.world.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 
 public class BlockCactusRenderer extends BlockRenderer {
 	
-	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {
+	public TextureMapTile getFaceTile(BlockState block, TextureMap map, Direction face) {
 	
 		if (face == Direction.TOP) {
 			return map.getTile("cactus_top");
@@ -21,7 +22,7 @@ public class BlockCactusRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldBlock block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		if (faces.isTop()) {
 			

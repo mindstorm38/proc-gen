@@ -1,13 +1,13 @@
 package fr.theorozier.procgen.common.world.biome;
 
-import fr.theorozier.procgen.world.HorizontalPosition;
-import fr.theorozier.procgen.world.chunk.Section;
+import fr.theorozier.procgen.common.world.chunk.WorldSection;
+import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 public interface BiomeAccessor {
 
 	Biome getBiomeAt(int x, int z);
 	
-	default Biome getBiomeAt(HorizontalPosition pos) {
+	default Biome getBiomeAt(SectionPositioned pos) {
 		return this.getBiomeAt(pos.getX(), pos.getZ());
 	}
 	
@@ -17,7 +17,7 @@ public interface BiomeAccessor {
 		
 		for (int rx = 0; rx < dx; rx++) {
 			for (int rz = 0; rz < dz; rz++) {
-				biomes[Section.getHorizontalPositionIndex(rx, rz)] = getBiomeAt(x + rx, z + rz);
+				biomes[WorldSection.getSectionIndex(rx, rz)] = getBiomeAt(x + rx, z + rz);
 			}
 		}
 		

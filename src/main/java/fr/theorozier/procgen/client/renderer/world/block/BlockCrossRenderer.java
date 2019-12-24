@@ -1,7 +1,10 @@
 package fr.theorozier.procgen.client.renderer.world.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.util.MathUtils;
+import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.biome.Biome;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
@@ -23,20 +26,21 @@ public class BlockCrossRenderer extends BlockRenderer {
 		
 	}
 	
-	public TextureMapTile getCrossTile(WorldBlock block, TextureMap map) {
+	public TextureMapTile getCrossTile(BlockState block, TextureMap map) {
 		return map.getTile(this.mapTileIdentifier);
 	}
 	
-	public Color getColorization(WorldBlock block) {
-		return block.getBiome().getFoliageColor();
+	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
+		Biome biome = world.getBiomeAt(x, z);
+		return biome == null ? Color.WHITE : biome.getFoliageColor();
 	}
 	
 	@Override
-	public void getRenderData(WorldBlock block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
-		Color color = this.needColorization ? this.getColorization(block) : Color.WHITE;
+		Color color = this.needColorization ? this.getColorization(world, block, MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z)) : Color.WHITE;
 		
 		int rand = posRand(x, y, z);
 		x += (rand % 3) * 0.1f;
@@ -60,46 +64,6 @@ public class BlockCrossRenderer extends BlockRenderer {
 		
 		dataArray.faceIndices();
 		dataArray.faceIndices();
-		
-		/*
-		vertices.put(x + OFFSET ).put(y).put(z + OFFSET );
-		vertices.put(x + OFFSIZE).put(y).put(z + OFFSET );
-		vertices.put(x + OFFSET ).put(y).put(z + OFFSIZE);
-		vertices.put(x + OFFSIZE).put(y).put(z + OFFSIZE);
-		
-		vertices.put(x + OFFSET ).put(y + HEIGHT).put(z + OFFSET );
-		vertices.put(x + OFFSIZE).put(y + HEIGHT).put(z + OFFSET );
-		vertices.put(x + OFFSET ).put(y + HEIGHT).put(z + OFFSIZE);
-		vertices.put(x + OFFSIZE).put(y + HEIGHT).put(z + OFFSIZE);
-		
-		texcoords.put(tile.x             ).put(tile.y + tile.height);
-		texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-		texcoords.put(tile.x             ).put(tile.y + tile.height);
-		texcoords.put(tile.x + tile.width).put(tile.y + tile.height);
-		
-		texcoords.put(tile.x             ).put(tile.y);
-		texcoords.put(tile.x + tile.width).put(tile.y);
-		texcoords.put(tile.x             ).put(tile.y);
-		texcoords.put(tile.x + tile.width).put(tile.y);
-	
-		if (this.needFoliageColorization) {
-			addColor(colors, block.getBiome().getFoliageColor(), 8);
-		} else {
-			addWhiteColor(colors, 8);
-		}
-		
-		indices.put(idx    ).put(idx + 3).put(idx + 7);
-		indices.put(idx    ).put(idx + 7).put(idx + 4);
-		indices.put(idx    ).put(idx + 4).put(idx + 7);
-		indices.put(idx    ).put(idx + 7).put(idx + 3);
-		
-		indices.put(idx + 1).put(idx + 5).put(idx + 6);
-		indices.put(idx + 1).put(idx + 6).put(idx + 2);
-		indices.put(idx + 1).put(idx + 2).put(idx + 6);
-		indices.put(idx + 1).put(idx + 6).put(idx + 5);
-		
-		return idx + 8;
-		*/
 		
 	}
 	

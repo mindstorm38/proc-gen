@@ -5,17 +5,16 @@ import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
-import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
-import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
-import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
-import fr.theorozier.procgen.common.world.position.SectionPositioned;
+import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
 
 import java.util.Random;
 
 public class WorldServer extends WorldBase {
+	
+	public static final int NEAR_CHUNK_LOADING = 4;
 	
 	private final long seed;
 	private final Random random;
@@ -24,11 +23,11 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	public WorldServer(long seed) {
+	public WorldServer(long seed, ChunkGeneratorProvider provider) {
 		
 		this.seed = seed;
 		this.random = new Random(seed);
-		this.manager = new ChunkManager(this, new BetaChunkGenerator(this.seed));
+		this.manager = new ChunkManager(this, provider.create(this));
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
@@ -37,8 +36,8 @@ public class WorldServer extends WorldBase {
 	
 	// PROPERTIES //
 	
-	public WorldServer() {
-		this(new Random().nextLong());
+	public WorldServer(ChunkGeneratorProvider provider) {
+		this(new Random().nextLong(), provider);
 	}
 	
 	public long getSeed() {
@@ -135,20 +134,25 @@ public class WorldServer extends WorldBase {
 	}
 	
 	// TODO : TEMPORARY FOR MONOTHREAD GENERATION
-	public void loadSection(int x, int z) {
+	public void loadSection(SectionPosition pos) {
 		
-		WorldServerSection section = (WorldServerSection) this.getSectionAt(x, z);
+		WorldServerSection section = this.getSectionAt(pos.getX(), pos.getZ());
 		
 		if (section == null) {
 			
-			SectionPositioned pos = new ImmutableSectionPosition(x, z);
-			section = new WorldServerSection(this, pos);
-			this.sections.put(pos, section);
+			ImmutableSectionPosition immutable = new ImmutableSectionPosition(pos);
+			
+			section = new WorldServerSection(this, immutable);
+			this.sections.put(immutable, section);
 			
 			section.generate();
 			
 		}
 		
+	}
+	
+	public void loadNear(float x, float z) {
+		this.forEachSectionPosNear(x, z, NEAR_CHUNK_LOADING, this::loadSection);
 	}
 	
 }

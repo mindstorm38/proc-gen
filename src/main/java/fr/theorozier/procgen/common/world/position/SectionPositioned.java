@@ -26,4 +26,8 @@ public interface SectionPositioned {
 		return pos.getX() == that.getX() && pos.getZ() == that.getZ();
 	}
 	
+	static String toString(SectionPositioned pos) {
+		return "<" + pos.getX() + "/" + pos.getZ() + ">";
+	}
+	
 }

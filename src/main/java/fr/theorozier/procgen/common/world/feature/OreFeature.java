@@ -1,24 +1,25 @@
 package fr.theorozier.procgen.common.world.feature;
 
 import fr.theorozier.procgen.common.block.Blocks;
-import fr.theorozier.procgen.world.BlockPosition;
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.position.BlockPosition;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.feature.config.OreFeatureConfig;
 import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
+import fr.theorozier.procgen.common.world.position.Direction;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OreFeature extends Feature<OreFeatureConfig> {
 	
-	private static boolean canPlaceOreOn(WorldBlock block) {
-		return block.getBlockType() == Blocks.STONE;
+	private static boolean canPlaceOreOn(BlockState block) {
+		return block.isBlock(Blocks.STONE);
 	}
 	
 	@Override
-	public boolean place(World world, ChunkGenerator generator, Random rand, BlockPosition at, OreFeatureConfig config) {
+	public boolean place(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, OreFeatureConfig config) {
 		
 		AtomicInteger oreCount = new AtomicInteger(config.getInfCount() + (int) (rand.nextFloat() * (config.getSupCount() - config.getInfCount())));
 		
@@ -27,24 +28,28 @@ public class OreFeature extends Feature<OreFeatureConfig> {
 		
 	}
 	
-	private static void place(World world, Random rand, BlockPosition at, OreFeatureConfig config, AtomicInteger oreCount) {
+	private static void place(WorldServer world, Random rand, BlockPositioned at, OreFeatureConfig config, AtomicInteger oreCount) {
 	
 		if (oreCount.get() == 0)
 			return;
 		
-		WorldBlock block = world.getBlockAt(at);
+		BlockState block = world.getBlockAt(at);
 		
 		if (block == null || !canPlaceOreOn(block))
 			return;
 		
-		block.setBlockType(config.getOre());
+		world.setBlockAt(at, config.getOre());
 		
 		oreCount.getAndDecrement();
 	
 		for (int i = 0; i < 3; ++i) {
 			
 			Direction dir = Direction.getRandom(rand.nextFloat());
-			place(world, rand, at.add(dir), config, oreCount);
+			
+			BlockPosition pos = new BlockPosition(at);
+			pos.add(dir);
+			
+			place(world, rand, pos, config, oreCount);
 			
 		}
 		

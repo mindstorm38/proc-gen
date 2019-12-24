@@ -1,8 +1,14 @@
 package fr.theorozier.procgen.client.renderer.world;
 
+import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
-import fr.theorozier.procgen.world.*;
-import fr.theorozier.procgen.world.chunk.Chunk;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.game.RenderGame;
 import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.model.ModelApplyListener;
@@ -22,7 +28,8 @@ import static org.lwjgl.opengl.GL11.*;
 public class WorldRenderer implements ModelApplyListener,
 		WindowFramebufferSizeEventListener,
 		WindowMousePositionEventListener,
-		WorldChunkLoadedListener {
+		WorldLoadingListener,
+		WorldChunkListener {
 	
 	private final Window window;
 	
@@ -36,7 +43,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private final Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
 	
-	private World renderingWorld;
+	private WorldClient renderingWorld;
 	
 	private boolean escaped;
 	private int lastMouseX, lastMouseY;
@@ -202,14 +209,15 @@ public class WorldRenderer implements ModelApplyListener,
 	 * @param world The world you want to start rendering, or Null to
 	 *              just unload last rendered world.
 	 */
-	public void renderWorld(World world) {
+	public void renderWorld(WorldClient world) {
 		
 		if (!this.init)
 			return;
 		
 		if (this.ready) {
 			
-			this.renderingWorld.removeChunkLoadedListener(this);
+			this.renderingWorld.getEventManager().removeEventListener(WorldLoadingListener.class, this);
+			this.renderingWorld.getEventManager().removeEventListener(WorldChunkListener.class, this);
 			this.chunkRenderManager.unload();
 		
 		}
@@ -220,13 +228,14 @@ public class WorldRenderer implements ModelApplyListener,
 		if (this.ready) {
 			
 			this.chunkRenderManager.updateViewPosition(this.camera);
-			this.renderingWorld.addChunkLoadedListener(this);
+			this.renderingWorld.getEventManager().addEventListener(WorldLoadingListener.class, this);
+			this.renderingWorld.getEventManager().addEventListener(WorldChunkListener.class, this);
 			
 		}
 	
 	}
 	
-	public World getRenderingWorld() {
+	public WorldClient getRenderingWorld() {
 		return this.renderingWorld;
 	}
 	
@@ -310,7 +319,7 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	@Override
-	public void worldChunkLoaded(World world, Chunk chunk) {
+	public void worldChunkLoaded(WorldBase world, WorldChunk chunk) {
 		
 		if (this.renderingWorld == world) {
 			this.chunkRenderManager.chunkLoaded(chunk);
@@ -319,10 +328,28 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	@Override
-	public void worldChunkUnloaded(World world, Chunk chunk) {
+	public void worldChunkUnloaded(WorldBase world, ImmutableBlockPosition position) {
 		
 		if (this.renderingWorld == world) {
-			this.chunkRenderManager.chunkUnloaded(chunk);
+			this.chunkRenderManager.chunkUnloaded(position);
+		}
+		
+	}
+	
+	@Override
+	public void worldChunkUpdated(WorldBase world, WorldChunk chunk) {
+		
+		if (this.renderingWorld == world) {
+			this.chunkRenderManager.chunkUpdated(chunk);
+		}
+		
+	}
+	
+	@Override
+	public void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state) {
+		
+		if (this.renderingWorld == world) {
+			this.chunkRenderManager.blockUpdated(chunk, pos, state);
 		}
 		
 	}

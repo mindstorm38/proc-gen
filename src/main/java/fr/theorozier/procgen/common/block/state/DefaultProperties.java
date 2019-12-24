@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.common.block.state;
 
 import fr.theorozier.procgen.common.block.state.property.EnumProperty;
-import fr.theorozier.procgen.world.util.Axis;
-import fr.theorozier.procgen.world.util.Direction;
+import fr.theorozier.procgen.common.world.position.Axis;
+import fr.theorozier.procgen.common.world.position.Direction;
 
 public class DefaultProperties {
 	

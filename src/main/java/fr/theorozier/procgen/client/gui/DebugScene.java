@@ -2,9 +2,12 @@ package fr.theorozier.procgen.client.gui;
 
 import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
+import fr.theorozier.procgen.client.world.WorldClient;
+import fr.theorozier.procgen.client.world.WorldSinglePlayer;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.world.World;
 import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextBase;
 import io.msengine.client.util.camera.Camera3D;
@@ -21,7 +24,7 @@ public class DebugScene extends GuiScene {
 		this.game = (ProcGenGame) ProcGenGame.getCurrent();
 		this.worldRenderer = this.game.getWorldRenderer();
 		
-		this.posTexts = new GuiTextBase[4];
+		this.posTexts = new GuiTextBase[6];
 		for (int i = 0; i < this.posTexts.length; i++) {
 			
 			this.posTexts[i] = new GuiTextBase();
@@ -43,13 +46,22 @@ public class DebugScene extends GuiScene {
 		this.posTexts[1].setText("Y: " + cam.getY());
 		this.posTexts[2].setText("Z: " + cam.getZ());
 		
-		World world = this.worldRenderer.getRenderingWorld();
+		WorldClient world = this.worldRenderer.getRenderingWorld();
 		Biome biome = world == null ? null : world.getBiomeAt(MathUtils.fastfloor(cam.getX()), MathUtils.fastfloor(cam.getZ()));
 		
 		if (biome != null) {
 			this.posTexts[3].setText("Biome : " + biome.getIdentifier());
 		} else {
 			this.posTexts[3].setText("");
+		}
+		
+		BlockState state = world == null ? null : world.getBlockAt(MathUtils.fastfloor(cam.getX()), MathUtils.fastfloor(cam.getY()), MathUtils.fastfloor(cam.getZ()));
+		this.posTexts[4].setText("Block : " + state);
+		
+		if (world instanceof WorldSinglePlayer) {
+			
+			this.posTexts[5].setText("Heightmap : " + ((WorldSinglePlayer) world).getServerWorld().getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, MathUtils.fastfloor(cam.getX()), MathUtils.fastfloor(cam.getZ())));
+			
 		}
 		
 	}

@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.common.world.position;
 
+import io.sutil.pool.FixedObjectPool;
+
 /**
  *
  * A class for mutable section position in the world, with integer coordinates.
@@ -9,6 +11,8 @@ package fr.theorozier.procgen.common.world.position;
  */
 public class SectionPosition implements SectionPositioned {
 
+	public static final FixedObjectPool<SectionPosition> POOL = new FixedObjectPool<>(SectionPosition::new, 32);
+	
 	private int x, z;
 	
 	public SectionPosition() {}
@@ -47,33 +51,39 @@ public class SectionPosition implements SectionPositioned {
 		return this.z;
 	}
 	
-	public void set(int x, int z) {
+	public SectionPosition set(int x, int z) {
 		
 		this.x = x;
 		this.z = z;
 		
+		return this;
+		
 	}
 	
-	public void add(int x, int z) {
+	public SectionPosition add(int x, int z) {
 		
 		this.x += x;
 		this.z += z;
 		
+		return this;
+		
 	}
 	
-	public void add(SectionPositioned sectionPos) {
-		this.add(sectionPos.getX(), sectionPos.getZ());
+	public SectionPosition add(SectionPositioned sectionPos) {
+		return this.add(sectionPos.getX(), sectionPos.getZ());
 	}
 	
-	public void sub(int x, int z) {
+	public SectionPosition sub(int x, int z) {
 		
 		this.x -= x;
 		this.z -= z;
 		
+		return this;
+		
 	}
 	
-	public void sub(SectionPositioned sectionPos) {
-		this.sub(sectionPos.getX(), sectionPos.getZ());
+	public SectionPosition sub(SectionPositioned sectionPos) {
+		return this.sub(sectionPos.getX(), sectionPos.getZ());
 	}
 	
 	@Override
@@ -85,4 +95,10 @@ public class SectionPosition implements SectionPositioned {
 	public int hashCode() {
 		return SectionPositioned.hashCode(this);
 	}
+	
+	@Override
+	public String toString() {
+		return SectionPositioned.toString(this);
+	}
+	
 }

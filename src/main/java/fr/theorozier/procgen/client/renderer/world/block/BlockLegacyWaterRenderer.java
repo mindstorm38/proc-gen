@@ -1,7 +1,9 @@
 package fr.theorozier.procgen.client.renderer.world.block;
 
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
@@ -13,7 +15,7 @@ public class BlockLegacyWaterRenderer extends BlockCubeRenderer {
 	}
 	
 	@Override
-	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {
+	public TextureMapTile getFaceTile(BlockState block, TextureMap map, Direction face) {
 		
 		if (face == Direction.TOP) {
 			return map.getTile("water_still");
@@ -24,8 +26,9 @@ public class BlockLegacyWaterRenderer extends BlockCubeRenderer {
 	}
 	
 	@Override
-	public Color getColorization(WorldBlock block) {
-		return block.getBiome().getWaterColor();
+	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
+		Biome biome = world.getBiomeAt(x, z);
+		return biome == null ? Color.WHITE : biome.getWaterColor();
 	}
 	
 }

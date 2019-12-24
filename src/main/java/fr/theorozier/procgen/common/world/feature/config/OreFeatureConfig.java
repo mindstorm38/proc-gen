@@ -1,14 +1,15 @@
 package fr.theorozier.procgen.common.world.feature.config;
 
 import fr.theorozier.procgen.common.block.Block;
+import fr.theorozier.procgen.common.block.state.BlockState;
 
 public class OreFeatureConfig implements FeatureConfig {
 
-	private final Block ore;
+	private final BlockState ore;
 	private final int infCount;
 	private final int supCount;
 	
-	public OreFeatureConfig(Block ore, int infCount, int supCount) {
+	public OreFeatureConfig(BlockState ore, int infCount, int supCount) {
 		
 		this.ore = ore;
 		this.infCount = infCount;
@@ -16,7 +17,11 @@ public class OreFeatureConfig implements FeatureConfig {
 		
 	}
 	
-	public Block getOre() {
+	public OreFeatureConfig(Block block, int infCount, int supCount) {
+		this(block.getDefaultState(), infCount, supCount);
+	}
+	
+	public BlockState getOre() {
 		return this.ore;
 	}
 	

@@ -2,9 +2,6 @@ package fr.theorozier.procgen.common.world.feature.placement;
 
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.BlockPosition;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.feature.placement.config.PlacementConfig;

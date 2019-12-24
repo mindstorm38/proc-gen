@@ -5,9 +5,7 @@ import fr.theorozier.procgen.common.block.state.BlockStateContainer;
 import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.world.position.Direction;
 import io.sutil.StringUtils;
 
 import java.util.Random;
@@ -52,13 +50,13 @@ public class Block {
 		return true;
 	}
 	
-	public boolean mustRenderFace(WorldBlock wb, Direction otherDir, WorldBlock other) {
+	public boolean mustRenderFace(BlockState state, Direction otherDir, BlockState other) {
 		
 		if (other == null) {
 			return true;
 		} else {
 			
-			Block otherBlock = other.getBlockType();
+			Block otherBlock = other.getBlock();
 			
 			if (this != otherBlock) {
 				return !otherBlock.isOpaque();

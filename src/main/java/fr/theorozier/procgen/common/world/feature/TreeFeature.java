@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.common.world.feature;
 
-import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.Blocks;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
-import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.position.BlockPosition;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
 
@@ -12,37 +12,40 @@ import java.util.Random;
 
 public class TreeFeature extends Feature<FeatureConfig> {
 	
-	private static boolean canGrowOn(Block block) {
-		return block == Blocks.DIRT || block == Blocks.GRASS;
+	private static boolean canGrowOn(BlockState block) {
+		return block != null && (block.isBlock(Blocks.DIRT) || block.isBlock(Blocks.GRASS));
+	}
+	
+	private static boolean isLogBlock(BlockState block) {
+		return block != null && block.isBlock(Blocks.LOG);
 	}
 	
 	@Override
-	public boolean place(World world, ChunkGenerator generator, Random rand, BlockPosition at, FeatureConfig config) {
+	public boolean place(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, FeatureConfig config) {
 		
-		WorldBlock bottomBlock = world.getBlockAt(at.getX(), at.getY() - 1, at.getZ());
+		BlockPosition temp = new BlockPosition();
 		
-		if (!canGrowOn(bottomBlock.getBlockType()))
+		BlockState bottomBlock = world.getBlockAt(temp.set(at, 0, -1, 0));
+		
+		if (!canGrowOn(bottomBlock))
 			return false;
 		
-		if (world.getBlockTypeAt(at.getX(), at.getY() + 1, at.getZ()) != Blocks.AIR)
+		if (world.getBlockAt(temp.set(at, 0, 1, 0)) != null)
 			return false;
 		
 		int height = this.getRandomHeight(rand);
 		int safeHeight = height + 5;
 		
-		WorldBlock block;
-		
 		for (int x = -1; x <= 1; ++x)
 			for (int z = -1; z <= 1; ++z)
 				for (int y = 0; y < safeHeight; ++y)
-					if (world.getBlockTypeAt(at.add(x, y, z)) == Blocks.LOG)
+					if (isLogBlock(world.getBlockAt(temp.set(at, x, y, z))))
 						return false;
 		
-		bottomBlock.setBlockType(Blocks.DIRT);
+		world.setBlockAt(temp.set(at, 0, -1, 0), Blocks.DIRT.getDefaultState());
 		
 		for (int y = 0; y < height; y++)
-			if ((block = world.getBlockAt(at.add(0, y, 0))) != null)
-				block.setBlockType(Blocks.LOG);
+			world.setBlockAt(temp.set(at, 0, y, 0), Blocks.LOG.getDefaultState());
 		
 		for (int x = -2; x <= 2; ++x) {
 			for (int z = -2; z <= 2; ++z) {
@@ -50,15 +53,14 @@ public class TreeFeature extends Feature<FeatureConfig> {
 					
 					for (int y = height - 2; y < height; ++y) {
 						
-						if ((block = world.getBlockAt(at.add(x, y, z))) != null) {
-							
+						if (world.getBlockAt(temp.set(at, x, y, z)) == null) {
 							
 							if ((x == 2 || x == -2) && (x == z || x == -z)) {
 								if (y != height - 1 && rand.nextInt(2) == 0) {
-									placeLeaves(block);
+									placeLeaves(world, temp);
 								}
 							} else {
-								placeLeaves(block);
+								placeLeaves(world, temp);
 							}
 							
 						}
@@ -76,16 +78,16 @@ public class TreeFeature extends Feature<FeatureConfig> {
 					
 					for (int y = height; y < height + 2; ++y) {
 						
-						if ((block = world.getBlockAt(at.add(x, y, z))) != null)
-							placeLeaves(block);
+						if (world.getBlockAt(temp.set(at, x, y, z)) == null)
+							placeLeaves(world, temp);
 						
 					}
 					
 				} else {
 					
 					if (rand.nextInt(2) == 0)
-						if ((block = world.getBlockAt(at.add(x, height, z))) != null)
-							placeLeaves(block);
+						if (world.getBlockAt(temp.set(at, x, height, z)) == null)
+							placeLeaves(world, temp);
 						
 				}
 				
@@ -96,8 +98,8 @@ public class TreeFeature extends Feature<FeatureConfig> {
 		
 	}
 	
-	private static void placeLeaves(WorldBlock block) {
-		if (!block.isSet()) block.setBlockType(Blocks.LEAVES);
+	private static void placeLeaves(WorldServer world, BlockPositioned pos) {
+		if (world.getBlockAt(pos) == null) world.setBlockAt(pos, Blocks.LEAVES.getDefaultState());
 	}
 	
 	protected int getRandomHeight(Random rand) {

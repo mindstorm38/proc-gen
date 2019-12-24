@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.common.world.position;
 
+import io.sutil.pool.FixedObjectPool;
+
 /**
  *
  * A class for mutable block position in world, with integer coordinates.
@@ -8,6 +10,8 @@ package fr.theorozier.procgen.common.world.position;
  *
  */
 public class BlockPosition implements BlockPositioned {
+	
+	public static final FixedObjectPool<BlockPosition> POOL = new FixedObjectPool<>(BlockPosition::new, 32);
 	
 	private int x, y, z;
 	
@@ -62,44 +66,66 @@ public class BlockPosition implements BlockPositioned {
 		return this.z;
 	}
 	
-	public void set(int x, int y, int z) {
+	public BlockPosition set(int x, int y, int z) {
 		
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		
+		return this;
+		
 	}
 	
-	public void add(int x, int y, int z) {
+	public BlockPosition set(BlockPositioned pos, int dx, int dy, int dz) {
+		return this.set(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
+	}
+	
+	public BlockPosition set(BlockPositioned pos) {
+		return this.set(pos.getX(), pos.getY(), pos.getZ());
+	}
+	
+	public BlockPosition add(int x, int y, int z) {
 		
 		this.x += x;
 		this.y += y;
 		this.z += z;
 		
+		return this;
+		
 	}
 	
-	public void add(BlockPositioned blockPos) {
-		this.add(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+	public BlockPosition add(BlockPositioned blockPos) {
+		return this.add(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 	}
 	
-	public void add(SectionPositioned sectionPos) {
-		this.add(sectionPos.getX(), 0, sectionPos.getZ());
+	public BlockPosition add(SectionPositioned sectionPos) {
+		return this.add(sectionPos.getX(), 0, sectionPos.getZ());
 	}
 	
-	public void sub(int x, int y, int z) {
+	public BlockPosition add(Direction dir) {
+		return this.add(dir.rx, dir.ry, dir.rz);
+	}
+	
+	public BlockPosition add(Direction dir, int xf, int yf, int zf) {
+		return this.add(dir.rx * xf, dir.ry * yf, dir.rz * zf);
+	}
+	
+	public BlockPosition sub(int x, int y, int z) {
 		
 		this.x -= x;
 		this.y -= y;
 		this.z -= z;
 		
+		return this;
+		
 	}
 	
-	public void sub(BlockPositioned blockPos) {
-		this.sub(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+	public BlockPosition sub(BlockPositioned blockPos) {
+		return this.sub(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 	}
 	
-	public void sub(SectionPositioned sectionPos) {
-		this.sub(sectionPos.getX(), 0, sectionPos.getZ());
+	public BlockPosition sub(SectionPositioned sectionPos) {
+		return this.sub(sectionPos.getX(), 0, sectionPos.getZ());
 	}
 	
 	@Override
@@ -110,6 +136,11 @@ public class BlockPosition implements BlockPositioned {
 	@Override
 	public int hashCode() {
 		return BlockPositioned.hashCode(this);
+	}
+	
+	@Override
+	public String toString() {
+		return BlockPositioned.toString(this);
 	}
 	
 }

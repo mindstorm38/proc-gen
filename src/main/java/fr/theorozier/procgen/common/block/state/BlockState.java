@@ -5,6 +5,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
 import fr.theorozier.procgen.common.block.Block;
+import fr.theorozier.procgen.common.block.BlockRenderLayer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,6 +95,19 @@ public class BlockState {
 		
 		return state;
 		
+	}
+	
+	public boolean isInRenderLayer(BlockRenderLayer layer) {
+		return this.owner.getRenderLayer() == layer;
+	}
+	
+	@Override
+	public String toString() {
+		return "BlockState{" +
+				"block=" + owner.getIdentifier() +
+				", properties=" + properties +
+				", uid=" + uid +
+				'}';
 	}
 	
 }

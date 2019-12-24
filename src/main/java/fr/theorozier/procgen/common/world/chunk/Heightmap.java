@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 public class Heightmap {
 	
 	private static final Predicate<BlockState> IS_SET = Objects::nonNull;
-	private static final Predicate<BlockState> IS_SET_NOT_WATER = b -> b.isBlock(Blocks.WATER);
+	private static final Predicate<BlockState> IS_SET_NOT_WATER = b -> b != null && !b.isBlock(Blocks.WATER);
 	
 	private final WorldServerSection section;
 	private final Predicate<BlockState> limitPredicate;
@@ -52,9 +52,8 @@ public class Heightmap {
 	
 	public static void updateSectionHeightmaps(WorldServerSection section, Set<Type> types) {
 	
-		int yStart = section.getWorldServer().getHeightLimit() - 1;
+		int yStart = section.getWorld().getHeightLimit() - 1;
 		
-		WorldServerChunk chunk;
 		BlockState block;
 		Heightmap map;
 		
@@ -70,31 +69,26 @@ public class Heightmap {
 			
 				for (int y = yStart; y >= 0; --y) {
 					
-					chunk = section.getChunkAtBlock(y);
-					block = chunk.getBlockAt(x, y & 15, z);
+					block = section.getBlockAt(x, y, z);
 					
-					if (block != null) {
+					while (iterator.hasNext()) {
 						
-						while (iterator.hasNext()) {
+						map = iterator.next();
+						
+						if (map.limitPredicate.test(block)) {
 							
-							map = iterator.next();
-							
-							if (map.limitPredicate.test(block)) {
-								
-								map.set(x, z, (short) (y + 1));
-								iterator.remove();
-								
-							}
+							map.set(x, z, (short) (y + 1));
+							iterator.remove();
 							
 						}
 						
-						if (heightmaps.isEmpty())
-							break;
-						
-						while (iterator.hasPrevious())
-							iterator.previous();
-					
 					}
+					
+					if (heightmaps.isEmpty())
+						break;
+					
+					while (iterator.hasPrevious())
+						iterator.previous();
 					
 				}
 				

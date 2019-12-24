@@ -2,25 +2,25 @@ package fr.theorozier.procgen.client.renderer.world.layer;
 
 import fr.theorozier.procgen.client.renderer.world.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.world.block.BlockRenderer;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
 
 public class ChunkCompiledBlock implements Comparable<ChunkCompiledBlock> {
 
 	private final BlockRenderer renderer;
-	private final WorldBlock block;
+	private final BlockState block;
 	private final byte faces;
 	private final int x, y, z;
 	
 	private int distanceSquared;
 	
-	ChunkCompiledBlock(BlockRenderer renderer, WorldBlock block, BlockFaces faces) {
+	ChunkCompiledBlock(BlockRenderer renderer, BlockState block, BlockFaces faces, int x, int y, int z) {
 		
 		this.renderer = renderer;
 		this.block = block;
 		this.faces = faces.toByte();
-		this.x = block.getX();
-		this.y = block.getY();
-		this.z = block.getZ();
+		this.x = x;
+		this.y = y;
+		this.z = z;
 		
 	}
 	
@@ -28,7 +28,7 @@ public class ChunkCompiledBlock implements Comparable<ChunkCompiledBlock> {
 		return this.renderer;
 	}
 	
-	public WorldBlock getBlock() {
+	public BlockState getBlock() {
 		return this.block;
 	}
 	

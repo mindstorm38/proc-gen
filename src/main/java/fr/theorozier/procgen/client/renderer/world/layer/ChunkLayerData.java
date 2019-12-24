@@ -7,15 +7,15 @@ import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.world.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.world.block.BlockRenderers;
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.World;
-import fr.theorozier.procgen.world.chunk.Chunk;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.position.Direction;
 
 public abstract class ChunkLayerData {
 	
-	protected final Chunk chunk;
-	protected final World world;
+	protected final WorldChunk chunk;
+	protected final WorldBase world;
 	protected final BlockRenderLayer layer;
 	protected final ChunkRenderManager renderManager;
 	
@@ -23,7 +23,7 @@ public abstract class ChunkLayerData {
 	
 	private boolean needUpdate = false;
 	
-	public ChunkLayerData(Chunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
+	public ChunkLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
 		this.chunk = chunk;
 		this.world = chunk.getWorld();
@@ -66,12 +66,12 @@ public abstract class ChunkLayerData {
 	protected void foreachBlocks(BlockConsumer consumer) {
 		
 		BlockFaces faces = new BlockFaces();
-		WorldBlock worldBlock;
 		BlockRenderer renderer;
+		BlockState state;
 		
-		int cx = this.chunk.getChunkPosition().getX();
-		int cy = this.chunk.getChunkPosition().getY();
-		int cz = this.chunk.getChunkPosition().getZ();
+		int cx = this.chunk.getChunkPos().getX() << 4;
+		int cy = this.chunk.getChunkPos().getY() << 4;
+		int cz = this.chunk.getChunkPos().getZ() << 4;
 		
 		int wx, wy, wz;
 		
@@ -79,15 +79,13 @@ public abstract class ChunkLayerData {
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
 					
-					if (!this.chunk.hasBlockAtRelative(x, y, z))
+					if ((state = this.chunk.getBlockAt(x, y, z)) == null)
 						continue;
 					
-					worldBlock = this.chunk.getBlockAtRelative(x, y, z);
-					
-					if (!worldBlock.isInRenderLayer(this.layer))
+					if (!state.isInRenderLayer(this.layer))
 						continue;
 					
-					renderer = BlockRenderers.getRenderer(worldBlock.getBlockType());
+					renderer = BlockRenderers.getRenderer(state.getBlock());
 					
 					if (renderer != null) {
 						
@@ -96,30 +94,30 @@ public abstract class ChunkLayerData {
 						wz = cz + z;
 						
 						if (y < 15)
-							faces.setFaceBlock(worldBlock, Direction.TOP, this.chunk.getBlockAtRelative(x, y + 1, z));
-						else faces.setFaceBlock(worldBlock, Direction.TOP, this.world.getBlockAt(wx, wy + 1, wz));
+							faces.setFaceBlock(state, Direction.TOP, this.chunk.getBlockAt(x, y + 1, z));
+						else faces.setFaceBlock(state, Direction.TOP, this.world.getBlockAt(wx, wy + 1, wz));
 						
 						if (y > 0)
-							faces.setFaceBlock(worldBlock, Direction.BOTTOM, this.chunk.getBlockAtRelative(x, y - 1, z));
-						else faces.setFaceBlock(worldBlock, Direction.BOTTOM, this.world.getBlockAt(wx, wy - 1, wz));
+							faces.setFaceBlock(state, Direction.BOTTOM, this.chunk.getBlockAt(x, y - 1, z));
+						else faces.setFaceBlock(state, Direction.BOTTOM, this.world.getBlockAt(wx, wy - 1, wz));
 						
 						if (x < 15)
-							faces.setFaceBlock(worldBlock, Direction.NORTH, this.chunk.getBlockAtRelative(x + 1, y, z));
-						else faces.setFaceBlock(worldBlock, Direction.NORTH, this.world.getBlockAt(wx + 1, wy, wz));
+							faces.setFaceBlock(state, Direction.NORTH, this.chunk.getBlockAt(x + 1, y, z));
+						else faces.setFaceBlock(state, Direction.NORTH, this.world.getBlockAt(wx + 1, wy, wz));
 						
 						if (x > 0)
-							faces.setFaceBlock(worldBlock, Direction.SOUTH, this.chunk.getBlockAtRelative(x - 1, y, z));
-						else faces.setFaceBlock(worldBlock, Direction.SOUTH, this.world.getBlockAt(wx - 1, wy, wz));
+							faces.setFaceBlock(state, Direction.SOUTH, this.chunk.getBlockAt(x - 1, y, z));
+						else faces.setFaceBlock(state, Direction.SOUTH, this.world.getBlockAt(wx - 1, wy, wz));
 						
 						if (z < 15)
-							faces.setFaceBlock(worldBlock, Direction.EAST, this.chunk.getBlockAtRelative(x, y, z + 1));
-						else faces.setFaceBlock(worldBlock, Direction.EAST, this.world.getBlockAt(wx, wy, wz + 1));
+							faces.setFaceBlock(state, Direction.EAST, this.chunk.getBlockAt(x, y, z + 1));
+						else faces.setFaceBlock(state, Direction.EAST, this.world.getBlockAt(wx, wy, wz + 1));
 						
 						if (z > 0)
-							faces.setFaceBlock(worldBlock, Direction.WEST, this.chunk.getBlockAtRelative(x, y, z - 1));
-						else faces.setFaceBlock(worldBlock, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
+							faces.setFaceBlock(state, Direction.WEST, this.chunk.getBlockAt(x, y, z - 1));
+						else faces.setFaceBlock(state, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
 						
-						consumer.accept(wx, wy, wz, worldBlock, renderer, faces);
+						consumer.accept(wx, wy, wz, state, renderer, faces);
 						
 					}
 					
@@ -130,7 +128,7 @@ public abstract class ChunkLayerData {
 	}
 	
 	protected interface BlockConsumer {
-		void accept(int x, int y, int z, WorldBlock block, BlockRenderer renderer, BlockFaces faces);
+		void accept(int x, int y, int z, BlockState block, BlockRenderer renderer, BlockFaces faces);
 	}
 	
 }

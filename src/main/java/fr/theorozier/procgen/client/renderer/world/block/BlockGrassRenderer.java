@@ -1,9 +1,12 @@
 package fr.theorozier.procgen.client.renderer.world.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
-import fr.theorozier.procgen.world.util.Direction;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
@@ -21,7 +24,7 @@ public class BlockGrassRenderer extends BlockRenderer {
 			(texcoords, tile) -> texcoords.put(tile.x + tile.width).put(tile.y              )
 	};
 	
-	public TextureMapTile getFaceTile(WorldBlock block, TextureMap map, Direction face) {
+	public TextureMapTile getFaceTile(BlockState block, TextureMap map, Direction face) {
 		
 		if (face == Direction.TOP) {
 			return map.getTile("grass_top");
@@ -37,14 +40,15 @@ public class BlockGrassRenderer extends BlockRenderer {
 		return map.getTile("grass_side_color");
 	}
 	
-	public Color getColorization(WorldBlock block) {
-		return block.getBiome().getFoliageColor();
+	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
+		Biome biome = world.getBiomeAt(x, z);
+		return biome == null ? Color.WHITE : biome.getFoliageColor();
 	}
 	
 	@Override
-	public void getRenderData(WorldBlock block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		Color color = this.getColorization(block);
+		Color color = this.getColorization(world, block, MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z));
 		TextureMapTile sideTile = this.getSideColorTile(map);
 		
 		if (faces.isTop()) {

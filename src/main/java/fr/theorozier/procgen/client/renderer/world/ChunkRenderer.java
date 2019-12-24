@@ -1,21 +1,23 @@
 package fr.theorozier.procgen.client.renderer.world;
 
-import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerData;
-import fr.theorozier.procgen.world.*;
-import fr.theorozier.procgen.world.chunk.Chunk;
-import fr.theorozier.procgen.world.util.Direction;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.Direction;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdatedListener {
+public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private final ChunkRenderManager renderManager;
 	private final WorldRenderer renderer;
-	private final Chunk chunk;
+	private final WorldChunk chunk;
 	
 	private final Map<Integer, ChunkRenderer> neighbours;
 	
@@ -24,7 +26,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	
 	private int distanceToCameraSquared;
 	
-	ChunkRenderer(ChunkRenderManager renderManager, Chunk chunk) {
+	ChunkRenderer(ChunkRenderManager renderManager, WorldChunk chunk) {
 		
 		this.renderManager = renderManager;
 		this.renderer = renderManager.getWorldRenderer();
@@ -56,8 +58,8 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 		return this.drawBuffers[layer.ordinal()];
 	}
 	
-	public BlockPosition getChunkPosition() {
-		return this.chunk.getChunkPosition();
+	public ImmutableBlockPosition getChunkPosition() {
+		return this.chunk.getChunkPos();
 	}
 	
 	void init() {
@@ -66,7 +68,6 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 			this.drawBuffers[i] = this.renderer.getShaderManager().createBasicDrawBuffer(true, true);
 		
 		this.setNeedUpdate(true);
-		this.chunk.addUpdatedListener(this);
 		
 	}
 	
@@ -76,8 +77,6 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
 			this.drawBuffers[i].delete();
-		
-		this.chunk.removeUpdatedListener(this);
 		
 	}
 	
@@ -125,7 +124,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	}
 	
 	float updateDistanceToCamera(float x, float y, float z) {
-		return this.distanceToCameraSquared = (int) this.chunk.getDistanceSquaredTo(x, y, z);
+		return this.distanceToCameraSquared = (int) this.chunk.getDistSquaredTo(x, y, z);
 	}
 	
 	void updateViewPosition(int x, int y, int z) {
@@ -150,29 +149,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	
 	}
 	
-	@Override
-	public void worldChunkUpdated(Chunk chunk, int x, int y, int z, Block block) {
-		
-		if (this.chunk == chunk) {
-			
-			chunk.checkBlockOnFaces(x, y, z, dir -> {
-				
-				ChunkRenderer neighbour = this.neighbours.get(dir.ordinal());
-				
-				if (neighbour != null)
-					neighbour.setNeedUpdate(true);
-				
-			});
-			
-			this.setNeedUpdate(block.getRenderLayer(), true);
-			
-			
-		}
-		
-	}
-	
-	@Override
-	public void worldChunkUpdated(Chunk chunk) {
+	void chunkUpdated(WorldChunk chunk) {
 		
 		if (this.chunk == chunk) {
 			
@@ -183,6 +160,42 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 		
 	}
 	
+	void blockUpdated(WorldChunk chunk, BlockPositioned pos, BlockState block) {
+		
+		if (this.chunk == chunk) {
+			
+			checkBlockOnFaces(pos, dir -> {
+				
+				ChunkRenderer neighbour = this.neighbours.get(dir.ordinal());
+				
+				if (neighbour != null)
+					neighbour.setNeedUpdate(true);
+				
+			});
+			
+			this.setNeedUpdate(block.getBlock().getRenderLayer(), true);
+			
+		}
+		
+	}
+	
+	private static void checkBlockOnFaces(BlockPositioned pos, Consumer<Direction> consumer) {
+		
+		int rx = pos.getX() & 15;
+		int ry = pos.getY() & 15;
+		int rz = pos.getZ() & 15;
+		
+		if (rx == 0) consumer.accept(Direction.SOUTH);
+		else if (rx == 15) consumer.accept(Direction.NORTH);
+		
+		if (ry == 0) consumer.accept(Direction.BOTTOM);
+		else if (ry == 15) consumer.accept(Direction.TOP);
+		
+		if (rz == 0) consumer.accept(Direction.WEST);
+		else if (rz == 15) consumer.accept(Direction.EAST);
+		
+	}
+	
 	@Override
 	public int compareTo(ChunkRenderer o) {
 		return o.distanceToCameraSquared - this.distanceToCameraSquared;
@@ -190,7 +203,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 	
 	@Override
 	public int hashCode() {
-		return this.chunk.getChunkPosition().hashCode();
+		return this.chunk.getChunkPos().hashCode();
 	}
 	
 	@Override
@@ -198,7 +211,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer>, WorldChunkUpdat
 		if (obj == this) return true;
 		if (obj.getClass() != getClass()) return true;
 		ChunkRenderer render = (ChunkRenderer) obj;
-		return this.chunk.getChunkPosition().equals(render.getChunkPosition());
+		return this.chunk.getChunkPos().equals(render.getChunkPosition());
 	}
 	
 }

@@ -4,8 +4,8 @@ import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
 import fr.theorozier.procgen.client.renderer.world.block.BlockFaces;
-import fr.theorozier.procgen.world.chunk.Chunk;
-import fr.theorozier.procgen.world.chunk.WorldBlock;
+import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	
 	private final List<ChunkCompiledBlock> cache;
 	
-	public ChunkSortedLayerData(Chunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
+	public ChunkSortedLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
 		super(chunk, layer, renderManager);
 		
@@ -48,7 +48,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 		this.cache.clear();
 		
 		this.foreachBlocks((x, y, z, block, renderer, faces) -> {
-			this.cache.add(new ChunkCompiledBlock(renderer, block, faces));
+			this.cache.add(new ChunkCompiledBlock(renderer, block, faces, x, y, z));
 		});
 		
 	}
@@ -65,14 +65,14 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 		this.rebuildArrays(() -> {
 			
 			BlockFaces faces = new BlockFaces();
-			WorldBlock block;
+			BlockState block;
 			
 			for (ChunkCompiledBlock compiledBlock : this.cache) {
 				
 				block = compiledBlock.getBlock();
 				compiledBlock.mutateBlockFaces(faces);
 				
-				compiledBlock.getRenderer().getRenderData(block, block.getX(), block.getY(), block.getZ(), faces, terrainMap, this.dataArray);
+				compiledBlock.getRenderer().getRenderData(this.world, block, compiledBlock.getX(), compiledBlock.getY(), compiledBlock.getZ(), faces, terrainMap, this.dataArray);
 				
 			}
 			

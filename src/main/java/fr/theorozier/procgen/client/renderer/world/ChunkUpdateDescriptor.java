@@ -1,23 +1,23 @@
 package fr.theorozier.procgen.client.renderer.world;
 
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
-import fr.theorozier.procgen.world.BlockPosition;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
 import java.util.Objects;
 
 public class ChunkUpdateDescriptor {
 	
-	private final BlockPosition chunkPosition;
+	private final ImmutableBlockPosition chunkPosition;
 	private final BlockRenderLayer renderLayer;
 	
-	public ChunkUpdateDescriptor(BlockPosition position, BlockRenderLayer renderLayer) {
+	public ChunkUpdateDescriptor(ImmutableBlockPosition position, BlockRenderLayer renderLayer) {
 		
 		this.chunkPosition = position;
 		this.renderLayer = renderLayer;
 		
 	}
 	
-	public BlockPosition getChunkPosition() {
+	public ImmutableBlockPosition getChunkPosition() {
 		return this.chunkPosition;
 	}
 	
