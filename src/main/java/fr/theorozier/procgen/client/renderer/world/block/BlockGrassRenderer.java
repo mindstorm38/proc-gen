@@ -34,7 +34,7 @@ public class BlockGrassRenderer extends BlockRenderer {
 	@Override
 	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		Color color = this.getColorization(world, block, MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z));
+		Color color = this.getColorization(world, block, (int) x, (int) y, (int) z);
 		TextureMapTile sideTile = this.getSideColorTile(map);
 		
 		if (faces.isTop()) {

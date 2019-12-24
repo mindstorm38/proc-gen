@@ -37,7 +37,7 @@ public class BlockCubeRenderer extends BlockRenderer {
 	@Override
 	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		Color color = this.needColorization ? this.getColorization(world, block, MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z)) : Color.WHITE;
+		Color color = this.needColorization ? this.getColorization(world, block, (int) x, (int) y, (int) z) : Color.WHITE;
 		
 		if (faces.isTop()) {
 			

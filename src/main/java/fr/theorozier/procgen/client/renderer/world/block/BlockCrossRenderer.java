@@ -44,7 +44,7 @@ public class BlockCrossRenderer extends BlockRenderer {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
-		Color color = this.needColorization ? this.getColorization(world, block, MathUtils.fastfloor(x), MathUtils.fastfloor(y), MathUtils.fastfloor(z)) : Color.WHITE;
+		Color color = this.needColorization ? this.getColorization(world, block, (int) x, (int) y, (int) z) : Color.WHITE;
 		
 		int rand = posRand(x, y, z);
 		x += (rand % 3) * 0.1f;
