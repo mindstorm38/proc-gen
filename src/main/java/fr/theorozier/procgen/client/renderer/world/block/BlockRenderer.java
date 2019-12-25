@@ -64,13 +64,13 @@ public abstract class BlockRenderer {
 			r |= 0b0110_0000_0000_0000_0000_1001;
 		
 		if (isBlockOpaque(world.getBlockAt(x, y + 1, z + 1)))
-			r |= 0b0000_0011_0000_0000_0000_0110; // TODO
+			r |= 0b0000_0011_0000_0000_0000_0110;
 		
 		if (isBlockOpaque(world.getBlockAt(x, y - 1, z - 1)))
 			r |= 0b1001_0000_0000_0000_1100_0000;
 		
 		if (isBlockOpaque(world.getBlockAt(x, y - 1, z + 1)))
-			r |= 0b0000_1100_0000_0000_0011_0000; // TODO
+			r |= 0b0000_1100_0000_0000_0011_0000;
 		
 		// X/Z Plane
 		if (isBlockOpaque(world.getBlockAt(x - 1, y, z - 1)))
@@ -80,10 +80,36 @@ public abstract class BlockRenderer {
 			r |= 0b0011_0000_0000_1100_0000_0000;
 		
 		if (isBlockOpaque(world.getBlockAt(x + 1, y, z + 1)))
-			r |= 0b0000_0110_0000_0011_0000_0000; // TODO
+			r |= 0b0000_0110_0000_0011_0000_0000;
 		
 		if (isBlockOpaque(world.getBlockAt(x - 1, y, z + 1)))
-			r |= 0b0000_1001_0110_0000_0000_0000; // TODO
+			r |= 0b0000_1001_0110_0000_0000_0000;
+		
+		// Additionnal corners Y-1
+		if ((r & 8421504) != 8421504 && isBlockOpaque(world.getBlockAt(x - 1, y - 1, z - 1)))
+			r |= 8421504;
+		
+		if ((r & 1050688) != 1050688 && isBlockOpaque(world.getBlockAt(x + 1, y - 1, z - 1)))
+			r |= 1050688;
+		
+		if ((r & 262432) != 262432 && isBlockOpaque(world.getBlockAt(x + 1, y - 1, z + 1)))
+			r |= 262432;
+		
+		if ((r & 540688) != 540688 && isBlockOpaque(world.getBlockAt(x - 1, y - 1, z + 1)))
+			r |= 540688;
+		
+		// Additionnal corners Y+1
+		if ((r & 4198408) != 4198408 && isBlockOpaque(world.getBlockAt(x - 1, y + 1, z - 1)))
+			r |= 4198408;
+		
+		if ((r & 2098177) != 2098177 && isBlockOpaque(world.getBlockAt(x + 1, y + 1, z - 1)))
+			r |= 2098177;
+		
+		if ((r & 131586) != 131586 && isBlockOpaque(world.getBlockAt(x + 1, y + 1, z + 1)))
+			r |= 131586;
+		
+		if ((r & 73732) != 73732 && isBlockOpaque(world.getBlockAt(x - 1, y + 1, z + 1)))
+			r |= 73732;
 		
 		return r;
 		

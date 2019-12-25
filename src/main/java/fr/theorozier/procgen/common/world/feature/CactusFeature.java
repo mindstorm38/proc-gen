@@ -24,7 +24,7 @@ public class CactusFeature extends Feature<FeatureConfig> {
 		if (!isSand(world.getBlockAt(temp.set(at, 0, -1, 0))))
 			return false;
 		
-		int height = 2 + rand.nextInt(1);
+		int height = 2 + rand.nextInt(2);
 		
 		for (int y = 0; y < height; ++y)
 			for (int x = -1; x <= 1; ++x)
