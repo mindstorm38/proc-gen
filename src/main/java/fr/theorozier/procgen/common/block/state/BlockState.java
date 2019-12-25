@@ -101,6 +101,10 @@ public class BlockState {
 		return this.owner.getRenderLayer() == layer;
 	}
 	
+	public boolean isBlockOpaque() {
+		return this.owner.isOpaque();
+	}
+	
 	@Override
 	public String toString() {
 		return "BlockState{" +

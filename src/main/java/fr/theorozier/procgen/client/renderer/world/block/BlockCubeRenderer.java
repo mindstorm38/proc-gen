@@ -2,9 +2,7 @@ package fr.theorozier.procgen.client.renderer.world.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
@@ -37,12 +35,18 @@ public class BlockCubeRenderer extends BlockRenderer {
 	@Override
 	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		Color color = this.needColorization ? this.getColorization(world, block, (int) x, (int) y, (int) z) : Color.WHITE;
+		int ix = (int) x;
+		int iy = (int) y;
+		int iz = (int) z;
+		
+		Color color = this.needColorization ? this.getColorization(world, block, ix, iy, iz) : Color.WHITE;
+		int occlData = block.isBlockOpaque() ? computeAmbientOcclusion(world, ix, iy, iz, faces) : 0;
 		
 		if (faces.isTop()) {
 			
 			dataArray.faceTop(x, y + 1, z, 1, 1);
-			dataArray.faceColor(color);
+			// dataArray.faceColor(color);
+			dataArray.faceTopColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP));
 			dataArray.faceIndices();
 			
@@ -51,7 +55,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 		if (faces.isBottom()) {
 			
 			dataArray.faceBottom(x, y, z, 1, 1);
-			dataArray.faceColor(color);
+			//dataArray.faceColor(color);
+			dataArray.faceBottomColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.BOTTOM));
 			dataArray.faceIndices();
 			
@@ -60,7 +65,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 		if (faces.isNorth()) {
 			
 			dataArray.faceNorth(x + 1, y, z, 1, 1);
-			dataArray.faceColor(color);
+			//dataArray.faceColor(color);
+			dataArray.faceNorthColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.NORTH));
 			dataArray.faceIndices();
 			
@@ -69,7 +75,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 		if (faces.isSouth()) {
 			
 			dataArray.faceSouth(x, y, z, 1, 1);
-			dataArray.faceColor(color);
+			//dataArray.faceColor(color);
+			dataArray.faceSouthColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.SOUTH));
 			dataArray.faceIndices();
 			
@@ -78,7 +85,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 		if (faces.isEast()) {
 			
 			dataArray.faceEast(x, y, z + 1, 1, 1);
-			dataArray.faceColor(color);
+			//dataArray.faceColor(color);
+			dataArray.faceEastColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.EAST));
 			dataArray.faceIndices();
 			
@@ -87,7 +95,8 @@ public class BlockCubeRenderer extends BlockRenderer {
 		if (faces.isWest()) {
 			
 			dataArray.faceWest(x, y, z, 1, 1);
-			dataArray.faceColor(color);
+			//dataArray.faceColor(color);
+			dataArray.faceWestColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.WEST));
 			dataArray.faceIndices();
 			

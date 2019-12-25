@@ -98,6 +98,10 @@ public class WorldRenderDataArray {
 		this.color(color.getRed(), color.getGreen(), color.getBlue());
 	}
 	
+	public void color(Color color, float f) {
+		this.color(color.getRed() * f, color.getGreen() * f, color.getBlue() * f);
+	}
+	
 	public void colorWhite() {
 		this.colors.put(1).put(1).put(1);
 	}
@@ -206,6 +210,48 @@ public class WorldRenderDataArray {
 	
 	public void faceColor(Color color, float f) {
 		this.faceColor(color.getRed() * f, color.getGreen() * f, color.getBlue() * f);
+	}
+	
+	public void faceTopColor(Color color, float occlFactor, int occlData) {
+		this.color(color, (occlData & 8) == 8 ? occlFactor : 1f);
+		this.color(color, (occlData & 4) == 4 ? occlFactor : 1f);
+		this.color(color, (occlData & 2) == 2 ? occlFactor : 1f);
+		this.color(color, (occlData & 1) == 1 ? occlFactor : 1f);
+	}
+	
+	public void faceBottomColor(Color color, float occlFactor, int occlData) {
+		this.color(color, (occlData & 16) == 16 ? occlFactor : 1f);
+		this.color(color, (occlData & 128) == 128 ? occlFactor : 1f);
+		this.color(color, (occlData & 64) == 64 ? occlFactor : 1f);
+		this.color(color, (occlData & 32) == 32 ? occlFactor : 1f);
+	}
+	
+	public void faceNorthColor(Color color, float occlFactor, int occlData) {
+		this.color(color, (occlData & 512) == 512 ? occlFactor : 1f);
+		this.color(color, (occlData & 256) == 256 ? occlFactor : 1f);
+		this.color(color, (occlData & 2048) == 2048 ? occlFactor : 1f);
+		this.color(color, (occlData & 1024) == 1024 ? occlFactor : 1f);
+	}
+	
+	public void faceSouthColor(Color color, float occlFactor, int occlData) {
+		this.color(color, (occlData & 4096) == 4096 ? occlFactor : 1f);
+		this.color(color, (occlData & 32768) == 32768 ? occlFactor : 1f);
+		this.color(color, (occlData & 16384) == 16384 ? occlFactor : 1f);
+		this.color(color, (occlData & 8192) == 8192 ? occlFactor : 1f);
+	}
+	
+	public void faceEastColor(Color color, float occlFactor, int occlData) {
+		this.color(color, (occlData & 65536) == 65536 ? occlFactor : 1f);
+		this.color(color, (occlData & 524288) == 524288 ? occlFactor : 1f);
+		this.color(color, (occlData & 262144) == 262144 ? occlFactor : 1f);
+		this.color(color, (occlData & 131072) == 131072 ? occlFactor : 1f);
+	}
+	
+	public void faceWestColor(Color color, float occlFactor, int occlData) {
+		this.color(color, (occlData & 2097152) == 2097152 ? occlFactor : 1f);
+		this.color(color, (occlData & 1048576) == 1048576 ? occlFactor : 1f);
+		this.color(color, (occlData & 8388608) == 8388608 ? occlFactor : 1f);
+		this.color(color, (occlData & 4194304) == 4194304 ? occlFactor : 1f);
 	}
 	
 	// Face Texcoords //

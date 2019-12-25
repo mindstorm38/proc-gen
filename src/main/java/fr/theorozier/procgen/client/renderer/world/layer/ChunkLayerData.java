@@ -119,9 +119,13 @@ public abstract class ChunkLayerData {
 								faces.setFaceBlock(state, Direction.WEST, this.chunk.getBlockAt(x, y, z - 1));
 							else faces.setFaceBlock(state, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
 							
+							if (faces.isVisible()) {
+								consumer.accept(wx, wy, wz, state, renderer, faces);
+							}
+							
+						} else {
+							consumer.accept(wx, wy, wz, state, renderer, faces);
 						}
-						
-						consumer.accept(wx, wy, wz, state, renderer, faces);
 						
 					}
 					
