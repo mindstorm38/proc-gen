@@ -5,6 +5,7 @@ import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
+import io.sutil.ThreadUtils;
 
 public class ChunkDirectLayerData extends ChunkLayerData {
 	

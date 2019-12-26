@@ -37,4 +37,5 @@ public class ChunkUpdateDescriptor {
 	public int hashCode() {
 		return Objects.hash(chunkPosition, renderLayer);
 	}
+	
 }

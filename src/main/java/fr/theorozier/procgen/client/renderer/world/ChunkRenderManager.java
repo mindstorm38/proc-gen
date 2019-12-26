@@ -96,7 +96,7 @@ public class ChunkRenderManager {
 		Iterator<Future<ChunkUpdateDescriptor>> chunkUpdatesIt = this.chunkUpdatesDescriptors.iterator();
 		Future<ChunkUpdateDescriptor> future;
 		ChunkUpdateDescriptor descriptor = null;
-		ChunkRenderer renderer;
+		ChunkRenderer renderer = null;
 		
 		while (chunkUpdatesIt.hasNext()) {
 			
@@ -108,10 +108,14 @@ public class ChunkRenderManager {
 					
 					descriptor = future.get();
 					renderer = this.chunkRenderers.get(descriptor.getChunkPosition());
-					renderer.chunkUpdateDone(descriptor.getRenderLayer());
+					// TODO renderer is sometimes NULL
 					
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
+				}
+				
+				if (renderer != null) {
+					renderer.chunkUpdateDone(descriptor.getRenderLayer());
 				}
 				
 				chunkUpdatesIt.remove();
