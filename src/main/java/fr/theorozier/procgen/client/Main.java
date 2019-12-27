@@ -7,7 +7,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		final RenderGameOptions options = new RenderGameOptions(ProcGenGame.class);
-		options.setInitialWindowTitle("Procedural Generation Test");
+		options.setInitialWindowTitle("Procedural Generation (A Minecraft Clone)");
 		options.setResourceNamespace("procgen");
 		options.setLoggerName("ProcGen");
 		

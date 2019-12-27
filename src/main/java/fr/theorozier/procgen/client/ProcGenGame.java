@@ -44,6 +44,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		TextureMap.setDebugAtlases(true);
 		Blocks.computeStatesUids();
+		this.profiler.setEnabled(true);
 		
 		this.window.addKeyEventListener(this);
 		

@@ -18,7 +18,7 @@ import io.msengine.client.renderer.util.BlendMode;
 import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
-import io.msengine.client.util.camera.Camera3D;
+import io.msengine.client.util.camera.SmoothCamera3D;
 import io.sutil.math.MathHelper;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -38,7 +38,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private final WorldSkyBox skyBox;
 	
 	private final ModelHandler model;
-	private final Camera3D camera;
+	private final SmoothCamera3D camera;
 	private final Matrix4f globalMatrix;
 	private final Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
@@ -63,7 +63,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.skyBox = new WorldSkyBox(this.shaderManager);
 		
 		this.model = new ModelHandler(this);
-		this.camera = new Camera3D();
+		this.camera = new SmoothCamera3D();
 		this.globalMatrix = new Matrix4f();
 		this.projectionMatrix = new Matrix4f();
 		
@@ -71,7 +71,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 	}
 	
-	public Camera3D getCamera() {
+	public SmoothCamera3D getCamera() {
 		return this.camera;
 	}
 	
@@ -88,7 +88,9 @@ public class WorldRenderer implements ModelApplyListener,
 		this.shaderManager.build();
 		this.skyBox.init();
 		
-		this.camera.setPosition(0, 110, 0);
+		this.camera.setSpeed(0.2f);
+		this.camera.setTarget(0, 110, 0, 0, 0);
+		this.camera.instantTarget();
 		this.camera.updateViewMatrix();
 		
 		this.updateRenderSize(this.window);
@@ -119,30 +121,30 @@ public class WorldRenderer implements ModelApplyListener,
 			boolean changed = false;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
-				this.camera.addPosition((float) Math.cos(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult);
+				this.camera.addTarget((float) Math.cos(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0, 0);
 				changed = true;
 			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_B)) {
-				this.camera.addPosition((float) Math.cos(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult);
+				this.camera.addTarget((float) Math.cos(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult, 0, 0);
 				changed = true;
 			}
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-				this.camera.addPosition(0, speedMult, 0);
+				this.camera.addTarget(0, speedMult, 0, 0, 0);
 				changed = true;
 			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_D)) {
-				this.camera.addPosition(0, -speedMult, 0);
+				this.camera.addTarget(0, -speedMult, 0, 0, 0);
 				changed = true;
 			}
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_C)) {
-				this.camera.addPosition((float) Math.cos(this.camera.getYaw() - Math.PI) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - Math.PI) * speedMult);
+				this.camera.addTarget((float) Math.cos(this.camera.getYaw() - Math.PI) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - Math.PI) * speedMult, 0, 0);
 				changed = true;
 			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_V)) {
-				this.camera.addPosition((float) Math.cos(this.camera.getYaw()) * speedMult, 0f, (float) Math.sin(this.camera.getYaw()) * speedMult);
+				this.camera.addTarget((float) Math.cos(this.camera.getYaw()) * speedMult, 0f, (float) Math.sin(this.camera.getYaw()) * speedMult, 0, 0);
 				changed = true;
 			}
 			
-			this.camera.updateViewMatrix();
+			this.camera.updateViewMatrix(alpha);
 			
 			if (changed) {
 				this.chunkRenderManager.updateViewPosition(this.camera);
@@ -201,6 +203,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.terrainMap.tick();
 		this.chunkRenderManager.update();
+		this.camera.update();
 		
 	}
 	
@@ -310,7 +313,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.lastMouseY = y;
 		
 		if (!this.escaped)
-			this.camera.addRotation((float) Math.toRadians(diffY / 10f), (float) Math.toRadians(diffX / 10f));
+			this.camera.addTarget(0, 0, 0, (float) Math.toRadians(diffX / 10f), (float) Math.toRadians(diffY / 10f));
 		
 	}
 	
