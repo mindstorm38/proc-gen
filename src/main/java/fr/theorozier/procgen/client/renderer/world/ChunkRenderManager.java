@@ -14,6 +14,8 @@ import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.util.camera.Camera3D;
+import io.msengine.common.util.GameProfiler;
+import io.sutil.profiler.Profiler;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +36,7 @@ public class ChunkRenderManager {
 	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
 	
 	private final WorldRenderer renderer;
+	private final Profiler profiler;
 	
 	private final BlockPosition cachedBlockPos;
 	
@@ -52,6 +55,7 @@ public class ChunkRenderManager {
 	ChunkRenderManager(WorldRenderer renderer) {
 		
 		this.renderer = renderer;
+		this.profiler = GameProfiler.getInstance();
 		
 		this.cachedBlockPos = new BlockPosition();
 		
@@ -88,7 +92,11 @@ public class ChunkRenderManager {
 	}
 	
 	void render(BlockRenderLayer layer) {
+		
+		this.profiler.startSection("render_layer_" + layer.name());
 		this.chunkRenderersList.forEach(cr -> cr.render(layer, RENDER_DISTANCE_SQUARED));
+		this.profiler.endSection();
+		
 	}
 	
 	void update() {

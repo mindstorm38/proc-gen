@@ -13,6 +13,8 @@ import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.window.CursorMode;
 import io.msengine.client.renderer.window.listener.WindowKeyEventListener;
 import io.msengine.client.util.camera.Camera3D;
+import io.msengine.common.util.GameProfiler;
+import io.sutil.profiler.Profiler;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -45,6 +47,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		TextureMap.setDebugAtlases(true);
 		Blocks.computeStatesUids();
 		this.profiler.setEnabled(true);
+		GameProfiler.WARNING_TIME_LIMIT = 50000000L;
 		
 		this.window.addKeyEventListener(this);
 		
@@ -74,16 +77,24 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+		this.profiler.startSection("world_rendering");
 		this.worldRenderer.render(alpha);
+		
+		this.profiler.endStartSection("gui");
 		this.guiManager.render(alpha);
+		this.profiler.endSection();
 		
 	}
 	
 	@Override
 	protected void update() {
 		
+		this.profiler.startSection("world_renderer_update");
 		this.worldRenderer.update();
+		
+		this.profiler.endStartSection("gui_update");
 		this.guiManager.update();
+		this.profiler.endSection();
 		
 		if (this.testWorld != null)
 			this.testWorld.update();

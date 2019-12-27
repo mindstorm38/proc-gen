@@ -44,7 +44,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 		if (faces.isTop()) {
 			
 			dataArray.faceTop(x, y + 1, z, 1, 1);
-			// dataArray.faceColor(color);
 			dataArray.faceTopColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP), posRand(x, y, z) % 4);
 			dataArray.faceIndices();
@@ -54,7 +53,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 		if (faces.isBottom()) {
 			
 			dataArray.faceBottom(x, y, z, 1, 1);
-			//dataArray.faceColorWhite();
 			dataArray.faceBottomColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.BOTTOM));
 			dataArray.faceIndices();
@@ -65,8 +63,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 			
 			dataArray.faceNorth(x + 1, y, z, 1, 1);
 			dataArray.faceNorth(x + 1, y, z, 1, 1);
-			//dataArray.faceColorWhite();
-			//dataArray.faceColor(color);
 			dataArray.faceNorthColor(Color.WHITE, OCCLUSION_FACTOR, occlData);
 			dataArray.faceNorthColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.NORTH));
@@ -80,8 +76,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 			
 			dataArray.faceSouth(x, y, z, 1, 1);
 			dataArray.faceSouth(x, y, z, 1, 1);
-			//dataArray.faceColorWhite();
-			//dataArray.faceColor(color);
 			dataArray.faceSouthColor(Color.WHITE, OCCLUSION_FACTOR, occlData);
 			dataArray.faceSouthColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.SOUTH));
@@ -95,8 +89,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 			
 			dataArray.faceEast(x, y, z + 1, 1, 1);
 			dataArray.faceEast(x, y, z + 1, 1, 1);
-			//dataArray.faceColorWhite();
-			//dataArray.faceColor(color);
 			dataArray.faceEastColor(Color.WHITE, OCCLUSION_FACTOR, occlData);
 			dataArray.faceEastColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.EAST));
@@ -110,8 +102,6 @@ public class BlockGrassRenderer extends BlockRenderer {
 			
 			dataArray.faceWest(x, y, z, 1, 1);
 			dataArray.faceWest(x, y, z, 1, 1);
-			//dataArray.faceColorWhite();
-			//dataArray.faceColor(color);
 			dataArray.faceWestColor(Color.WHITE, OCCLUSION_FACTOR, occlData);
 			dataArray.faceWestColor(color, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.WEST));

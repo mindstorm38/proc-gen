@@ -19,7 +19,9 @@ import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
 import io.msengine.client.util.camera.SmoothCamera3D;
+import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
+import io.sutil.profiler.Profiler;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
@@ -32,6 +34,7 @@ public class WorldRenderer implements ModelApplyListener,
 		WorldChunkListener {
 	
 	private final Window window;
+	private final Profiler profiler;
 	
 	private final Basic3DShaderManager shaderManager;
 	private final TextureMap terrainMap;
@@ -57,6 +60,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.window = Window.getInstance();
 		this.window.addFramebufferSizeEventListener(this);
+		this.profiler = GameProfiler.getInstance();
 		
 		this.shaderManager = new Basic3DShaderManager("world", "world");
 		this.terrainMap = new TextureMap("textures/blocks", TextureMap.PNG_FILTER);
@@ -117,6 +121,8 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (!this.escaped) {
 			
+			this.profiler.startSection("camera");
+			
 			float speedMult = alpha * 1.0f;
 			boolean changed = false;
 			
@@ -147,8 +153,14 @@ public class WorldRenderer implements ModelApplyListener,
 			this.camera.updateViewMatrix(alpha);
 			
 			if (changed) {
+				
+				this.profiler.startSection("update_view_pos");
 				this.chunkRenderManager.updateViewPosition(this.camera);
+				this.profiler.endSection();
+				
 			}
+			
+			this.profiler.endSection();
 			
 		}
 		
@@ -160,8 +172,12 @@ public class WorldRenderer implements ModelApplyListener,
 		glEnable(GL_DEPTH_TEST);
 		
 		this.shaderManager.use();
+		this.profiler.startSection("render_skybox");
 		this.renderSkyBox();
+		this.profiler.endStartSection("render_chunks");
 		this.renderChunks();
+		this.profiler.endSection();
+		
 		this.shaderManager.end();
 	
 	}
