@@ -221,7 +221,7 @@ public abstract class BlockRenderer {
 		
 	}
 	
-	public abstract void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces face, TextureMap map, WorldRenderDataArray dataArray);
+	public abstract void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray);
 	
 	public boolean needFaces() {
 		return true;

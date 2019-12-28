@@ -315,6 +315,10 @@ public class WorldRenderDataArray {
 		this.faceTexcoords(tile.x, tile.y, tile.width, tile.height, rotation);
 	}
 	
+	public void faceTexcoords(TextureMapTile tile, float xOffFactor, float yOffFactor, float wFactor, float hFactor) {
+		this.faceTexcoords(tile.x + (tile.width * xOffFactor), tile.y + (tile.height * yOffFactor), tile.width * wFactor, tile.height * hFactor);
+	}
+	
 	// Face Indices //
 	
 	public void faceIndices() {

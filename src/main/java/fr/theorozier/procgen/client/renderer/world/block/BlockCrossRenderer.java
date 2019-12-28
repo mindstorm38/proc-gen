@@ -2,14 +2,12 @@ package fr.theorozier.procgen.client.renderer.world.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.biome.Biome;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
 
-public class BlockCrossRenderer extends BlockRenderer {
+public class BlockCrossRenderer extends BlockColorizableRenderer {
 	
 	private static final float OFFSET  = 0.1464466094f;
 	private static final float SIZE    = 0.7071067812f;
@@ -17,12 +15,11 @@ public class BlockCrossRenderer extends BlockRenderer {
 	private static final float HEIGHT  = 1f;
 	
 	private final String mapTileIdentifier;
-	private final boolean needColorization;
 	
 	public BlockCrossRenderer(String mapTileIdentifier, boolean needColorization) {
 		
+		super(needColorization);
 		this.mapTileIdentifier = mapTileIdentifier;
-		this.needColorization = needColorization;
 		
 	}
 	
@@ -30,6 +27,7 @@ public class BlockCrossRenderer extends BlockRenderer {
 		return map.getTile(this.mapTileIdentifier);
 	}
 	
+	@Override
 	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
 		return world.getBiomeAt(x, z).getFoliageColor();
 	}
