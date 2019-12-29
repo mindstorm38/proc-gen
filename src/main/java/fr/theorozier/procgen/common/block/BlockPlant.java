@@ -3,7 +3,6 @@ package fr.theorozier.procgen.common.block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.tick.TickPriority;
 
 import java.util.Random;
 
@@ -21,11 +20,6 @@ public class BlockPlant extends Block {
 	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_NOT_CULLED;
-	}
-	
-	@Override
-	public void initBlock(WorldServer world, BlockPositioned pos, BlockState block) {
-		world.getBlockTickList().scheduleTick(this, pos.immutableBlockPos(), 100, TickPriority.NORMAL);
 	}
 	
 	@Override

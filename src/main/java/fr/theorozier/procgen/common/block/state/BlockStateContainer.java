@@ -51,8 +51,12 @@ public class BlockStateContainer {
 			
 		});
 		
-		for (BlockState state : states)
+		for (BlockState state : states) {
+			
 			state.setAllStates(statesByProperties);
+			state.setupBoundingBoxes();
+			
+		}
 		
 		this.states = ImmutableList.copyOf(states);
 		

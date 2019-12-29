@@ -2,12 +2,14 @@ package fr.theorozier.procgen.common.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateContainer;
+import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.sutil.StringUtils;
 
+import java.util.List;
 import java.util.Random;
 
 public class Block {
@@ -94,9 +96,9 @@ public class Block {
 		return this.stateContainer;
 	}
 	
-	// Dynamic function for modifying the world
+	public void getStateCollision(BlockState state, List<AxisAlignedBB> boundingBoxes) {}
 	
-	public void initBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+	// Dynamic function for modifying the world
 	
 	public void tickBlock(WorldServer world, BlockPositioned pos, BlockState block, Random rand) {}
 	

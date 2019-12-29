@@ -6,14 +6,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
+import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BlockState {
 
 	private final Block owner;
 	private final ImmutableMap<BlockStateProperty<?>, ?> properties;
+	private final List<AxisAlignedBB> boundingBoxes;
 	private Table<BlockStateProperty<?>, ?, BlockState> statesByValues;
 	private short uid;
 	
@@ -21,6 +25,7 @@ public class BlockState {
 		
 		this.owner = owner;
 		this.properties = properties;
+		this.boundingBoxes = new ArrayList<>();
 		this.uid = 0;
 		
 	}
@@ -39,6 +44,13 @@ public class BlockState {
 	
 	public void setUid(short uid) {
 		this.uid = uid;
+	}
+	
+	public void setupBoundingBoxes() {
+		
+		this.boundingBoxes.clear();
+		this.owner.getStateCollision(this, this.boundingBoxes);
+		
 	}
 	
 	public void setAllStates(Map<ImmutableMap<BlockStateProperty<?>, ?>, BlockState> states) {
