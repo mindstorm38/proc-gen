@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.util;
 
+import io.sutil.math.MathHelper;
 import org.joml.SimplexNoise;
 
 public class MathUtils {
@@ -21,10 +22,12 @@ public class MathUtils {
 	 * @param v Value to be rounded off.
 	 * @return Floor value of x.
 	 */
+	@Deprecated
 	public static int fastfloor(float v) {
 		
-		final int i = (int) v;
-		return v < i ? i - 1 : i;
+		// final int i = (int) v;
+		// return v < i ? i - 1 : i;
+		return MathHelper.floorFloatInt(v);
 		
 	}
 	

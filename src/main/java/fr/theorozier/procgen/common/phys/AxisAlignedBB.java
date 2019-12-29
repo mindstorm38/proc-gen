@@ -9,6 +9,10 @@ public class AxisAlignedBB {
 		this.setPosition(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 	
+	public AxisAlignedBB() {
+		this.setPosition(0, 0, 0, 0, 0, 0);
+	}
+	
 	public float getMinX() {
 		return minX;
 	}
@@ -31,6 +35,30 @@ public class AxisAlignedBB {
 	
 	public float getMaxZ() {
 		return maxZ;
+	}
+	
+	public float getSizeX() {
+		return this.maxX - this.minX;
+	}
+	
+	public float getSizeY() {
+		return this.maxY - this.minY;
+	}
+	
+	public float getSizeZ() {
+		return this.maxZ - this.minZ;
+	}
+	
+	public float getMiddleX() {
+		return (this.maxX + this.minX) / 2f;
+	}
+	
+	public float getMiddleY() {
+		return (this.maxY + this.minY) / 2f;
+	}
+	
+	public float getMiddleZ() {
+		return (this.maxZ + this.minZ) / 2f;
 	}
 	
 	public void setPosition(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {

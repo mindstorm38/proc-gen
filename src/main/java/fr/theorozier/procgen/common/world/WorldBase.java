@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
@@ -9,6 +10,7 @@ import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.*;
 import io.msengine.common.util.event.MethodEventManager;
+import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
 
 import java.util.HashMap;
@@ -147,9 +149,30 @@ public abstract class WorldBase {
 	
 	// UTILITES //
 	
+	public void forEachBoundingBoxesIn(AxisAlignedBB boundingBox, Consumer<AxisAlignedBB> bbConsumer) {
+	
+		int xMin = MathHelper.floorFloatInt(boundingBox.getMinX()) - 1;
+		int xMax = MathHelper.ceilingFloatInt(boundingBox.getMaxX()) + 1;
+		
+		int yMin = MathHelper.floorFloatInt(boundingBox.getMinY()) - 1;
+		int yMax = MathHelper.ceilingFloatInt(boundingBox.getMaxY()) + 1;
+		
+		int zMin = MathHelper.floorFloatInt(boundingBox.getMinZ()) - 1;
+		int zMax = MathHelper.ceilingFloatInt(boundingBox.getMaxZ()) + 1;
+		
+		BlockState state;
+		
+		for (; yMin <= yMax; ++yMin)
+			for (; xMin <= xMax; ++xMin)
+				for (; zMin <= zMax; ++zMin)
+					if ((state = this.getBlockAt(xMin, yMin, zMin)) != null)
+						state.forEachBoundingBox(bbConsumer);
+		
+	}
+	
 	public void forEachChunkPosNear(float x, float y, float z, int range, boolean wholeY, Consumer<BlockPosition> consumer) {
 		
-		ImmutableBlockPosition chunkPos = new ImmutableBlockPosition(MathUtils.fastfloor(x) >> 4, MathUtils.fastfloor(y) >> 4, MathUtils.fastfloor(z) >> 4);
+		ImmutableBlockPosition chunkPos = new ImmutableBlockPosition(MathHelper.floorFloatInt(x) >> 4, MathHelper.floorFloatInt(y) >> 4, MathHelper.floorFloatInt(z) >> 4);
 		BlockPosition minPos = new BlockPosition(chunkPos).sub(range, range, range);
 		
 		int xmax = chunkPos.getX() + range;
@@ -176,7 +199,7 @@ public abstract class WorldBase {
 	
 	public void forEachSectionPosNear(float x, float z, int range, Consumer<SectionPosition> consumer) {
 		
-		ImmutableSectionPosition sectionPos = new ImmutableSectionPosition(MathUtils.fastfloor(x) >> 4, MathUtils.fastfloor(z) >> 4);
+		ImmutableSectionPosition sectionPos = new ImmutableSectionPosition(MathHelper.floorFloatInt(x) >> 4, MathHelper.floorFloatInt(z) >> 4);
 		SectionPosition minPos = new SectionPosition(sectionPos).sub(range, range);
 		
 		int xmax = sectionPos.getX() + range;

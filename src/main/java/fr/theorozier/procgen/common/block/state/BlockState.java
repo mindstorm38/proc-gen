@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class BlockState {
 
@@ -50,6 +51,13 @@ public class BlockState {
 		
 		this.boundingBoxes.clear();
 		this.owner.getStateCollision(this, this.boundingBoxes);
+		
+	}
+	
+	public void forEachBoundingBox(Consumer<AxisAlignedBB> bbConsumer) {
+		
+		for (int i = 0, size = this.boundingBoxes.size(); i < size; ++i)
+			bbConsumer.accept(this.boundingBoxes.get(i));
 		
 	}
 	
