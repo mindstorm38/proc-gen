@@ -55,8 +55,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.setEscaped(true);
 		
 		this.worldRenderer.renderWorld(this.testWorld);
-		//this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
-		//this.worldRenderer.getCamera().instantTarget();
+		// this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
+		// this.worldRenderer.getCamera().instantTarget();
 		
 		this.guiManager.registerSceneClass("debug", DebugScene.class);
 		this.guiManager.loadScene("debug");

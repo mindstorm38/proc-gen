@@ -96,4 +96,98 @@ public class AxisAlignedBB {
 		
 	}
 	
+	public boolean intersect(float x, float y, float z) {
+		return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY && z >= this.minZ && z <= this.maxZ;
+	}
+	
+	public boolean intersect(AxisAlignedBB bb) {
+		return this.minX < bb.maxX && this.maxX > bb.minX &&
+				this.minY < bb.maxY && this.maxY > bb.minY &&
+				this.minZ < bb.maxZ && this.maxZ > bb.minZ;
+	}
+	
+	public float calcOffsetX(AxisAlignedBB other, float offsetX) {
+		
+		if (this.minY < other.maxY && this.maxY > other.minY && this.minZ < other.maxZ && this.maxZ > other.minZ) {
+			
+			if (offsetX > 0 && other.maxX > this.maxX) {
+				
+				float d = other.minX - this.maxX;
+				
+				if (d < offsetX) {
+					offsetX = d;
+				}
+				
+			} else if (offsetX < 0 && other.minX < this.minX) {
+				
+				float d = other.minX - this.maxX;
+				
+				if (d > offsetX) {
+					offsetX = d;
+				}
+				
+			}
+			
+		}
+		
+		return offsetX;
+		
+	}
+	
+	public float calcOffsetY(AxisAlignedBB other, float offsetY) {
+	
+		if (this.minX < other.maxX && this.maxX > other.minX && this.minZ < other.maxZ && this.maxZ > other.minZ) {
+			
+			if (offsetY > 0 && other.maxY > this.maxY) {
+				
+				float d = other.minY - this.maxY;
+				
+				if (d < offsetY) {
+					offsetY = d;
+				}
+				
+			} else if (offsetY < 0 && other.minY < this.minY) {
+				
+				float d = other.minY - this.maxY;
+				
+				if (d > offsetY) {
+					offsetY = d;
+				}
+				
+			}
+			
+		}
+		
+		return offsetY;
+	
+	}
+	
+	public float calcOffsetZ(AxisAlignedBB other, float offsetZ) {
+		
+		if (this.minY < other.maxY && this.maxY > other.minY && this.minX < other.maxX && this.maxX > other.minX) {
+			
+			if (offsetZ > 0 && other.maxZ > this.maxZ) {
+				
+				float d = other.minZ - this.maxZ;
+				
+				if (d < offsetZ) {
+					offsetZ = d;
+				}
+				
+			} else if (offsetZ < 0 && other.minZ < this.minZ) {
+				
+				float d = other.minZ - this.maxZ;
+				
+				if (d > offsetZ) {
+					offsetZ = d;
+				}
+				
+			}
+			
+		}
+		
+		return offsetZ;
+		
+	}
+	
 }

@@ -2,7 +2,6 @@ package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
-import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
