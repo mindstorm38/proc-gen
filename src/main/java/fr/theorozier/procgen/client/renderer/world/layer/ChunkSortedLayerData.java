@@ -33,7 +33,10 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	
 	@Override
 	public void handleChunkUpdate(ChunkRenderer cr) {
+		
+		this.refreshRenderOffsets();
 		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildCacheAndData);
+		
 	}
 	
 	private void rebuildCacheAndData() {
@@ -47,8 +50,8 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 		
 		this.cache.clear();
 		
-		this.foreachBlocks((x, y, z, block, renderer, faces) -> {
-			this.cache.add(new ChunkCompiledBlock(renderer, block, faces, x, y, z));
+		this.foreachBlocks((bx, by, bz, block, renderer, faces) -> {
+			this.cache.add(new ChunkCompiledBlock(renderer, block, faces, bx, by, bz));
 		});
 		
 	}
@@ -72,7 +75,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 				block = compiledBlock.getBlock();
 				compiledBlock.mutateBlockFaces(faces);
 				
-				compiledBlock.getRenderer().getRenderData(this.world, block, compiledBlock.getX(), compiledBlock.getY(), compiledBlock.getZ(), faces, terrainMap, this.dataArray);
+				compiledBlock.getRenderer().getRenderData(this.world, block, compiledBlock.getX(), compiledBlock.getY(), compiledBlock.getZ(), compiledBlock.getX() + this.roX, compiledBlock.getY(), compiledBlock.getZ() + this.roZ, faces, terrainMap, this.dataArray);
 				
 			}
 			

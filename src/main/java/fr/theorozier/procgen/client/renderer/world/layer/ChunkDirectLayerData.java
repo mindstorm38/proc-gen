@@ -5,7 +5,6 @@ import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
-import io.sutil.ThreadUtils;
 
 public class ChunkDirectLayerData extends ChunkLayerData {
 	
@@ -18,7 +17,10 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	
 	@Override
 	public void handleChunkUpdate(ChunkRenderer cr) {
+		
+		this.refreshRenderOffsets();
 		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildData);
+		
 	}
 	
 	private void rebuildData() {
@@ -28,8 +30,8 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	public void rebuildData(TextureMap terrainMap) {
 		
 		this.rebuildArrays(() -> {
-			this.foreachBlocks((x, y, z, block, renderer, faces) -> {
-				renderer.getRenderData(this.world, block, x, y, z, faces, terrainMap, this.dataArray);
+			this.foreachBlocks((bx, by, bz, block, renderer, faces) -> {
+				renderer.getRenderData(this.world, block, bx, by, bz, bx + this.roX, by, bz + this.roZ, faces, terrainMap, this.dataArray);
 			});
 		});
 		

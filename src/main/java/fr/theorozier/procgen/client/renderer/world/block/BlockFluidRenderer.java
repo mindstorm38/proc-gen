@@ -42,14 +42,10 @@ public class BlockFluidRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		int ix = (int) x;
-		int iy = (int) y;
-		int iz = (int) z;
-		
-		Color color = this.needColorization ? this.getColorization(world, block, ix, iy, iz) : Color.WHITE;
-		boolean under = this.hasSameBlockOnTop(world, ix, iy, iz);
+		Color color = this.needColorization ? this.getColorization(world, block, bx, by, bz) : Color.WHITE;
+		boolean under = this.hasSameBlockOnTop(world, bx, by, bz);
 		
 		float height = under ? 1 : TOP_HEIGHT;
 		float topOffset = under ? 0 : TOP_OFFSET;

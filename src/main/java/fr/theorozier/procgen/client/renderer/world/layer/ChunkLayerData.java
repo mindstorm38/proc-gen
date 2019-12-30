@@ -23,6 +23,8 @@ public abstract class ChunkLayerData {
 	
 	private boolean needUpdate = false;
 	
+	protected int roX, roZ;
+	
 	public ChunkLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
 		this.chunk = chunk;
@@ -43,11 +45,20 @@ public abstract class ChunkLayerData {
 	}
 	
 	public void setNeedUpdate(boolean needUpdate) {
+		
 		this.needUpdate = needUpdate;
+		
 	}
 	
 	public abstract void handleNewViewPosition(ChunkRenderer cr, int x, int y, int z);
 	public abstract void handleChunkUpdate(ChunkRenderer cr);
+	
+	protected void refreshRenderOffsets() {
+		
+		this.roX = this.renderManager.getRenderOffsetX();
+		this.roZ = this.renderManager.getRenderOffsetZ();
+		
+	}
 	
 	protected void rebuildArrays(Runnable run) {
 		
@@ -136,7 +147,7 @@ public abstract class ChunkLayerData {
 	}
 	
 	protected interface BlockConsumer {
-		void accept(int x, int y, int z, BlockState block, BlockRenderer renderer, BlockFaces faces);
+		void accept(int bx, int by, int bz, BlockState block, BlockRenderer renderer, BlockFaces faces);
 	}
 	
 }

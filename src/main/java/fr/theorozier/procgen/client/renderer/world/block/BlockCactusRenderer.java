@@ -22,7 +22,7 @@ public class BlockCactusRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		if (faces.isTop()) {
 			

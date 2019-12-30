@@ -38,13 +38,13 @@ public class BlockCrossRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldBase world, BlockState block, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
-		Color color = this.needColorization ? this.getColorization(world, block, (int) x, (int) y, (int) z) : Color.WHITE;
+		Color color = this.needColorization ? this.getColorization(world, block, bx, by, bz) : Color.WHITE;
 		
-		int rand = posRand(x, y, z);
+		int rand = posRand(bx, by, bz);
 		x += (rand % 3) * 0.1f;
 		z += ((rand >> 2) % 3) * 0.1f;
 		

@@ -33,6 +33,10 @@ public class WorldRenderer implements ModelApplyListener,
 		WorldLoadingListener,
 		WorldChunkListener {
 	
+	private static final int RENDER_OFFSET_STEP  = 1024;
+	private static final int RENDER_OFFSET_BASE  = 512;
+	private static final int RENDER_OFFSET_SHIFT = 10; // Step : 1024 (2^10)
+	
 	private final Window window;
 	private final Profiler profiler;
 	
@@ -56,6 +60,8 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	private final ChunkRenderManager chunkRenderManager;
 	
+	private int renderOffsetX, renderOffsetZ;
+	
 	public WorldRenderer() {
 		
 		this.window = Window.getInstance();
@@ -72,6 +78,9 @@ public class WorldRenderer implements ModelApplyListener,
 		this.projectionMatrix = new Matrix4f();
 		
 		this.chunkRenderManager = new ChunkRenderManager(this);
+		
+		this.renderOffsetX = 0;
+		this.renderOffsetZ = 0;
 		
 	}
 	
@@ -150,15 +159,29 @@ public class WorldRenderer implements ModelApplyListener,
 				changed = true;
 			}
 			
-			this.camera.updateViewMatrix(alpha);
-			
 			if (changed) {
+				
+				int newRoX = -((MathHelper.floorFloatInt(this.camera.getTargetX() + RENDER_OFFSET_BASE) >> RENDER_OFFSET_SHIFT) << RENDER_OFFSET_SHIFT);
+				int newRoZ = -((MathHelper.floorFloatInt(this.camera.getTargetZ() + RENDER_OFFSET_BASE) >> RENDER_OFFSET_SHIFT) << RENDER_OFFSET_SHIFT);
+				
+				if (this.renderOffsetX != newRoX || this.renderOffsetZ != newRoZ) {
+					
+					this.renderOffsetX = newRoX;
+					this.renderOffsetZ = newRoZ;
+					
+					this.chunkRenderManager.updateRenderOffset(newRoX, newRoZ);
+					
+					System.out.println("New render offset : " + newRoX + "/" + newRoZ);
+					
+				}
 				
 				this.profiler.startSection("update_view_pos");
 				this.chunkRenderManager.updateViewPosition(this.camera);
 				this.profiler.endSection();
 				
 			}
+			
+			this.camera.updateViewMatrix(alpha, this.renderOffsetX, 0, this.renderOffsetZ);
 			
 			this.profiler.endSection();
 			
@@ -209,7 +232,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.shaderManager.setTextureSampler(null);
 		
-		this.model.push().translate(this.camera.getX(), this.camera.getY(), this.camera.getZ()).apply();
+		this.model.push().translate(this.camera.getX() + this.renderOffsetX, this.camera.getY(), this.camera.getZ() + this.renderOffsetZ).apply();
 		this.skyBox.render();
 		this.model.pop();
 	

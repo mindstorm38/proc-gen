@@ -7,14 +7,15 @@ import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerData;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerDataProvider;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkSortedLayerData;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.util.camera.Camera3D;
+import io.msengine.client.util.camera.SmoothCamera3D;
 import io.msengine.common.util.GameProfiler;
+import io.sutil.math.MathHelper;
 import io.sutil.profiler.Profiler;
 
 import java.util.*;
@@ -51,6 +52,7 @@ public class ChunkRenderManager {
 	private final List<Future<ChunkUpdateDescriptor>> chunkUpdatesDescriptors;
 	
 	private float viewX, viewY, viewZ;
+	private int renderOffsetX, renderOffsetZ;
 	
 	ChunkRenderManager(WorldRenderer renderer) {
 		
@@ -72,6 +74,9 @@ public class ChunkRenderManager {
 		this.chunkComputer = Executors.newFixedThreadPool(2);
 		this.chunkUpdates = new HashMap<>();
 		this.chunkUpdatesDescriptors = new ArrayList<>();
+		
+		this.renderOffsetX = 0;
+		this.renderOffsetZ = 0;
 		
 	}
 	
@@ -199,8 +204,29 @@ public class ChunkRenderManager {
 		
 	}
 	
-	void updateViewPosition(Camera3D cam) {
-		this.updateViewPosition(cam.getX(), cam.getY(), cam.getZ());
+	void updateRenderOffset(int dx, int dz) {
+		
+		if (this.renderOffsetX != dx || this.renderOffsetZ != dz) {
+			
+			this.renderOffsetX = dx;
+			this.renderOffsetZ = dz;
+			
+			this.chunkRenderersList.forEach(cr -> cr.setNeedUpdate(true));
+			
+		}
+		
+	}
+	
+	public int getRenderOffsetX() {
+		return renderOffsetX;
+	}
+	
+	public int getRenderOffsetZ() {
+		return renderOffsetZ;
+	}
+	
+	void updateViewPosition(SmoothCamera3D cam) {
+		this.updateViewPosition(cam.getTargetX(), cam.getTargetY(), cam.getTargetZ());
 	}
 	
 	void updateViewPosition(float x, float y, float z) {
@@ -209,9 +235,9 @@ public class ChunkRenderManager {
 		this.viewY = y;
 		this.viewZ = z;
 		
-		int ix = MathUtils.fastfloor(x);
-		int iy = MathUtils.fastfloor(y);
-		int iz = MathUtils.fastfloor(z);
+		int ix = MathHelper.floorFloatInt(x);
+		int iy = MathHelper.floorFloatInt(y);
+		int iz = MathHelper.floorFloatInt(z);
 		
 		this.chunkRenderers.forEach((pos, cr) -> {
 			
