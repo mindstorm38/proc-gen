@@ -14,7 +14,6 @@ import io.msengine.client.renderer.window.CursorMode;
 import io.msengine.client.renderer.window.listener.WindowKeyEventListener;
 import io.msengine.client.util.camera.Camera3D;
 import io.msengine.common.util.GameProfiler;
-import io.sutil.profiler.Profiler;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -55,8 +54,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.setEscaped(true);
 		
 		this.worldRenderer.renderWorld(this.testWorld);
-		// this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
-		// this.worldRenderer.getCamera().instantTarget();
+		this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
+		this.worldRenderer.getCamera().instantTarget();
 		
 		this.guiManager.registerSceneClass("debug", DebugScene.class);
 		this.guiManager.loadScene("debug");

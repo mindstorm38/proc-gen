@@ -12,7 +12,7 @@ import java.nio.IntBuffer;
 
 public class WorldSkyBox {
 	
-	public static final int SKYBOX_RADIUS = 16 * 24;
+	public static final int SKYBOX_RADIUS = 16 * 14;
 	
 	private final Basic3DShaderManager shaderManager;
 	private IndicesDrawBuffer drawBuffer;

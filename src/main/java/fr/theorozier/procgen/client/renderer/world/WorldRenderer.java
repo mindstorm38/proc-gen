@@ -33,9 +33,8 @@ public class WorldRenderer implements ModelApplyListener,
 		WorldLoadingListener,
 		WorldChunkListener {
 	
-	private static final int RENDER_OFFSET_STEP  = 1024;
-	private static final int RENDER_OFFSET_BASE  = 512;
-	private static final int RENDER_OFFSET_SHIFT = 10; // Step : 1024 (2^10)
+	private static final int RENDER_OFFSET_BASE  = 2048;
+	private static final int RENDER_OFFSET_SHIFT = 12; // Step : 4096 (2^12)
 	
 	private final Window window;
 	private final Profiler profiler;
@@ -132,7 +131,7 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			this.profiler.startSection("camera");
 			
-			float speedMult = alpha * 1.0f;
+			float speedMult = alpha * 4.0f;
 			boolean changed = false;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
@@ -182,6 +181,7 @@ public class WorldRenderer implements ModelApplyListener,
 			}
 			
 			this.camera.updateViewMatrix(alpha, this.renderOffsetX, 0, this.renderOffsetZ);
+			// this.camera.updateRotatedViewMatrix(alpha);
 			
 			this.profiler.endSection();
 			
@@ -195,8 +195,10 @@ public class WorldRenderer implements ModelApplyListener,
 		glEnable(GL_DEPTH_TEST);
 		
 		this.shaderManager.use();
+		
 		this.profiler.startSection("render_skybox");
 		this.renderSkyBox();
+		
 		this.profiler.endStartSection("render_chunks");
 		this.renderChunks();
 		this.profiler.endSection();
@@ -324,7 +326,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private void updateRenderSize(int width, int height) {
 		
 		this.projectionMatrix.identity();
-		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, 16 * 256);
+		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, ChunkRenderManager.RENDER_DISTANCE * 3f);
 		this.updateGlobalMatrix();
 		
 	}

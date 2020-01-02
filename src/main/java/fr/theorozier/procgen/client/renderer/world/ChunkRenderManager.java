@@ -12,7 +12,6 @@ import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
-import io.msengine.client.util.camera.Camera3D;
 import io.msengine.client.util.camera.SmoothCamera3D;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;

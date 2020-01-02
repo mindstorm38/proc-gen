@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
@@ -12,7 +13,9 @@ import io.msengine.common.util.event.MethodEventManager;
 import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -26,6 +29,9 @@ import java.util.function.Consumer;
 public abstract class WorldBase {
 
 	protected final Map<SectionPositioned, WorldSection> sections = new HashMap<>();
+	protected final List<Entity> entities = new ArrayList<>();
+	protected final Map<Long, Entity> entitiesById = new HashMap<>();
+	
 	protected long time;
 	
 	protected final MethodEventManager eventManager;
@@ -146,6 +152,22 @@ public abstract class WorldBase {
 		this.setBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
 	}
 	
+	// ENTITIES //
+	
+	protected boolean addEntity(Entity entity) {
+		
+		if (!this.entitiesById.containsKey(entity.getUid())) {
+			
+			this.entities.add(entity);
+			this.entitiesById.put(entity.getUid(), entity);
+			return true;
+			
+		} else {
+			return false;
+		}
+		
+	}
+	
 	// UTILITES //
 	
 	public void forEachBoundingBoxesIn(AxisAlignedBB boundingBox, Consumer<AxisAlignedBB> bbConsumer) {
@@ -165,7 +187,7 @@ public abstract class WorldBase {
 			for (; xMin <= xMax; ++xMin)
 				for (; zMin <= zMax; ++zMin)
 					if ((state = this.getBlockAt(xMin, yMin, zMin)) != null)
-						state.forEachBoundingBox(bbConsumer);
+						state.forEachCollidingBoundingBox(boundingBox, bbConsumer);
 		
 	}
 	
