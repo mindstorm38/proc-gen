@@ -1,6 +1,5 @@
 package fr.theorozier.procgen.client.renderer.world;
 
-import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.util.BufferUsage;
 import io.msengine.client.renderer.util.BufferUtils;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
@@ -14,10 +13,10 @@ public class WorldSkyBox {
 	
 	public static final int SKYBOX_RADIUS = 16 * 14;
 	
-	private final Basic3DShaderManager shaderManager;
+	private final WorldShaderManager shaderManager;
 	private IndicesDrawBuffer drawBuffer;
 	
-	public WorldSkyBox(Basic3DShaderManager shaderManager) {
+	public WorldSkyBox(WorldShaderManager shaderManager) {
 		this.shaderManager = shaderManager;
 	}
 	

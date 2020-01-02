@@ -12,9 +12,11 @@ uniform int fog_enabled;
 const vec4 fog_color = vec4(0.8, 0.8, 0.8, 1.0);
 const float fog_density = 0.2;
 
+const vec4 one = vec4(1.0);
+
 void main() {
 
-	frag_color = mix(vec4(1.0), texture(texture_sampler, out_tex_coord), texture_enabled) * vec4(out_color, 1.0);
+	frag_color = mix(one, texture(texture_sampler, out_tex_coord), texture_enabled) * vec4(out_color, 1.0);
 
 	if (frag_color.a < 0.5)
 		discard;

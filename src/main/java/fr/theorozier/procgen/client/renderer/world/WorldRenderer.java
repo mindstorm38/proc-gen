@@ -39,7 +39,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private final Window window;
 	private final Profiler profiler;
 	
-	private final Basic3DShaderManager shaderManager;
+	private final WorldShaderManager shaderManager;
 	private final TextureMap terrainMap;
 	private final WorldSkyBox skyBox;
 	
@@ -67,7 +67,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.window.addFramebufferSizeEventListener(this);
 		this.profiler = GameProfiler.getInstance();
 		
-		this.shaderManager = new Basic3DShaderManager("world", "world");
+		this.shaderManager = new WorldShaderManager();
 		this.terrainMap = new TextureMap("textures/blocks", TextureMap.PNG_FILTER);
 		this.skyBox = new WorldSkyBox(this.shaderManager);
 		
@@ -160,6 +160,7 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			if (changed) {
 				
+				/*
 				int newRoX = -((MathHelper.floorFloatInt(this.camera.getTargetX() + RENDER_OFFSET_BASE) >> RENDER_OFFSET_SHIFT) << RENDER_OFFSET_SHIFT);
 				int newRoZ = -((MathHelper.floorFloatInt(this.camera.getTargetZ() + RENDER_OFFSET_BASE) >> RENDER_OFFSET_SHIFT) << RENDER_OFFSET_SHIFT);
 				
@@ -173,6 +174,7 @@ public class WorldRenderer implements ModelApplyListener,
 					System.out.println("New render offset : " + newRoX + "/" + newRoZ);
 					
 				}
+				*/
 				
 				this.profiler.startSection("update_view_pos");
 				this.chunkRenderManager.updateViewPosition(this.camera);
@@ -180,14 +182,20 @@ public class WorldRenderer implements ModelApplyListener,
 				
 			}
 			
-			this.camera.updateViewMatrix(alpha, this.renderOffsetX, 0, this.renderOffsetZ);
-			// this.camera.updateRotatedViewMatrix(alpha);
+			//this.camera.updateViewMatrix(alpha, this.renderOffsetX, 0, this.renderOffsetZ);
+			//this.camera.updateRotatedViewMatrix(alpha);
 			
 			this.profiler.endSection();
 			
 		}
 		
 		glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
+		
+		Matrix4f view = this.camera.getViewMatrix();
+		view.identity();
+		view.rotateX(-this.camera.getLerpedPitch(alpha));
+		view.rotateY(this.camera.getLerpedYaw(alpha));
+		view.translate(0, -this.camera.getLerpedY(alpha), 0);
 		
 		this.updateGlobalMatrix();
 		
@@ -197,9 +205,11 @@ public class WorldRenderer implements ModelApplyListener,
 		this.shaderManager.use();
 		
 		this.profiler.startSection("render_skybox");
+		this.shaderManager.setGlobalOffset(0, 0);
 		this.renderSkyBox();
 		
 		this.profiler.endStartSection("render_chunks");
+		this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedZ(alpha));
 		this.renderChunks();
 		this.profiler.endSection();
 		
@@ -234,9 +244,9 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.shaderManager.setTextureSampler(null);
 		
-		this.model.push().translate(this.camera.getX() + this.renderOffsetX, this.camera.getY(), this.camera.getZ() + this.renderOffsetZ).apply();
+		// this.model.push().translate(this.camera.getX() + this.renderOffsetX, this.camera.getY(), this.camera.getZ() + this.renderOffsetZ).apply();
 		this.skyBox.render();
-		this.model.pop();
+		// this.model.pop();
 	
 	}
 	
@@ -287,7 +297,7 @@ public class WorldRenderer implements ModelApplyListener,
 	 * Package private method.
 	 * @return The world shader manager.
 	 */
-	Basic3DShaderManager getShaderManager() {
+	WorldShaderManager getShaderManager() {
 		return this.shaderManager;
 	}
 	
