@@ -12,15 +12,15 @@ public class MotionEntity extends Entity {
 	protected boolean noClip;
 	protected boolean hasMass;
 	protected boolean onGround;
-	protected float stepHeight;
+	protected double stepHeight;
 	
-	protected float velX;
-	protected float velY;
-	protected float velZ;
+	protected double velX;
+	protected double velY;
+	protected double velZ;
 	
-	protected float lastX;
-	protected float lastY;
-	protected float lastZ;
+	protected double lastX;
+	protected double lastY;
+	protected double lastZ;
 	
 	public MotionEntity(WorldBase world, WorldServer serverWorld, long uid) {
 		
@@ -29,7 +29,7 @@ public class MotionEntity extends Entity {
 		this.noClip = false;
 		this.hasMass = false;
 		this.onGround = false;
-		this.stepHeight = 0f;
+		this.stepHeight = 0.0;
 		
 	}
 	
@@ -46,7 +46,7 @@ public class MotionEntity extends Entity {
 	}
 	
 	@Override
-	public void move(float dx, float dy, float dz) {
+	public void move(double dx, double dy, double dz) {
 	
 		if (this.noClip) {
 			
@@ -55,8 +55,8 @@ public class MotionEntity extends Entity {
 			
 		} else {
 			
-			float finalStep = 0;
-			float maxStep = 0;
+			double finalStep = 0;
+			double maxStep = 0;
 			
 			List<AxisAlignedBB> bbs = new ArrayList<>();
 			this.world.forEachBoundingBoxesIn(this.boundingBox, bbs::add);
@@ -67,7 +67,7 @@ public class MotionEntity extends Entity {
 					
 					if (bb.intersect(this.boundingBox)) {
 						
-						float step = bb.getMaxY() - this.boundingBox.getMinY();
+						double step = bb.getMaxY() - this.boundingBox.getMinY();
 						
 						if (step > finalStep && step <= this.stepHeight) {
 							finalStep = step;
@@ -75,7 +75,7 @@ public class MotionEntity extends Entity {
 						
 					}
 					
-					float allowedStep = bb.getMinY() - this.boundingBox.getMaxY();
+					double allowedStep = bb.getMinY() - this.boundingBox.getMaxY();
 					
 					if (allowedStep > maxStep)
 						maxStep = allowedStep;
@@ -151,7 +151,7 @@ public class MotionEntity extends Entity {
 		return this.onGround;
 	}
 	
-	public void setVelocity(float x, float y, float z) {
+	public void setVelocity(double x, double y, double z) {
 		
 		this.velX = x;
 		this.velY = y;

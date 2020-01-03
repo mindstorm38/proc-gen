@@ -172,14 +172,14 @@ public abstract class WorldBase {
 	
 	public void forEachBoundingBoxesIn(AxisAlignedBB boundingBox, Consumer<AxisAlignedBB> bbConsumer) {
 	
-		int xMin = MathHelper.floorFloatInt(boundingBox.getMinX()) - 1;
-		int xMax = MathHelper.ceilingFloatInt(boundingBox.getMaxX()) + 1;
+		int xMin = MathHelper.floorDoubleInt(boundingBox.getMinX()) - 1;
+		int xMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxX()) + 1;
 		
-		int yMin = MathHelper.floorFloatInt(boundingBox.getMinY()) - 1;
-		int yMax = MathHelper.ceilingFloatInt(boundingBox.getMaxY()) + 1;
+		int yMin = MathHelper.floorDoubleInt(boundingBox.getMinY()) - 1;
+		int yMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxY()) + 1;
 		
-		int zMin = MathHelper.floorFloatInt(boundingBox.getMinZ()) - 1;
-		int zMax = MathHelper.ceilingFloatInt(boundingBox.getMaxZ()) + 1;
+		int zMin = MathHelper.floorDoubleInt(boundingBox.getMinZ()) - 1;
+		int zMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxZ()) + 1;
 		
 		BlockState state;
 		

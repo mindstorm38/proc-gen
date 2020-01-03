@@ -6,6 +6,13 @@ import fr.theorozier.procgen.common.world.WorldServer;
 
 import java.util.Random;
 
+/**
+ *
+ * Base class for all entities in BaseWorld.
+ *
+ * @author Theo Rozier
+ *
+ */
 public abstract class Entity {
 	
 	public static final float GRAVITY_FACTOR = 0.01f;
@@ -18,10 +25,11 @@ public abstract class Entity {
 	protected final Random rand;
 	
 	protected final AxisAlignedBB boundingBox;
+	protected final AxisAlignedBB debugBoundingBox;
 	
-	protected float posX;
-	protected float posY;
-	protected float posZ;
+	protected double posX;
+	protected double posY;
+	protected double posZ;
 	
 	protected long lifetime;
 	
@@ -35,6 +43,8 @@ public abstract class Entity {
 		
 		this.boundingBox = new AxisAlignedBB();
 		this.setPositionRaw(0, 0, 0);
+		
+		this.debugBoundingBox = new AxisAlignedBB(this.boundingBox);
 		
 		this.lifetime = 0L;
 		
@@ -56,7 +66,14 @@ public abstract class Entity {
 		return this.uid;
 	}
 	
-	protected void setPositionRaw(float x, float y, float z) {
+	/**
+	 * Override this method (keep calling super) to initiate the
+	 * bounding box coordinates and size.
+	 * @param x The raw X coordinate.
+	 * @param y The raw Y coordinate.
+	 * @param z The raw Z coordinate.
+	 */
+	protected void setPositionRaw(double x, double y, double z) {
 		
 		this.posX = x;
 		this.posY = y;
@@ -64,14 +81,14 @@ public abstract class Entity {
 		
 	}
 	
-	public void setPosition(float x, float y, float z) {
+	public void setPosition(double x, double y, double z) {
 		
 		this.boundingBox.move(x - this.posX, y - this.posY, z - this.posZ);
 		this.resetPositionToBoundingBox();
 		
 	}
 	
-	public void move(float dx, float dy, float dz) {
+	public void move(double dx, double dy, double dz) {
 		
 		this.boundingBox.move(dx, dy, dz);
 		this.resetPositionToBoundingBox();

@@ -2,10 +2,10 @@ package fr.theorozier.procgen.common.phys;
 
 public class AxisAlignedBB {
 
-	private float minX, minY, minZ;
-	private float maxX, maxY, maxZ;
+	private double minX, minY, minZ;
+	private double maxX, maxY, maxZ;
 	
-	public AxisAlignedBB(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+	public AxisAlignedBB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		this.setPosition(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 	
@@ -13,55 +13,59 @@ public class AxisAlignedBB {
 		this.setPosition(0, 0, 0, 0, 0, 0);
 	}
 	
-	public float getMinX() {
+	public AxisAlignedBB(AxisAlignedBB bb) {
+		this.setPosition(bb);
+	}
+	
+	public double getMinX() {
 		return minX;
 	}
 	
-	public float getMinY() {
+	public double getMinY() {
 		return minY;
 	}
 	
-	public float getMinZ() {
+	public double getMinZ() {
 		return minZ;
 	}
 	
-	public float getMaxX() {
+	public double getMaxX() {
 		return maxX;
 	}
 	
-	public float getMaxY() {
+	public double getMaxY() {
 		return maxY;
 	}
 	
-	public float getMaxZ() {
+	public double getMaxZ() {
 		return maxZ;
 	}
 	
-	public float getSizeX() {
+	public double getSizeX() {
 		return this.maxX - this.minX;
 	}
 	
-	public float getSizeY() {
+	public double getSizeY() {
 		return this.maxY - this.minY;
 	}
 	
-	public float getSizeZ() {
+	public double getSizeZ() {
 		return this.maxZ - this.minZ;
 	}
 	
-	public float getMiddleX() {
-		return (this.maxX + this.minX) / 2f;
+	public double getMiddleX() {
+		return (this.maxX + this.minX) / 2.0;
 	}
 	
-	public float getMiddleY() {
-		return (this.maxY + this.minY) / 2f;
+	public double getMiddleY() {
+		return (this.maxY + this.minY) / 2.0;
 	}
 	
-	public float getMiddleZ() {
-		return (this.maxZ + this.minZ) / 2f;
+	public double getMiddleZ() {
+		return (this.maxZ + this.minZ) / 2.0;
 	}
 	
-	public void setPosition(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+	public void setPosition(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		
 		this.minX = Math.min(minX, maxX);
 		this.minY = Math.min(minY, maxY);
@@ -73,7 +77,11 @@ public class AxisAlignedBB {
 		
 	}
 	
-	public void setPositionUnsafe(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+	public void setPosition(AxisAlignedBB bb) {
+		this.setPositionUnsafe(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+	}
+	
+	public void setPositionUnsafe(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		
 		this.minX = minX;
 		this.minY = minY;
@@ -85,7 +93,7 @@ public class AxisAlignedBB {
 		
 	}
 	
-	public void move(float dx, float dy, float dz) {
+	public void move(double dx, double dy, double dz) {
 		
 		this.minX += dx;
 		this.maxX += dx;
@@ -96,7 +104,7 @@ public class AxisAlignedBB {
 		
 	}
 	
-	public boolean intersect(float x, float y, float z) {
+	public boolean intersect(double x, double y, double z) {
 		return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY && z >= this.minZ && z <= this.maxZ;
 	}
 	
@@ -106,13 +114,13 @@ public class AxisAlignedBB {
 				this.minZ < bb.maxZ && this.maxZ > bb.minZ;
 	}
 	
-	public float calcOffsetX(AxisAlignedBB other, float offsetX) {
+	public double calcOffsetX(AxisAlignedBB other, double offsetX) {
 		
 		if (this.minY < other.maxY && this.maxY > other.minY && this.minZ < other.maxZ && this.maxZ > other.minZ) {
 			
 			if (offsetX > 0 && other.maxX > this.maxX) {
 				
-				float d = other.minX - this.maxX;
+				double d = other.minX - this.maxX;
 				
 				if (d < offsetX) {
 					offsetX = d;
@@ -120,7 +128,7 @@ public class AxisAlignedBB {
 				
 			} else if (offsetX < 0 && other.minX < this.minX) {
 				
-				float d = other.minX - this.maxX;
+				double d = other.minX - this.maxX;
 				
 				if (d > offsetX) {
 					offsetX = d;
@@ -134,13 +142,13 @@ public class AxisAlignedBB {
 		
 	}
 	
-	public float calcOffsetY(AxisAlignedBB other, float offsetY) {
+	public double calcOffsetY(AxisAlignedBB other, double offsetY) {
 	
 		if (this.minX < other.maxX && this.maxX > other.minX && this.minZ < other.maxZ && this.maxZ > other.minZ) {
 			
 			if (offsetY > 0 && other.maxY > this.maxY) {
 				
-				float d = other.minY - this.maxY;
+				double d = other.minY - this.maxY;
 				
 				if (d < offsetY) {
 					offsetY = d;
@@ -148,7 +156,7 @@ public class AxisAlignedBB {
 				
 			} else if (offsetY < 0 && other.minY < this.minY) {
 				
-				float d = other.minY - this.maxY;
+				double d = other.minY - this.maxY;
 				
 				if (d > offsetY) {
 					offsetY = d;
@@ -162,13 +170,13 @@ public class AxisAlignedBB {
 	
 	}
 	
-	public float calcOffsetZ(AxisAlignedBB other, float offsetZ) {
+	public double calcOffsetZ(AxisAlignedBB other, double offsetZ) {
 		
 		if (this.minY < other.maxY && this.maxY > other.minY && this.minX < other.maxX && this.maxX > other.minX) {
 			
 			if (offsetZ > 0 && other.maxZ > this.maxZ) {
 				
-				float d = other.minZ - this.maxZ;
+				double d = other.minZ - this.maxZ;
 				
 				if (d < offsetZ) {
 					offsetZ = d;
@@ -176,7 +184,7 @@ public class AxisAlignedBB {
 				
 			} else if (offsetZ < 0 && other.minZ < this.minZ) {
 				
-				float d = other.minZ - this.maxZ;
+				double d = other.minZ - this.maxZ;
 				
 				if (d > offsetZ) {
 					offsetZ = d;
