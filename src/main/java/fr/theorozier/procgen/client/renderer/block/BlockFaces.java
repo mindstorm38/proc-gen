@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.renderer.world.block;
+package fr.theorozier.procgen.client.renderer.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.position.Direction;

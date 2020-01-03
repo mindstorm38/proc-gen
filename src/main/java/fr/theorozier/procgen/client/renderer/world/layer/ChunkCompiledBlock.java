@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world.layer;
 
-import fr.theorozier.procgen.client.renderer.world.block.BlockFaces;
-import fr.theorozier.procgen.client.renderer.world.block.BlockRenderer;
+import fr.theorozier.procgen.client.renderer.block.BlockFaces;
+import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 
 public class ChunkCompiledBlock implements Comparable<ChunkCompiledBlock> {
