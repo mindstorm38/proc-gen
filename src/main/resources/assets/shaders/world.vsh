@@ -8,11 +8,14 @@ out vec3 out_color;
 out vec2 out_tex_coord;
 
 uniform mat4 global_matrix;
-uniform vec2 global_offset;
+uniform mat4 model_matrix;
+
+uniform ivec3 chunk_position;
+uniform vec3 global_offset;
 
 void main() {
 
-    gl_Position = global_matrix * vec4(position.x + global_offset.x, position.y, position.z + global_offset.y, 1.0);
+    gl_Position = global_matrix * model_matrix * vec4(position + global_offset, 1.0);
 
     out_color = color;
     out_tex_coord = tex_coord;
