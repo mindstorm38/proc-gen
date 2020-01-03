@@ -107,13 +107,13 @@ public class AxisAlignedBB {
 	public void expand(double x, double y, double z) {
 		
 		if (x > 0) this.maxX += x;
-		else this.minX -= x;
+		else this.minX += x;
 		
 		if (y > 0) this.maxY += y;
-		else this.minY -= y;
+		else this.minY += y;
 		
 		if (z > 0) this.maxZ += z;
-		else this.minZ -= z;
+		else this.minZ += z;
 		
 	}
 	
@@ -131,19 +131,19 @@ public class AxisAlignedBB {
 	
 	public double calcOffsetX(AxisAlignedBB other, double offsetX) {
 		
-		if (this.minY < other.maxY && this.maxY > other.minY && this.minZ < other.maxZ && this.maxZ > other.minZ) {
+		if (other.maxY > this.minY && other.minY < this.maxY && other.maxZ > this.minZ && other.minZ < this.maxZ) {
 			
-			if (offsetX > 0 && other.maxX > this.maxX) {
+			if (offsetX > 0.0 && other.maxX <= this.minX) {
 				
-				double d = other.minX - this.maxX;
+				double d = this.minX - other.maxX;
 				
 				if (d < offsetX) {
 					offsetX = d;
 				}
 				
-			} else if (offsetX < 0 && other.minX < this.minX) {
+			} else if (offsetX < 0.0 && other.minX >= this.maxX) {
 				
-				double d = other.minX - this.maxX;
+				double d = this.maxX - other.minX;
 				
 				if (d > offsetX) {
 					offsetX = d;
@@ -158,20 +158,20 @@ public class AxisAlignedBB {
 	}
 	
 	public double calcOffsetY(AxisAlignedBB other, double offsetY) {
-	
-		if (this.minX < other.maxX && this.maxX > other.minX && this.minZ < other.maxZ && this.maxZ > other.minZ) {
+		
+		if (other.maxX > this.minX && other.minX < this.maxX && other.maxZ > this.minZ && other.minZ < this.maxZ) {
 			
-			if (offsetY > 0 && other.maxY > this.maxY) {
+			if (offsetY > 0.0 && other.maxY <= this.minY) {
 				
-				double d = other.minY - this.maxY;
+				double d = this.minY - other.maxY;
 				
 				if (d < offsetY) {
 					offsetY = d;
 				}
 				
-			} else if (offsetY < 0 && other.minY < this.minY) {
+			} else if (offsetY < 0.0 && other.minY >= this.maxY) {
 				
-				double d = other.minY - this.maxY;
+				double d = this.maxY - other.minY;
 				
 				if (d > offsetY) {
 					offsetY = d;
@@ -182,24 +182,24 @@ public class AxisAlignedBB {
 		}
 		
 		return offsetY;
-	
+		
 	}
 	
 	public double calcOffsetZ(AxisAlignedBB other, double offsetZ) {
 		
-		if (this.minY < other.maxY && this.maxY > other.minY && this.minX < other.maxX && this.maxX > other.minX) {
+		if (other.maxX > this.minX && other.minX < this.maxX && other.maxY > this.minY && other.minY < this.maxY) {
 			
-			if (offsetZ > 0 && other.maxZ > this.maxZ) {
+			if (offsetZ > 0.0 && other.maxZ <= this.minZ) {
 				
-				double d = other.minZ - this.maxZ;
+				double d = this.minZ - other.maxZ;
 				
 				if (d < offsetZ) {
 					offsetZ = d;
 				}
 				
-			} else if (offsetZ < 0 && other.minZ < this.minZ) {
+			} else if (offsetZ < 0.0 && other.minZ >= this.maxZ) {
 				
-				double d = other.minZ - this.maxZ;
+				double d = this.maxZ - other.minZ;
 				
 				if (d > offsetZ) {
 					offsetZ = d;

@@ -75,7 +75,7 @@ public class MotionEntity extends Entity {
 			List<AxisAlignedBB> bbs = new ArrayList<>();
 			this.world.forEachBoundingBoxesIn(newBoundingBox, bbs::add);
 			
-			if (this.stepHeight != 0.0) {
+			if (this.stepHeight != 0) {
 				
 				for (AxisAlignedBB bb : bbs) {
 					
@@ -103,7 +103,7 @@ public class MotionEntity extends Entity {
 				boolean down = dy < 0;
 				
 				for (AxisAlignedBB bb : bbs) {
-					dy = this.boundingBox.calcOffsetY(bb, dy);
+					dy = bb.calcOffsetY(this.boundingBox, dy);
 				}
 				
 				this.boundingBox.move(0, dy, 0);
@@ -114,7 +114,7 @@ public class MotionEntity extends Entity {
 			if (dx != 0) {
 				
 				for (AxisAlignedBB bb : bbs) {
-					dx = this.boundingBox.calcOffsetX(bb, dx);
+					dx = bb.calcOffsetX(this.boundingBox, dx);
 				}
 				
 				this.boundingBox.move(dx, 0, 0);
@@ -124,7 +124,7 @@ public class MotionEntity extends Entity {
 			if (dz != 0) {
 			
 				for (AxisAlignedBB bb : bbs) {
-					dz = this.boundingBox.calcOffsetZ(bb, dz);
+					dz = bb.calcOffsetZ(this.boundingBox, dz);
 				}
 				
 				this.boundingBox.move(0, 0, dz);

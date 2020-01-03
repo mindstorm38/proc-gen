@@ -146,7 +146,7 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			this.profiler.startSection("camera");
 			
-			float speedMult = alpha * 4.0f;
+			float speedMult = alpha * 0.5f;
 			boolean changed = false;
 			
 			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
