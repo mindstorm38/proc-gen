@@ -7,6 +7,7 @@ import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
+import io.msengine.common.util.math.BoundingBox;
 import io.sutil.StringUtils;
 
 import java.util.List;
@@ -96,7 +97,9 @@ public class Block {
 		return this.stateContainer;
 	}
 	
-	public void getStateCollision(BlockState state, List<AxisAlignedBB> boundingBoxes) {}
+	public void getStateCollision(BlockState state, List<AxisAlignedBB> boundingBoxes) {
+		addCubeBoundingBox(boundingBoxes);
+	}
 	
 	// Dynamic function for modifying the world
 	
@@ -114,4 +117,10 @@ public class Block {
 				", identifier='" + identifier + '\'' +
 				'}';
 	}
+	
+	// Utilities for blocks bounding boxes
+	public static void addCubeBoundingBox(List<AxisAlignedBB> boundingBoxes) {
+		boundingBoxes.add(new AxisAlignedBB(0, 0, 0, 1, 1, 1));
+	}
+	
 }

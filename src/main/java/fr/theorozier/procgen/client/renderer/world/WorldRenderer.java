@@ -3,14 +3,15 @@ package fr.theorozier.procgen.client.renderer.world;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.game.RenderGame;
-import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.model.ModelApplyListener;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.TextureMap;
@@ -31,7 +32,8 @@ public class WorldRenderer implements ModelApplyListener,
 		WindowFramebufferSizeEventListener,
 		WindowMousePositionEventListener,
 		WorldLoadingListener,
-		WorldChunkListener {
+		WorldChunkListener,
+		WorldEntityListener {
 	
 	private static final int RENDER_OFFSET_BASE  = 2048;
 	private static final int RENDER_OFFSET_SHIFT = 12; // Step : 4096 (2^12)
@@ -57,6 +59,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private boolean ready = false;
 	
 	private final ChunkRenderManager chunkRenderManager;
+	private final EntityRenderManager entityRenderManager;
 	
 	private int renderOffsetX, renderOffsetZ;
 	
@@ -76,6 +79,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.projectionMatrix = new Matrix4f();
 		
 		this.chunkRenderManager = new ChunkRenderManager(this);
+		this.entityRenderManager = new EntityRenderManager(this);
 		
 		this.renderOffsetX = 0;
 		this.renderOffsetZ = 0;
@@ -84,6 +88,14 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	public SmoothCamera3D getCamera() {
 		return this.camera;
+	}
+	
+	public ChunkRenderManager getChunkRenderManager() {
+		return chunkRenderManager;
+	}
+	
+	public EntityRenderManager getEntityRenderManager() {
+		return entityRenderManager;
 	}
 	
 	public void init() {
@@ -106,6 +118,8 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.updateRenderSize(this.window);
 		
+		this.entityRenderManager.init();
+		
 		this.init = true;
 		
 	}
@@ -114,6 +128,8 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (!this.init)
 			throw new IllegalStateException("World renderer can't be stoped until initialized.");
+		
+		this.entityRenderManager.stop();
 		
 		this.skyBox.stop();
 		this.shaderManager.delete();
@@ -212,6 +228,8 @@ public class WorldRenderer implements ModelApplyListener,
 		this.renderChunks();
 		this.profiler.endSection();
 		
+		this.entityRenderManager.render(alpha);
+		
 		this.shaderManager.end();
 	
 	}
@@ -271,7 +289,9 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			this.renderingWorld.getEventManager().removeEventListener(WorldLoadingListener.class, this);
 			this.renderingWorld.getEventManager().removeEventListener(WorldChunkListener.class, this);
+			this.renderingWorld.getEventManager().removeEventListener(WorldEntityListener.class, this);
 			this.chunkRenderManager.unload();
+			this.entityRenderManager.unload();
 		
 		}
 		
@@ -281,8 +301,11 @@ public class WorldRenderer implements ModelApplyListener,
 		if (this.ready) {
 			
 			this.chunkRenderManager.updateViewPosition(this.camera);
+			this.renderingWorld.getEntitiesView().forEach(this.entityRenderManager::addEntity);
+			
 			this.renderingWorld.getEventManager().addEventListener(WorldLoadingListener.class, this);
 			this.renderingWorld.getEventManager().addEventListener(WorldChunkListener.class, this);
+			this.renderingWorld.getEventManager().addEventListener(WorldEntityListener.class, this);
 			
 		}
 	
@@ -298,6 +321,10 @@ public class WorldRenderer implements ModelApplyListener,
 	 */
 	WorldShaderManager getShaderManager() {
 		return this.shaderManager;
+	}
+	
+	ModelHandler getModelHandler() {
+		return this.model;
 	}
 	
 	public TextureMap getTerrainMap() {
@@ -397,6 +424,24 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (this.renderingWorld == world) {
 			this.chunkRenderManager.blockUpdated(chunk, pos, state);
+		}
+		
+	}
+	
+	@Override
+	public void worldEntityAdded(WorldBase world, Entity entity) {
+		
+		if (this.renderingWorld == world) {
+			this.entityRenderManager.addEntity(entity);
+		}
+		
+	}
+	
+	@Override
+	public void worldEntityRemoved(WorldBase world, Entity entity) {
+		
+		if (this.renderingWorld == world) {
+			this.entityRenderManager.removeEntity(entity);
 		}
 		
 	}

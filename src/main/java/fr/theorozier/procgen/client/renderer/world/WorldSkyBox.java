@@ -31,7 +31,7 @@ public class WorldSkyBox {
 		try {
 			
 			vertices = MemoryUtil.memAllocFloat(24);
-			colors = MemoryUtil.memAllocFloat(32);
+			colors = MemoryUtil.memAllocFloat(24);
 			indices = MemoryUtil.memAllocInt(this.drawBuffer.setIndicesCount(36));
 			
 			vertices.put(-SKYBOX_RADIUS).put(-SKYBOX_RADIUS).put(-SKYBOX_RADIUS);

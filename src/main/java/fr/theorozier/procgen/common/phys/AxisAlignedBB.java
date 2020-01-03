@@ -85,7 +85,7 @@ public class AxisAlignedBB {
 		
 		this.minX = minX;
 		this.minY = minY;
-		this.minX = minZ;
+		this.minZ = minZ;
 		
 		this.maxX = maxX;
 		this.maxY = maxY;
@@ -104,14 +104,29 @@ public class AxisAlignedBB {
 		
 	}
 	
-	public boolean intersect(double x, double y, double z) {
+	public void expand(double x, double y, double z) {
+		
+		if (x > 0) this.maxX += x;
+		else this.minX -= x;
+		
+		if (y > 0) this.maxY += y;
+		else this.minY -= y;
+		
+		if (z > 0) this.maxZ += z;
+		else this.minZ -= z;
+		
+	}
+	
+	public boolean intersects(double x, double y, double z) {
 		return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY && z >= this.minZ && z <= this.maxZ;
 	}
 	
-	public boolean intersect(AxisAlignedBB bb) {
-		return this.minX < bb.maxX && this.maxX > bb.minX &&
-				this.minY < bb.maxY && this.maxY > bb.minY &&
-				this.minZ < bb.maxZ && this.maxZ > bb.minZ;
+	public boolean intersects(double x1, double y1, double z1, double x2, double y2, double z2) {
+		return this.minX < x2 && this.maxX > x1 && this.minY < y2 && this.maxY > y1 && this.minZ < z2 && this.maxZ > z1;
+	}
+	
+	public boolean intersects(AxisAlignedBB other) {
+		return this.intersects(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ);
 	}
 	
 	public double calcOffsetX(AxisAlignedBB other, double offsetX) {
@@ -196,6 +211,18 @@ public class AxisAlignedBB {
 		
 		return offsetZ;
 		
+	}
+	
+	@Override
+	public String toString() {
+		return "AABB{" +
+				"minX=" + minX +
+				", minY=" + minY +
+				", minZ=" + minZ +
+				", maxX=" + maxX +
+				", maxY=" + maxY +
+				", maxZ=" + maxZ +
+				'}';
 	}
 	
 }

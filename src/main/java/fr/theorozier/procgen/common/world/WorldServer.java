@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
@@ -64,6 +65,8 @@ public class WorldServer extends WorldBase {
 		
 		this.manager.tick();
 		this.blockTickList.tick();
+		
+		this.entities.forEach(Entity::update);
 		
 	}
 	
@@ -133,7 +136,7 @@ public class WorldServer extends WorldBase {
 		return new ImmutableBlockPosition(pos, this.getHeightAt(type, pos));
 	}
 	
-	// TODO : TEMPORARY FOR MONOTHREAD GENERATION
+	// FIXME : TEMPORARY FOR MONOTHREAD GENERATION
 	public void loadSection(SectionPosition pos) {
 		
 		WorldServerSection section = this.getSectionAt(pos.getX(), pos.getZ());
@@ -153,6 +156,11 @@ public class WorldServer extends WorldBase {
 	
 	public void loadNear(float x, float z) {
 		this.forEachSectionPosNear(x, z, NEAR_CHUNK_LOADING, this::loadSection);
+	}
+	
+	// FIXME : TEMPORARY FOR ENTITY TESTING
+	public void rawAddEntity(Entity entity) {
+		super.addEntity(entity);
 	}
 	
 }

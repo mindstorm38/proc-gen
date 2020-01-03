@@ -24,12 +24,18 @@ public abstract class EntityRenderer<E extends Entity> {
 	
 	private final HashMap<String, EntityModelPart> parts = new HashMap<>();
 	
+	public boolean isInitied() {
+		return this.initied;
+	}
+	
 	public void initRenderer(WorldShaderManager shaderManager) {
 	
 		if (this.initied)
 			throw new IllegalStateException("This '" + this.getClass() + "' can't be initialized twice.");
 		
 		this.parts.values().forEach(p -> p.initPart(shaderManager));
+		
+		this.initTexture();
 		
 		this.shaderManager = shaderManager;
 		this.initied = true;
@@ -69,5 +75,15 @@ public abstract class EntityRenderer<E extends Entity> {
 	public abstract void initTexture();
 	public abstract Texture getTexture(E entity);
 	public abstract void renderEntity(float alpha, ModelHandler model, E entity);
+	
+	@SuppressWarnings("unchecked")
+	public void renderEntityUnsafe(float alpha, ModelHandler model, Entity entity) {
+		this.renderEntity(alpha, model, (E) entity);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Texture getTextureUnsafe(Entity entity) {
+		return this.getTexture((E) entity);
+	}
 	
 }

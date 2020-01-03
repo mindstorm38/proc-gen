@@ -3,6 +3,7 @@ package fr.theorozier.procgen.common.entity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.WorldServer;
+import io.sutil.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,10 @@ public class MotionEntity extends Entity {
 		
 		super(world, serverWorld, uid);
 		
+		this.velX = 0;
+		this.velY = 0;
+		this.velZ = 0;
+		
 		this.noClip = false;
 		this.hasMass = false;
 		this.onGround = false;
@@ -46,6 +51,12 @@ public class MotionEntity extends Entity {
 	}
 	
 	@Override
+	public void setPositionInstant(double x, double y, double z) {
+		super.setPositionInstant(x, y, z);
+		this.setLastPos();
+	}
+	
+	@Override
 	public void move(double dx, double dy, double dz) {
 	
 		if (this.noClip) {
@@ -58,23 +69,22 @@ public class MotionEntity extends Entity {
 			double finalStep = 0;
 			double maxStep = 0;
 			
-			List<AxisAlignedBB> bbs = new ArrayList<>();
-			this.world.forEachBoundingBoxesIn(this.boundingBox, bbs::add);
+			AxisAlignedBB newBoundingBox = new AxisAlignedBB(this.boundingBox);
+			newBoundingBox.expand(dx, dy, dz);
 			
-			if (this.stepHeight != 0) {
+			List<AxisAlignedBB> bbs = new ArrayList<>();
+			this.world.forEachBoundingBoxesIn(newBoundingBox, bbs::add);
+			
+			if (this.stepHeight != 0.0) {
 				
 				for (AxisAlignedBB bb : bbs) {
 					
-					if (bb.intersect(this.boundingBox)) {
-						
-						double step = bb.getMaxY() - this.boundingBox.getMinY();
-						
-						if (step > finalStep && step <= this.stepHeight) {
-							finalStep = step;
-						}
-						
-					}
+					double step = bb.getMaxY() - this.boundingBox.getMinY();
 					
+					if (step > finalStep && step <= this.stepHeight) {
+						finalStep = step;
+					}
+						
 					double allowedStep = bb.getMinY() - this.boundingBox.getMaxY();
 					
 					if (allowedStep > maxStep)
@@ -137,6 +147,18 @@ public class MotionEntity extends Entity {
 		this.lastY = this.posY;
 		this.lastZ = this.posZ;
 		
+	}
+	
+	public double getLerpedX(float alpha) {
+		return MathHelper.interpolate(alpha, this.posX, this.lastX);
+	}
+	
+	public double getLerpedY(float alpha) {
+		return MathHelper.interpolate(alpha, this.posY, this.lastY);
+	}
+	
+	public double getLerpedZ(float alpha) {
+		return MathHelper.interpolate(alpha, this.posZ, this.lastZ);
 	}
 	
 	public boolean isNoClip() {

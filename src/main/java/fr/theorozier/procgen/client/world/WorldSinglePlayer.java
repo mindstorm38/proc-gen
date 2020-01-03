@@ -1,17 +1,20 @@
 package fr.theorozier.procgen.client.world;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
 public class WorldSinglePlayer extends WorldClient implements
 		WorldLoadingListener,
-		WorldChunkListener {
+		WorldChunkListener,
+		WorldEntityListener {
 	
 	private final WorldServer server;
 	
@@ -21,11 +24,21 @@ public class WorldSinglePlayer extends WorldClient implements
 		
 		server.getEventManager().addEventListener(WorldLoadingListener.class, this);
 		server.getEventManager().addEventListener(WorldChunkListener.class, this);
+		server.getEventManager().addEventListener(WorldEntityListener.class, this);
 		
 	}
 	
 	public WorldServer getServerWorld() {
 		return this.server;
+	}
+	
+	@Override
+	public void update() {
+		
+		this.server.update();
+		
+		super.update();
+		
 	}
 	
 	@Override
@@ -52,6 +65,16 @@ public class WorldSinglePlayer extends WorldClient implements
 	@Override
 	public void worldChunkUnloaded(WorldBase world, ImmutableBlockPosition position) {
 		this.eventManager.fireListeners(WorldLoadingListener.class, l -> l.worldChunkUnloaded(this, position));
+	}
+	
+	@Override
+	public void worldEntityAdded(WorldBase world, Entity entity) {
+		this.addEntity(entity);
+	}
+	
+	@Override
+	public void worldEntityRemoved(WorldBase world, Entity entity) {
+	
 	}
 	
 }

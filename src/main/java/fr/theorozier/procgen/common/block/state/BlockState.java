@@ -54,11 +54,22 @@ public class BlockState {
 		
 	}
 	
-	public void forEachCollidingBoundingBox(AxisAlignedBB other, Consumer<AxisAlignedBB> bbConsumer) {
+	public void forEachCollidingBoundingBox(int x, int y, int z, AxisAlignedBB other, Consumer<AxisAlignedBB> bbConsumer) {
 		
-		for (AxisAlignedBB bb : this.boundingBoxes)
-			if (bb.intersect(other))
-				bbConsumer.accept(bb);
+		AxisAlignedBB copy = new AxisAlignedBB();
+		for (AxisAlignedBB bb : this.boundingBoxes) {
+			
+			copy.setPosition(bb);
+			copy.move(x, y, z);
+			
+			if (copy.intersects(other)) {
+				
+				bbConsumer.accept(copy);
+				copy = new AxisAlignedBB();
+				
+			}
+			
+		}
 		
 	}
 	

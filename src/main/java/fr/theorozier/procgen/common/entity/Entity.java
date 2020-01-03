@@ -42,9 +42,9 @@ public abstract class Entity {
 		this.rand = new Random();
 		
 		this.boundingBox = new AxisAlignedBB();
-		this.setPositionRaw(0, 0, 0);
+		this.setPositionInstant(0, 0, 0);
 		
-		this.debugBoundingBox = new AxisAlignedBB(this.boundingBox);
+		this.debugBoundingBox = new AxisAlignedBB();
 		
 		this.lifetime = 0L;
 		
@@ -73,7 +73,7 @@ public abstract class Entity {
 	 * @param y The raw Y coordinate.
 	 * @param z The raw Z coordinate.
 	 */
-	protected void setPositionRaw(double x, double y, double z) {
+	public void setPositionInstant(double x, double y, double z) {
 		
 		this.posX = x;
 		this.posY = y;
@@ -103,10 +103,28 @@ public abstract class Entity {
 		
 	}
 	
+	public AxisAlignedBB getDebugBoundingBox() {
+		this.debugBoundingBox.setPosition(this.boundingBox);
+		return this.debugBoundingBox;
+	}
+	
 	public void update() {
 		
 		++this.lifetime;
 		
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Entity entity = (Entity) o;
+		return entity.uid == this.uid;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Long.hashCode(this.uid);
 	}
 	
 }

@@ -7,16 +7,14 @@ import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.*;
 import io.msengine.common.util.event.MethodEventManager;
 import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -29,8 +27,9 @@ import java.util.function.Consumer;
 public abstract class WorldBase {
 
 	protected final Map<SectionPositioned, WorldSection> sections = new HashMap<>();
-	protected final List<Entity> entities = new ArrayList<>();
 	protected final Map<Long, Entity> entitiesById = new HashMap<>();
+	protected final List<Entity> entities = new ArrayList<>();
+	protected final List<Entity> entitiesView = Collections.unmodifiableList(this.entities);
 	
 	protected long time;
 	
@@ -42,7 +41,8 @@ public abstract class WorldBase {
 		
 		this.eventManager = new MethodEventManager(
 				WorldChunkListener.class,
-				WorldLoadingListener.class
+				WorldLoadingListener.class,
+				WorldEntityListener.class
 		);
 		
 	}
@@ -154,18 +154,23 @@ public abstract class WorldBase {
 	
 	// ENTITIES //
 	
-	protected boolean addEntity(Entity entity) {
+	protected final boolean addEntity(Entity entity) {
 		
-		if (!this.entitiesById.containsKey(entity.getUid())) {
+		if (this.entitiesById.put(entity.getUid(), entity) == null) {
 			
 			this.entities.add(entity);
-			this.entitiesById.put(entity.getUid(), entity);
+			this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityAdded(this, entity));
+			
 			return true;
 			
 		} else {
 			return false;
 		}
 		
+	}
+	
+	public final List<Entity> getEntitiesView() {
+		return this.entitiesView;
 	}
 	
 	// UTILITES //
@@ -183,11 +188,11 @@ public abstract class WorldBase {
 		
 		BlockState state;
 		
-		for (; yMin <= yMax; ++yMin)
-			for (; xMin <= xMax; ++xMin)
-				for (; zMin <= zMax; ++zMin)
-					if ((state = this.getBlockAt(xMin, yMin, zMin)) != null)
-						state.forEachCollidingBoundingBox(boundingBox, bbConsumer);
+		for (int y = yMin; y <= yMax; ++y)
+			for (int x = xMin; x <= xMax; ++x)
+				for (int z = zMin; z <= zMax; ++z)
+					if ((state = this.getBlockAt(x, y, z)) != null)
+						state.forEachCollidingBoundingBox(x, y, z, boundingBox, bbConsumer);
 		
 	}
 	

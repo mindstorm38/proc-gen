@@ -5,6 +5,7 @@ import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
+import fr.theorozier.procgen.common.entity.FallingBlockEntity;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
 import io.msengine.client.game.DefaultRenderGame;
@@ -97,7 +98,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.update();
 		this.profiler.endSection();
 		
-		if (this.testWorld != null)
+		if (this.window.isKeyPressed(GLFW.GLFW_KEY_P) && this.testWorld != null)
 			this.testWorld.update();
 		
 	}
@@ -126,7 +127,24 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 			if (this.testWorld instanceof WorldSinglePlayer)
 				((WorldSinglePlayer) this.testWorld).getServerWorld().loadNear(cam.getX(), cam.getZ());
 		
-		}
+		} else if (key == GLFW.GLFW_KEY_I && action == GLFW.GLFW_PRESS) {
+			
+			if (this.testWorld instanceof WorldSinglePlayer) {
+				
+				WorldServer serverWorld = ((WorldSinglePlayer) this.testWorld).getServerWorld();
+				
+				Camera3D cam = this.worldRenderer.getCamera();
+				
+				FallingBlockEntity entity = new FallingBlockEntity(serverWorld, serverWorld, (long) (Math.random() * 100000));
+				entity.setPositionInstant(cam.getX() - 0.5f, cam.getY() - 2f, cam.getZ() - 0.5f);
+				
+				serverWorld.rawAddEntity(entity);
+				
+			}
+			
+		}/* else if (key == GLFW.GLFW_KEY_P && action == GLFW.GLFW_PRESS) {
+			this.testWorld.update();
+		}*/
 		
 	}
 	
