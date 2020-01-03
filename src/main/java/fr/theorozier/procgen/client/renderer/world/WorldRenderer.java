@@ -47,7 +47,6 @@ public class WorldRenderer implements ModelApplyListener,
 	private final SmoothCamera3D camera;
 	private final Matrix4f globalMatrix;
 	private final Matrix4f projectionMatrix;
-	private Matrix4f modelMatrix;
 	
 	private WorldClient renderingWorld;
 	
@@ -195,9 +194,9 @@ public class WorldRenderer implements ModelApplyListener,
 		view.identity();
 		view.rotateX(-this.camera.getLerpedPitch(alpha));
 		view.rotateY(this.camera.getLerpedYaw(alpha));
-		view.translate(0, -this.camera.getLerpedY(alpha), 0);
 		
 		this.updateGlobalMatrix();
+		this.model.apply();
 		
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
@@ -205,11 +204,11 @@ public class WorldRenderer implements ModelApplyListener,
 		this.shaderManager.use();
 		
 		this.profiler.startSection("render_skybox");
-		this.shaderManager.setGlobalOffset(0, 0);
+		this.shaderManager.setGlobalOffset(0, 0, 0);
 		this.renderSkyBox();
 		
 		this.profiler.endStartSection("render_chunks");
-		this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedZ(alpha));
+		this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		this.renderChunks();
 		this.profiler.endSection();
 		
@@ -313,19 +312,13 @@ public class WorldRenderer implements ModelApplyListener,
 		this.globalMatrix.set(this.projectionMatrix);
 		this.globalMatrix.mul(this.camera.getViewMatrix());
 		
-		if (this.modelMatrix != null)
-			this.globalMatrix.mul(this.modelMatrix);
-		
 		this.shaderManager.setGlobalMatrix(this.globalMatrix);
 		
 	}
 	
 	@Override
 	public void modelApply(Matrix4f model) {
-		
-		this.modelMatrix = model;
-		this.updateGlobalMatrix();
-		
+		this.shaderManager.setModelMatrix(model);
 	}
 	
 	/**
