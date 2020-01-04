@@ -13,6 +13,9 @@
           <set>
             <option value="$PROJECT_DIR$/../msengine" />
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/pg-client" />
+            <option value="$PROJECT_DIR$/pg-common" />
+            <option value="$PROJECT_DIR$/pg-server" />
             <option value="$PROJECT_DIR$/../sutil" />
           </set>
         </option>
