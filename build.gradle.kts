@@ -1,8 +1,23 @@
 
+buildscript {
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:5.2.0")
+    }
+
+}
+
+description = "Proc Gen"
+
 allprojects {
 
+    apply(plugin = "com.github.johnrengelman.shadow")
+
     version = "b1.0.0"
-    description = "Procedural Generation Test"
 
 }
 
@@ -19,27 +34,14 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    tasks.named<JavaCompile>("compileJava") {
+        options.encoding = "UTF-8"
+    }
+
 }
+
 
 /*
-apply(plugin = "java")
-
-version = "b1.0.0"
-description = "Procedural Generation Test"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    "compile"(project(":sutil"))
-    "compile"(project(":msengine"))
-}
-
-project.the<SourceSetContainer>()["main"].java {
-     exclude("fr/theorozier/procgen/world/**")
-}
-
 tasks.register<JavaExec>("runMain") {
 
     dependsOn("jar")

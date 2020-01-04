@@ -5,6 +5,13 @@ in order to understand procedural generation and I thought creating
 a MC clone was the best easy way to visualize this type of
 generation.
 
+> I am currently rewriting the configuration of the Gradle project using
+> Kotlin DSL for MSEngine and this project. These two projects will have
+> in the future a beautiful structure using gradle's subprojects for
+> better managing of client and server JARs.
+
+> For now I keep the './src' directory but it will be deleted soon.
+
 ## Play or Contribute
 
 This game is currently in development, it is not playable but it is
