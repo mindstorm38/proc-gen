@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.client.renderer.world;
 
+import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
@@ -24,7 +25,6 @@ import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
 import io.sutil.profiler.Profiler;
 import org.joml.Matrix4f;
-import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -146,29 +146,29 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			this.profiler.startSection("camera");
 			
-			float speedMult = alpha * 0.5f;
+			float speedMult = alpha * 2f;
 			boolean changed = false;
 			
-			if (this.window.isKeyPressed(GLFW.GLFW_KEY_F)) {
+			if (this.window.isKeyPressed(ProcGenGame.KEY_FORWARD.getKeyCode())) {
 				this.camera.addTarget((float) Math.cos(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - MathHelper.PI_HALF) * speedMult, 0, 0);
 				changed = true;
-			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_B)) {
+			} else if (this.window.isKeyPressed(ProcGenGame.KEY_BACKWARD.getKeyCode())) {
 				this.camera.addTarget((float) Math.cos(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() + MathHelper.PI_HALF) * speedMult, 0, 0);
 				changed = true;
 			}
 			
-			if (this.window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
+			if (this.window.isKeyPressed(ProcGenGame.KEY_JUMP.getKeyCode())) {
 				this.camera.addTarget(0, speedMult, 0, 0, 0);
 				changed = true;
-			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_D)) {
+			} else if (this.window.isKeyPressed(ProcGenGame.KEY_CROUCH.getKeyCode())) {
 				this.camera.addTarget(0, -speedMult, 0, 0, 0);
 				changed = true;
 			}
 			
-			if (this.window.isKeyPressed(GLFW.GLFW_KEY_C)) {
+			if (this.window.isKeyPressed(ProcGenGame.KEY_LEFT.getKeyCode())) {
 				this.camera.addTarget((float) Math.cos(this.camera.getYaw() - Math.PI) * speedMult, 0f, (float) Math.sin(this.camera.getYaw() - Math.PI) * speedMult, 0, 0);
 				changed = true;
-			} else if (this.window.isKeyPressed(GLFW.GLFW_KEY_V)) {
+			} else if (this.window.isKeyPressed(ProcGenGame.KEY_RIGHT.getKeyCode())) {
 				this.camera.addTarget((float) Math.cos(this.camera.getYaw()) * speedMult, 0f, (float) Math.sin(this.camera.getYaw()) * speedMult, 0, 0);
 				changed = true;
 			}
