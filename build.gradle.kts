@@ -11,22 +11,28 @@ buildscript {
 
 }
 
-description = "Proc Gen"
+typealias ShadowJar = com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 allprojects {
 
-    apply(plugin = "com.github.johnrengelman.shadow")
-
-    version = "b1.0.0"
+    version = "0.1.0"
 
 }
 
 subprojects {
 
+    val subproj = this
+
     apply(plugin = "java")
+    apply(plugin = "com.github.johnrengelman.shadow")
 
     repositories {
         mavenCentral()
+    }
+
+    ext {
+        set("msengineClient", "../libs/client-1.0.3-all.jar")
+        set("msengineCommon", "../libs/common-1.0.3-all.jar")
     }
 
     configure<JavaPluginConvention> {
@@ -40,15 +46,18 @@ subprojects {
 
 }
 
+description = "Proc Gen"
 
-/*
-tasks.register<JavaExec>("runMain") {
+tasks.create<Copy>("distrib") {
 
-    dependsOn("jar")
+    group = "shadow"
+    dependsOn("pg-client:shadowJar", "pg-server:shadowJar")
 
-    main = "fr.theorozier.procgen.client.Main"
-    classpath = files(tasks.named<Jar>("jar").get().archiveFile.get())
-    classpath += project.the<SourceSetContainer>()["main"].runtimeClasspath
+    from(
+            project("pg-client").tasks.named<ShadowJar>("shadowJar").get().archiveFile,
+            project("pg-server").tasks.named<ShadowJar>("shadowJar").get().archiveFile
+    )
+
+    into("build/libs")
 
 }
-*/

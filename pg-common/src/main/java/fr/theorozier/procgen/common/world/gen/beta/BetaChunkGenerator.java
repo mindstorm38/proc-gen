@@ -10,6 +10,7 @@ import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
+import io.sutil.math.MathHelper;
 
 public class BetaChunkGenerator extends ChunkGenerator {
 	
@@ -92,9 +93,9 @@ public class BetaChunkGenerator extends ChunkGenerator {
 				noise3 = randomMap[noiseX    ][noiseZ + 1];
 				noise4 = randomMap[noiseX + 1][noiseZ + 1];
 				
-				noiseInt1 = MathUtils.lerp(noise1, noise2, ratioX);
-				noiseInt2 = MathUtils.lerp(noise3, noise4, ratioX);
-				noise = MathUtils.lerp(noiseInt1, noiseInt2, ratioZ);
+				noiseInt1 = MathHelper.interpolate(ratioX, noise2, noise1);
+				noiseInt2 = MathHelper.interpolate(ratioX, noise4, noise3);
+				noise = MathHelper.interpolate(ratioZ, noiseInt2, noiseInt1);
 				
 				for (int y = 0; y < 16; ++y) {
 					

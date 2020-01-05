@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.util.noise;
 
-import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.util.Vector2f;
+import io.sutil.math.MathHelper;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -39,10 +39,10 @@ public class PerlinNoise {
 	 */
 	public static float perlin(float x, float y) {
 		
-		int x0 = MathUtils.fastfloor(x);
+		int x0 = MathHelper.floorFloatInt(x);
 		int x1 = x0 + 1;
 		
-		int y0 = MathUtils.fastfloor(y);
+		int y0 = MathHelper.floorFloatInt(y);
 		int y1 = y0 + 1;
 		
 		float sx = x - x0;
@@ -53,7 +53,7 @@ public class PerlinNoise {
 		float s2 = scalar(x0, y1, x, y);
 		float s3 = scalar(x1, y1, x, y);
 		
-		return MathUtils.lerp(MathUtils.lerp(s0, s1, sx), MathUtils.lerp(s2, s3, sx), sy);
+		return MathHelper.interpolate(sy, MathHelper.interpolate(sx, s3, s2), MathHelper.interpolate(sx, s1, s0));
 		
 	}
 	

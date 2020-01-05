@@ -11,6 +11,7 @@ import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextBase;
 import io.msengine.client.util.camera.Camera3D;
+import io.sutil.math.MathHelper;
 
 public class DebugScene extends GuiScene {
 
@@ -47,7 +48,7 @@ public class DebugScene extends GuiScene {
 		this.posTexts[2].setText("Z: " + cam.getZ());
 		
 		WorldClient world = this.worldRenderer.getRenderingWorld();
-		Biome biome = world == null ? null : world.getBiomeAt(MathUtils.fastfloor(cam.getX()), MathUtils.fastfloor(cam.getZ()));
+		Biome biome = world == null ? null : world.getBiomeAt(MathHelper.floorFloatInt(cam.getX()), MathHelper.floorFloatInt(cam.getZ()));
 		
 		if (biome != null) {
 			this.posTexts[3].setText("Biome : " + biome.getIdentifier());
@@ -55,12 +56,12 @@ public class DebugScene extends GuiScene {
 			this.posTexts[3].setText("");
 		}
 		
-		BlockState state = world == null ? null : world.getBlockAt(MathUtils.fastfloor(cam.getX()), MathUtils.fastfloor(cam.getY()), MathUtils.fastfloor(cam.getZ()));
+		BlockState state = world == null ? null : world.getBlockAt(MathHelper.floorFloatInt(cam.getX()), MathHelper.floorFloatInt(cam.getY()), MathHelper.floorFloatInt(cam.getZ()));
 		this.posTexts[4].setText("Block : " + state);
 		
 		if (world instanceof WorldSinglePlayer) {
 			
-			this.posTexts[5].setText("Heightmap : " + ((WorldSinglePlayer) world).getServerWorld().getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, MathUtils.fastfloor(cam.getX()), MathUtils.fastfloor(cam.getZ())));
+			this.posTexts[5].setText("Heightmap : " + ((WorldSinglePlayer) world).getServerWorld().getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, MathHelper.floorFloatInt(cam.getX()), MathHelper.floorFloatInt(cam.getZ())));
 			
 		}
 		
