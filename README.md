@@ -12,15 +12,23 @@ generation.
 
 > For now I keep the './src' directory but it will be deleted soon.
 
-## Play or Contribute
+## Play (version 0.1.0)
+
+- Escape to switch pause mode
+- Use mouse to move the camera
+- Press `L` to generate terrain around the camera
+- Press `I` to instantiate a falling block entity
+- Use `ZQSD` (or WASD) to move
+- Space and Shift to move verticaly
+- Use `F11` to toggle fullscreen
+
+> If you want to customize controls, you can edit the `options.json` next to downloaded jar file.
+> You can use the [GLFW page about keys ids](https://www.glfw.org/docs/latest/group__keys.html) to know numbers to put in the configuration file to change control keys.
+> This config file will be supported in future version.
+
+## Contribute
 
 This game is currently in development, it is not playable but it is
 already possible to move through the world.
 
 For development I'm using Gradle (6.0) and IntelliJ IDEA as IDE.
-The only dependencies are :
-- [SUtil](https://github.com/mindstorm38/sutil), which is a utility library I developped.
-- [MSEngine](https://gitlab.com/mindstorm38/msengine) : this is my helper over OpenGL and GLFW.
-
-These two libraries must be placed in the same parent folder that
-this repo.
