@@ -6,5 +6,5 @@ tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJ
 }
 
 dependencies {
-    "compile"(files(project.ext["msengineCommon"]))
+
 }

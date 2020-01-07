@@ -2,22 +2,24 @@
 description = rootProject.description + " Client"
 
 dependencies {
-    "compile"(project(":pg-common"))
-    "compile"(files(project.ext["msengineClient"]))
+
+    "implementation"(project(":pg-common"))
+    "implementation"("fr.theorozier:msengine-client:${project.ext["msengineVersion"]}")
+
 }
 
-val main = "fr.theorozier.procgen.client.Main"
+val mainClass = "fr.theorozier.procgen.client.Main"
 
 tasks.named<Jar>("jar") {
     manifest {
-        attributes(mapOf("Main-Class" to main))
+        attributes(mapOf("Main-Class" to mainClass))
     }
 }
 
 tasks.create<JavaExec>("run") {
 
     dependsOn("shadowJar")
-    main = main
+    main = mainClass
     classpath = files(tasks.named<Jar>("shadowJar").get().archiveFile)
 
 }

@@ -2,5 +2,5 @@
 description = rootProject.description + " Server"
 
 dependencies {
-    "compile"(project(":pg-common"))
+    "implementation"(project(":pg-common"))
 }

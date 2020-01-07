@@ -21,18 +21,22 @@ allprojects {
 
 subprojects {
 
-    val subproj = this
-
     apply(plugin = "java")
     apply(plugin = "com.github.johnrengelman.shadow")
 
-    repositories {
-        mavenCentral()
+    ext {
+        set("msengineVersion", "1.0.6")
+        set("sutilVersion", "1.1.0")
     }
 
-    ext {
-        set("msengineClient", "../libs/client-1.0.3-all.jar")
-        set("msengineCommon", "../libs/common-1.0.3-all.jar")
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        "implementation"("fr.theorozier:sutil:${project.ext["sutilVersion"]}")
+        "implementation"("fr.theorozier:msengine-common:${project.ext["msengineVersion"]}")
     }
 
     configure<JavaPluginConvention> {
@@ -42,6 +46,16 @@ subprojects {
 
     tasks.named<JavaCompile>("compileJava") {
         options.encoding = "UTF-8"
+    }
+
+    tasks.named<ShadowJar>("shadowJar") {
+        exclude("*.dll.git", "*.dll.sha1")
+        exclude("*.dylib.git", "*.dylib.sha1")
+        exclude("*.so.git", "*.so.sha1")
+    }
+
+    tasks.register("showConf") {
+        configurations.named("runtimeClasspath").get().forEach { println(it) }
     }
 
 }
