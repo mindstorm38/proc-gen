@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 buildscript {
 
@@ -10,8 +11,6 @@ buildscript {
     }
 
 }
-
-typealias ShadowJar = com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 allprojects {
 
@@ -30,8 +29,12 @@ subprojects {
     }
 
     repositories {
-        mavenCentral()
-        mavenLocal()
+        mavenCentral {
+            metadataSources {
+                mavenPom()
+                ignoreGradleMetadataRedirection()
+            }
+        }
     }
 
     dependencies {
