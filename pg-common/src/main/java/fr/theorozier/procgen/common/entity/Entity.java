@@ -76,7 +76,7 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * Override this method (keep calling super) to initiate the
+	 * REMEMBER TO OVERRIDE this method (keep calling super) to initiate the
 	 * bounding box coordinates and size.
 	 * @param x The raw X coordinate.
 	 * @param y The raw Y coordinate.

@@ -23,6 +23,10 @@ public class Heightmap {
 		
 	}
 	
+	public WorldServerSection getSection() {
+		return this.section;
+	}
+	
 	// All these methods are relative to the section
 	
 	public short get(int x, int z) {

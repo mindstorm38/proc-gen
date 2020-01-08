@@ -6,6 +6,7 @@ import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
+import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
 import io.msengine.client.game.DefaultRenderGame;
@@ -167,8 +168,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					
 					Camera3D cam = this.worldRenderer.getCamera();
 					
-					FallingBlockEntity entity = new FallingBlockEntity(serverWorld, (long) (Math.random() * 100000));
-					entity.setPositionInstant(cam.getX() - 0.5f, cam.getY() - 2f, cam.getZ() - 0.5f);
+					PigEntity entity = new PigEntity(serverWorld, (long) (Math.random() * 10000000));
+					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					
 					serverWorld.rawAddEntity(entity);
 					

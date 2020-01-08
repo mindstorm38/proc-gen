@@ -210,6 +210,7 @@ public class WorldRenderer implements ModelApplyListener,
 		view.identity();
 		view.rotateX(-this.camera.getLerpedPitch(alpha));
 		view.rotateY(this.camera.getLerpedYaw(alpha));
+		view.translate(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		
 		this.updateGlobalMatrix();
 		this.model.apply();
@@ -224,10 +225,11 @@ public class WorldRenderer implements ModelApplyListener,
 		this.renderSkyBox();
 		
 		this.profiler.endStartSection("render_chunks");
-		this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
+		// this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		this.renderChunks();
 		this.profiler.endSection();
 		
+		// this.shaderManager.setGlobalOffset(0, 0, 0);
 		this.entityRenderManager.render(alpha);
 		
 		this.shaderManager.end();

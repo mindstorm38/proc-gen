@@ -2,8 +2,10 @@ package fr.theorozier.procgen.client.renderer.world;
 
 import fr.theorozier.procgen.client.renderer.entity.EntityRenderer;
 import fr.theorozier.procgen.client.renderer.entity.FallingBlockEntityRenderer;
+import fr.theorozier.procgen.client.renderer.entity.PigEntityRenderer;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
+import fr.theorozier.procgen.common.entity.PigEntity;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.Texture;
 import io.msengine.common.util.GameProfiler;
@@ -38,6 +40,7 @@ public class EntityRenderManager {
 		this.entitiesByClasses = new HashMap<>();
 		
 		this.addEntityRenderer(FallingBlockEntity.class, new FallingBlockEntityRenderer());
+		this.addEntityRenderer(PigEntity.class, new PigEntityRenderer());
 		
 	}
 	

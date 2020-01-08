@@ -2,7 +2,6 @@ package fr.theorozier.procgen.common.entity;
 
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.WorldServer;
 import io.sutil.math.MathHelper;
 
 import java.util.ArrayList;

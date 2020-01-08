@@ -35,7 +35,7 @@ public abstract class EntityRenderer<E extends Entity> {
 		
 		this.parts.values().forEach(p -> p.initPart(shaderManager));
 		
-		this.initTexture();
+		this.initTexture(); // FIXME : Do not allow to re-start renderer after stoping (for texture managing).
 		
 		this.shaderManager = shaderManager;
 		this.initied = true;
