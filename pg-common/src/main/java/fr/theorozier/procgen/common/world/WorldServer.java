@@ -45,6 +45,10 @@ public class WorldServer extends WorldBase {
 		return this.seed;
 	}
 	
+	public Random getRandom() {
+		return this.random;
+	}
+	
 	public ChunkManager getChunkManager() {
 		return this.manager;
 	}

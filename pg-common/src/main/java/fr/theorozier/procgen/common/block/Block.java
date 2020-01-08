@@ -20,6 +20,8 @@ public class Block {
 	protected final BlockStateContainer stateContainer;
 	private BlockState defaultState;
 	
+	private float resistance = 1f;
+	
 	public Block(int uid, String identifier) {
 		
 		if (uid <= 0)
@@ -98,6 +100,20 @@ public class Block {
 	
 	public void getStateCollision(BlockState state, List<AxisAlignedBB> boundingBoxes) {
 		addCubeBoundingBox(boundingBoxes);
+	}
+	
+	public float getInnerViscosity() {
+		return 0f;
+	}
+	
+	// Properties
+	
+	public float getResistance(BlockState state) {
+		return resistance;
+	}
+	
+	public void setResistance(float resistance) {
+		this.resistance = resistance;
 	}
 	
 	// Dynamic function for modifying the world
