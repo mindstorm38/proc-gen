@@ -31,4 +31,4 @@ generation.
 This game is currently in development, it is not playable but it is
 already possible to move through the world.
 
-For development I'm using Gradle (6.0) and IntelliJ IDEA as IDE.
+For development I'm using Gradle (use wrapper with `./gradrew` and `./gradlew.bat`) and IntelliJ IDEA as IDE.
