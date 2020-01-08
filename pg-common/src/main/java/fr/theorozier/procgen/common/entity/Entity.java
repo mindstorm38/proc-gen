@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.entity;
 
+import fr.theorozier.procgen.common.entity.controller.EntityController;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.WorldServer;
@@ -27,17 +28,21 @@ public abstract class Entity {
 	protected final AxisAlignedBB boundingBox;
 	protected final AxisAlignedBB debugBoundingBox;
 	
+	protected EntityController controller;
+	
 	protected double posX;
 	protected double posY;
 	protected double posZ;
 	
 	protected long lifetime;
 	
-	public Entity(WorldBase world, WorldServer serverWorld, long uid) {
+	protected boolean dead;
+	
+	public Entity(WorldBase world, long uid) {
 		
 		this.world = world;
-		this.serverWorld = serverWorld;
-		this.isInServer = serverWorld != null;
+		this.serverWorld = world.isServer() ? world.getAsServer() : null;
+		this.isInServer = world.isServer();
 		this.uid = uid;
 		this.rand = new Random();
 		
@@ -46,7 +51,11 @@ public abstract class Entity {
 		
 		this.debugBoundingBox = new AxisAlignedBB();
 		
+		this.controller = null;
+		
 		this.lifetime = 0L;
+		
+		this.dead = false;
 		
 	}
 	
@@ -108,10 +117,55 @@ public abstract class Entity {
 		return this.debugBoundingBox;
 	}
 	
+	/**
+	 * Set the entity controller.
+	 * @param controller Entity controller.
+	 */
+	public void setController(EntityController controller) {
+		this.controller = controller;
+	}
+	
+	/**
+	 * Common update method called by worlds on each ticks, only use short
+	 * methods calls in this because update can be entirely overrided with
+	 * no super call.
+	 */
 	public void update() {
 		
-		++this.lifetime;
+		this.updateLifetime();
+		this.updateController();
 		
+	}
+	
+	/**
+	 * Internal method to increment entity lifetime.
+	 */
+	protected void updateLifetime() {
+		++this.lifetime;
+	}
+	
+	/**
+	 * Internal method to update entity controller.
+	 */
+	protected void updateController() {
+		if (this.controller != null) {
+			this.controller.control(this);
+		}
+	}
+	
+	/**
+	 * Immutable method to know if an entity is dead.
+	 * @return True if the entity is dead.
+	 */
+	public final boolean isDead() {
+		return this.dead;
+	}
+	
+	/**
+	 * Kill the entity.
+	 */
+	public void setDead() {
+		this.dead = true;
 	}
 	
 	@Override

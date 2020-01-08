@@ -1,12 +1,11 @@
 package fr.theorozier.procgen.common.entity;
 
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.WorldServer;
 
 public class FallingBlockEntity extends MotionEntity {
 	
-	public FallingBlockEntity(WorldBase world, WorldServer serverWorld, long uid) {
-		super(world, serverWorld, uid);
+	public FallingBlockEntity(WorldBase world, long uid) {
+		super(world, uid);
 	}
 	
 	@Override

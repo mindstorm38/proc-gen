@@ -47,6 +47,14 @@ public abstract class WorldBase {
 		
 	}
 	
+	public boolean isServer() {
+		return false;
+	}
+	
+	public WorldServer getAsServer() {
+		throw new UnsupportedOperationException("This world is not a server world.");
+	}
+	
 	/**
 	 * Run a single tick in this world.
 	 */

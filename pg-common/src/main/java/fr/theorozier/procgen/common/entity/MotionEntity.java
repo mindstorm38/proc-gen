@@ -8,7 +8,7 @@ import io.sutil.math.MathHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MotionEntity extends Entity {
+public abstract class MotionEntity extends Entity {
 	
 	protected boolean noClip;
 	protected boolean hasMass;
@@ -23,9 +23,11 @@ public class MotionEntity extends Entity {
 	protected double lastY;
 	protected double lastZ;
 	
-	public MotionEntity(WorldBase world, WorldServer serverWorld, long uid) {
+	protected double fallDistance;
+	
+	public MotionEntity(WorldBase world, long uid) {
 		
-		super(world, serverWorld, uid);
+		super(world, uid);
 		
 		this.velX = 0;
 		this.velY = 0;
@@ -36,17 +38,39 @@ public class MotionEntity extends Entity {
 		this.onGround = false;
 		this.stepHeight = 0.0;
 		
+		this.fallDistance = 0;
+		
 	}
 	
 	@Override
 	public void update() {
 		
 		super.update();
+		this.updateMotion();
+		
+	}
+	
+	/**
+	 * Internal method to update entity's motion.
+	 */
+	protected void updateMotion() {
 		
 		this.setLastPos();
 		this.updateNaturalVelocity();
-		
 		this.move(this.velX, this.velY, this.velZ);
+		
+		double dy = this.posY - this.lastY;
+		
+		if (dy >= 0 || this.onGround) {
+			
+			if (this.onGround)
+				this.fallen(this.fallDistance);
+			
+			this.fallDistance = 0;
+			
+		} else {
+			this.fallDistance -= dy;
+		}
 		
 	}
 	
@@ -109,6 +133,9 @@ public class MotionEntity extends Entity {
 				this.boundingBox.move(0, dy, 0);
 				this.onGround = (down && dy == 0);
 			
+				if (dy == 0)
+					this.velY = 0;
+				
 			}
 			
 			if (dx != 0) {
@@ -119,6 +146,9 @@ public class MotionEntity extends Entity {
 				
 				this.boundingBox.move(dx, 0, 0);
 				
+				if (dx == 0)
+					this.velX = 0;
+				
 			}
 			
 			if (dz != 0) {
@@ -128,6 +158,9 @@ public class MotionEntity extends Entity {
 				}
 				
 				this.boundingBox.move(0, 0, dz);
+				
+				if (dz == 0)
+					this.velZ = 0;
 			
 			}
 			
@@ -137,11 +170,16 @@ public class MotionEntity extends Entity {
 		
 	}
 	
+	public void fallen(double distance) { }
+	
+	/**
+	 * Internal method to update natural velocity, like gravity.
+	 */
 	protected void updateNaturalVelocity() {
 		this.velY -= GRAVITY_FACTOR;
 	}
 	
-	public void setLastPos() {
+	protected void setLastPos() {
 		
 		this.lastX = this.posX;
 		this.lastY = this.posY;

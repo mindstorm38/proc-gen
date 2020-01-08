@@ -167,7 +167,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					
 					Camera3D cam = this.worldRenderer.getCamera();
 					
-					FallingBlockEntity entity = new FallingBlockEntity(serverWorld, serverWorld, (long) (Math.random() * 100000));
+					FallingBlockEntity entity = new FallingBlockEntity(serverWorld, (long) (Math.random() * 100000));
 					entity.setPositionInstant(cam.getX() - 0.5f, cam.getY() - 2f, cam.getZ() - 0.5f);
 					
 					serverWorld.rawAddEntity(entity);
