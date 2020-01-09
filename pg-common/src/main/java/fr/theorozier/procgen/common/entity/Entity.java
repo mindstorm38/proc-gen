@@ -34,6 +34,9 @@ public abstract class Entity {
 	protected double posY;
 	protected double posZ;
 	
+	protected float yaw;
+	protected float pitch;
+	
 	protected long lifetime;
 	
 	protected boolean dead;
@@ -76,8 +79,7 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * REMEMBER TO OVERRIDE this method (keep calling super) to initiate the
-	 * bounding box coordinates and size.
+	 * Teleport this entity to a position.
 	 * @param x The raw X coordinate.
 	 * @param y The raw Y coordinate.
 	 * @param z The raw Z coordinate.
@@ -88,6 +90,19 @@ public abstract class Entity {
 		this.posY = y;
 		this.posZ = z;
 		
+		this.setupBoundingBoxPosition(x, y, z);
+		
+	}
+	
+	/**
+	 * REMEMBER TO OVERRIDE this method (keep calling super) to initiate the
+	 * bounding box coordinates and size.
+	 * @param x The raw X coordinate.
+	 * @param y The raw Y coordinate.
+	 * @param z The raw Z coordinate.
+	 */
+	public void setupBoundingBoxPosition(double x, double y, double z) {
+		this.boundingBox.setPositionUnsafe(x, y, z, x, y, z);
 	}
 	
 	public void setPosition(double x, double y, double z) {

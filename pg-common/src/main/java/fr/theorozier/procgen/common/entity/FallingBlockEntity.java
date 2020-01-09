@@ -9,11 +9,8 @@ public class FallingBlockEntity extends MotionEntity {
 	}
 	
 	@Override
-	public void setPositionInstant(double x, double y, double z) {
-		
-		super.setPositionInstant(x, y, z);
+	public void setupBoundingBoxPosition(double x, double y, double z) {
 		this.boundingBox.setPositionUnsafe(x, y, z, x + 1.0, y + 1.0, z + 1.0);
-		
 	}
 	
 	@Override

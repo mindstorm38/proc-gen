@@ -13,11 +13,8 @@ public class PigEntity extends WalkingEntity {
 	}
 	
 	@Override
-	public void setPositionInstant(double x, double y, double z) {
-		
-		super.setPositionInstant(x, y, z);
+	public void setupBoundingBoxPosition(double x, double y, double z) {
 		this.boundingBox.setPositionUnsafe(x - 0.5f, y, z - 0.5f, x + 0.5f, y + 0.6f, z + 0.5f);
-		
 	}
 	
 	@Override
