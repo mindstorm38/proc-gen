@@ -43,7 +43,7 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 		
 		this.head = new EntityCubePart(-0.25f, -0.375f, -0.375f, 0.25f, 0.125f, 0.125f);
 		this.head.setFaceTile(Direction.TOP, this.baseTexture.newPixelTile("head_top", 8, 0, 8, 8));
-		this.head.setFaceTile(Direction.BOTTOM, this.baseTexture.newPixelTile("head_bottom", 24, 8, 8, 8));
+		this.head.setFaceTile(Direction.BOTTOM, this.baseTexture.newPixelTile("head_bottom", 16, 0, 8, 8));
 		this.head.setFaceTile(Direction.NORTH, this.baseTexture.newPixelTile("head_left", 16, 8, 8, 8));
 		this.head.setFaceTile(Direction.SOUTH, this.baseTexture.newPixelTile("head_right", 0, 8, 8, 8));
 		this.head.setFaceTile(Direction.EAST, this.baseTexture.newPixelTile("head_front", 8, 8, 8, 8));
@@ -76,7 +76,7 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 		
 		this.body.render();
 		
-		model.push().translate(0, 0.875f, 0.625f).apply();
+		model.push().translate(0, 0.875f, 0.75f).apply();
 		this.head.render();
 		this.muzzle.render();
 		model.pop();
