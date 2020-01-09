@@ -24,17 +24,30 @@ subprojects {
     apply(plugin = "com.github.johnrengelman.shadow")
 
     ext {
-        set("msengineVersion", "1.0.6")
+        set("msengineVersion", "1.0.7-SNAPSHOT")
         set("sutilVersion", "1.1.0")
     }
 
     repositories {
+
         mavenCentral {
             metadataSources {
                 mavenPom()
                 ignoreGradleMetadataRedirection()
             }
         }
+
+        maven {
+            url = uri("https://oss.sonatype.org/content/groups/public/")
+            metadataSources {
+                mavenPom()
+                ignoreGradleMetadataRedirection()
+            }
+            mavenContent {
+                snapshotsOnly()
+            }
+        }
+
     }
 
     dependencies {
