@@ -7,7 +7,7 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
 import fr.theorozier.procgen.common.entity.PigEntity;
 import io.msengine.client.renderer.model.ModelHandler;
-import io.msengine.client.renderer.texture.Texture;
+import io.msengine.client.renderer.shader.ShaderSamplerObject;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.profiler.Profiler;
 
@@ -46,9 +46,12 @@ public class EntityRenderManager {
 	
 	void init() {
 		
+		WorldShaderManager shaderManager = this.shaderManager;
+		WorldRenderDataArray dataArray = new WorldRenderDataArray();
+		
 		for (EntityRenderer<?> renderer : this.entityRenderers.values())
 			if (!renderer.isInitied())
-				renderer.initRenderer(this.shaderManager);
+				renderer.initRenderer(shaderManager, dataArray);
 		
 	}
 	
@@ -73,6 +76,9 @@ public class EntityRenderManager {
 	
 		ModelHandler model = this.model;
 		EntityRenderer<?> renderer;
+		ShaderSamplerObject sampler = null, newSampler;
+		
+		this.shaderManager.setTextureSampler(null);
 		
 		for (Map.Entry<Class<? extends Entity>, HashSet<Entity>> entitiesOfClass : this.entitiesByClasses.entrySet()) {
 			
@@ -80,7 +86,11 @@ public class EntityRenderManager {
 				
 				for (Entity e : entitiesOfClass.getValue()) {
 					
-					this.shaderManager.setTextureSampler(renderer.getTextureUnsafe(e));
+					newSampler = renderer.getTextureUnsafe(e);
+					
+					if (newSampler != sampler)
+						this.shaderManager.setTextureSampler(sampler = newSampler);
+					
 					renderer.renderEntityUnsafe(alpha, model, e);
 					
 				}

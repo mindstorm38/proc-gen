@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.client.renderer.entity;
 
 import fr.theorozier.procgen.client.renderer.entity.part.EntityModelPart;
+import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
 import fr.theorozier.procgen.common.entity.Entity;
 import io.msengine.client.renderer.model.ModelHandler;
@@ -20,7 +21,6 @@ import java.util.HashMap;
 public abstract class EntityRenderer<E extends Entity> {
 
 	private boolean initied = false;
-	private WorldShaderManager shaderManager = null;
 	
 	private final HashMap<String, EntityModelPart> parts = new HashMap<>();
 	
@@ -28,16 +28,20 @@ public abstract class EntityRenderer<E extends Entity> {
 		return this.initied;
 	}
 	
-	public void initRenderer(WorldShaderManager shaderManager) {
+	public void initRenderer(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
 	
 		if (this.initied)
 			throw new IllegalStateException("This '" + this.getClass() + "' can't be initialized twice.");
 		
-		this.parts.values().forEach(p -> p.initPart(shaderManager));
+		this.parts.values().forEach(p -> {
+			
+			dataArray.resetBuffers();
+			p.initPart(shaderManager, dataArray);
+			
+		});
 		
 		this.initTexture(); // FIXME : Do not allow to re-start renderer after stoping (for texture managing).
 		
-		this.shaderManager = shaderManager;
 		this.initied = true;
 	
 	}
@@ -49,26 +53,25 @@ public abstract class EntityRenderer<E extends Entity> {
 		
 		this.parts.values().forEach(EntityModelPart::stopPart);
 		
-		this.shaderManager = null;
 		this.initied = false;
 		
 	}
 	
 	public void addPart(String id, EntityModelPart part) {
 		
-		this.parts.put(id, part);
-		
 		if (this.initied)
-			part.initPart(this.shaderManager);
+			throw new IllegalStateException("Entity renderer already started, can't add part.");
+		
+		this.parts.put(id, part);
 		
 	}
 	
 	public void removePart(String id) {
 		
-		EntityModelPart part = this.parts.remove(id);
+		if (this.initied)
+			throw new IllegalStateException("Entity renderer already started, can't remove part.");
 		
-		if (part != null && this.initied)
-			part.stopPart();
+		this.parts.remove(id);
 		
 	}
 	

@@ -368,4 +368,14 @@ public class WorldRenderDataArray {
 	
 	}
 	
+	@Override
+	public String toString() {
+		return "WorldRenderDataArray{" +
+				"vertices=" + vertices.getSize() +
+				", colors=" + colors.getSize() +
+				", texcoords=" + texcoords.getSize() +
+				", indices=" + indices.getSize() +
+				", idx=" + idx +
+				'}';
+	}
 }

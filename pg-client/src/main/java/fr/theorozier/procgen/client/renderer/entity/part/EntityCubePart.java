@@ -1,14 +1,14 @@
 package fr.theorozier.procgen.client.renderer.entity.part;
 
+import fr.theorozier.procgen.client.renderer.block.BlockFaces;
+import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
-import io.msengine.client.renderer.util.BufferUsage;
-import io.msengine.client.renderer.util.BufferUtils;
+import fr.theorozier.procgen.common.world.position.Direction;
+import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
-import io.msengine.client.renderer.vertex.type.BasicFormat;
-import org.lwjgl.system.MemoryUtil;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.util.EnumMap;
+import java.util.function.BiConsumer;
 
 public class EntityCubePart extends EntityModelPart {
 	
@@ -18,6 +18,10 @@ public class EntityCubePart extends EntityModelPart {
 	private final float maxX;
 	private final float maxY;
 	private final float maxZ;
+	
+	private final BlockFaces faces;
+	private final TextureMapTile[] tiles;
+	private final int[] tilesRotations;
 	
 	private IndicesDrawBuffer buffer;
 	
@@ -31,13 +35,108 @@ public class EntityCubePart extends EntityModelPart {
 		this.maxY = maxY;
 		this.maxZ = maxZ;
 		
+		this.faces = new BlockFaces();
+		this.faces.setData((byte) 0xFF);
+		
+		this.tiles = new TextureMapTile[Direction.values().length];
+		this.tilesRotations = new int[Direction.values().length];
+		
+	}
+	
+	public BlockFaces getFaces() {
+		return this.faces;
+	}
+	
+	public void setFaceTile(Direction dir, TextureMapTile tile, int rotation) {
+		this.tiles[dir.ordinal()] = tile;
+		this.tilesRotations[dir.ordinal()] = rotation;
+	}
+	
+	public void setFaceTile(Direction dir, TextureMapTile tile) {
+		this.setFaceTile(dir, tile, 0);
+	}
+	
+	protected void applyTexcoords(Direction direction, WorldRenderDataArray dataArray) {
+		
+		TextureMapTile tile = this.tiles[direction.ordinal()];
+		
+		if (tile != null) {
+			dataArray.faceTexcoords(tile, this.tilesRotations[direction.ordinal()]);
+		}
+		
 	}
 	
 	@Override
-	public void init(WorldShaderManager shaderManager) {
+	public void init(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
 		
-		this.buffer = shaderManager.createBasicDrawBuffer(true, false);
+		float dx = this.maxX - this.minX;
+		float dy = this.maxY - this.minY;
+		float dz = this.maxZ - this.minZ;
 		
+		// Y DIRECTION
+		
+		if (this.faces.isTop()) {
+			
+			dataArray.faceTop(this.minX, this.maxY, this.minZ, dx, dz);
+			dataArray.faceColorWhite();
+			this.applyTexcoords(Direction.TOP, dataArray);
+			dataArray.faceIndices();
+			
+		}
+		
+		if (this.faces.isBottom()) {
+			
+			dataArray.faceBottom(this.minX, this.minY, this.minZ, dx, dz);
+			dataArray.faceColorWhite();
+			this.applyTexcoords(Direction.BOTTOM, dataArray);
+			dataArray.faceIndices();
+			
+		}
+		
+		// X DIRECTION
+		
+		if (this.faces.isNorth()) {
+			
+			dataArray.faceNorth(this.maxX, this.minY, this.minZ, dy, dz);
+			dataArray.faceColorWhite();
+			this.applyTexcoords(Direction.NORTH, dataArray);
+			dataArray.faceIndices();
+			
+		}
+		
+		if (this.faces.isSouth()) {
+			
+			dataArray.faceSouth(this.minX, this.minY, this.minZ, dy, dz);
+			dataArray.faceColorWhite();
+			this.applyTexcoords(Direction.SOUTH, dataArray);
+			dataArray.faceIndices();
+			
+		}
+		
+		// Z DIRECTION
+		
+		if (this.faces.isEast()) {
+			
+			dataArray.faceEast(this.minX, this.minY, this.maxZ, dy, dx);
+			dataArray.faceColorWhite();
+			this.applyTexcoords(Direction.EAST, dataArray);
+			dataArray.faceIndices();
+			
+		}
+		
+		if (this.faces.isWest()) {
+			
+			dataArray.faceWest(this.minX, this.minY, this.minZ, dy, dx);
+			dataArray.faceColorWhite();
+			this.applyTexcoords(Direction.WEST, dataArray);
+			dataArray.faceIndices();
+			
+		}
+		
+		this.buffer = shaderManager.createBasicDrawBuffer(true, true);
+		dataArray.uploadToDrawBuffer(this.buffer);
+		
+		/*
 		FloatBuffer vertices = null;
 		FloatBuffer colors = null;
 		IntBuffer indices = null;
@@ -58,7 +157,10 @@ public class EntityCubePart extends EntityModelPart {
 			vertices.put(maxX).put(maxY).put(maxZ);
 			
 			for (int i = 0; i < 8; ++i)
-				colors.put(0.96078431f).put(0.61960784f).put(0.25882352f);
+				colors.put(0.96078431f + (float) Math.random()).put(0.61960784f + (float) Math.random()).put(0.25882352f + (float) Math.random());
+			
+			float[] texCoords = new float[4];
+			
 			
 			// WEST
 			indices.put(0).put(4).put(1);
@@ -100,6 +202,7 @@ public class EntityCubePart extends EntityModelPart {
 			BufferUtils.safeFree(indices);
 			
 		}
+		*/
 		
 	}
 	
