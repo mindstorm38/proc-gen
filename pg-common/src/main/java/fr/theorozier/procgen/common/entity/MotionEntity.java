@@ -24,6 +24,8 @@ public abstract class MotionEntity extends Entity {
 	
 	protected double fallDistance;
 	
+	private final AxisAlignedBB tempMotionBoundingBox;
+	
 	public MotionEntity(WorldBase world, long uid) {
 		
 		super(world, uid);
@@ -38,6 +40,8 @@ public abstract class MotionEntity extends Entity {
 		this.stepHeight = 0.0;
 		
 		this.fallDistance = 0;
+		
+		this.tempMotionBoundingBox = new AxisAlignedBB();
 		
 	}
 	
@@ -92,11 +96,11 @@ public abstract class MotionEntity extends Entity {
 			double finalStep = 0;
 			double maxStep = 0;
 			
-			AxisAlignedBB newBoundingBox = new AxisAlignedBB(this.boundingBox);
-			newBoundingBox.expand(dx, dy, dz);
+			this.tempMotionBoundingBox.setPosition(this.boundingBox);
+			this.tempMotionBoundingBox.expand(dx, dy, dz);
 			
 			List<AxisAlignedBB> bbs = new ArrayList<>();
-			this.world.forEachBoundingBoxesIn(newBoundingBox, bbs::add);
+			this.world.forEachBoundingBoxesIn(this.tempMotionBoundingBox, bbs::add);
 			
 			if (this.stepHeight != 0) {
 				
