@@ -41,7 +41,7 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 		this.leg.setFaceTile(Direction.WEST, this.baseTexture.newPixelTile("leg_back", 12, 20, 4, 6));
 		this.addPart("leg", this.leg);
 		
-		this.head = new EntityCubePart(-0.25f, -0.375f, -0.375f, 0.25f, 0.125f, 0.125f);
+		this.head = new EntityCubePart(-0.25f, -0.375f, -0.125f, 0.25f, 0.125f, 0.375f);
 		this.head.setFaceTile(Direction.TOP, this.baseTexture.newPixelTile("head_top", 8, 0, 8, 8));
 		this.head.setFaceTile(Direction.BOTTOM, this.baseTexture.newPixelTile("head_bottom", 16, 0, 8, 8));
 		this.head.setFaceTile(Direction.NORTH, this.baseTexture.newPixelTile("head_left", 16, 8, 8, 8));
@@ -50,7 +50,7 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 		this.head.setFaceTile(Direction.WEST, this.baseTexture.newPixelTile("head_back", 24, 8, 8, 8));
 		this.addPart("head", this.head);
 		
-		this.muzzle = new EntityCubePart(-0.125f, -0.3125f, 0.125f, 0.125f, -0.125f, 0.1875f);
+		this.muzzle = new EntityCubePart(-0.125f, -0.3125f, 0.375f, 0.125f, -0.125f, 0.4375f);
 		this.muzzle.setFaceTile(Direction.TOP, this.baseTexture.newPixelTile("muzzle_top", 17, 16, 4, 1));
 		this.muzzle.setFaceTile(Direction.BOTTOM, this.baseTexture.newPixelTile("muzzle_bottom", 21, 16, 4, 1));
 		this.muzzle.setFaceTile(Direction.NORTH, this.baseTexture.newPixelTile("muzzle_left", 21, 17, 1, 3));
@@ -76,9 +76,15 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 		
 		this.body.render();
 		
-		model.push().translate(0, 0.875f, 0.75f).apply();
+		model.push()
+				.translate(0, 0.875f, 0.5f)
+				.rotateX(entity.getLerpedHeadPitch(alpha))
+				.rotateY(entity.getLerpedHeadYaw(alpha))
+				.apply();
+		
 		this.head.render();
 		this.muzzle.render();
+		
 		model.pop();
 		
 		model.push().translate(0, 0.375f, 0.3125f);

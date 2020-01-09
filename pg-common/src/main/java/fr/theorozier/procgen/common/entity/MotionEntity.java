@@ -22,6 +22,9 @@ public abstract class MotionEntity extends Entity {
 	protected double lastY;
 	protected double lastZ;
 	
+	protected float lastYaw;
+	protected float lastPitch;
+	
 	protected double fallDistance;
 	
 	private final AxisAlignedBB tempMotionBoundingBox;
@@ -175,6 +178,14 @@ public abstract class MotionEntity extends Entity {
 	
 	public void fallen(double distance) { }
 	
+	public void setVelocity(double x, double y, double z) {
+		
+		this.velX = x;
+		this.velY = y;
+		this.velZ = z;
+		
+	}
+	
 	/**
 	 * Internal method to update natural velocity, like gravity.
 	 */
@@ -187,6 +198,8 @@ public abstract class MotionEntity extends Entity {
 		this.lastX = this.posX;
 		this.lastY = this.posY;
 		this.lastZ = this.posZ;
+		this.lastYaw = this.yaw;
+		this.lastPitch = this.pitch;
 		
 	}
 	
@@ -202,6 +215,14 @@ public abstract class MotionEntity extends Entity {
 		return MathHelper.interpolate(alpha, this.posZ, this.lastZ);
 	}
 	
+	public float getLerpedYaw(float alpha) {
+		return MathHelper.interpolate(alpha, this.yaw, this.lastYaw);
+	}
+	
+	public float getLerpedPitch(float alpha) {
+		return MathHelper.interpolate(alpha, this.pitch, this.lastPitch);
+	}
+	
 	public boolean isNoClip() {
 		return this.noClip;
 	}
@@ -212,14 +233,6 @@ public abstract class MotionEntity extends Entity {
 	
 	public boolean isOnGround() {
 		return this.onGround;
-	}
-	
-	public void setVelocity(double x, double y, double z) {
-		
-		this.velX = x;
-		this.velY = y;
-		this.velZ = z;
-		
 	}
 	
 }

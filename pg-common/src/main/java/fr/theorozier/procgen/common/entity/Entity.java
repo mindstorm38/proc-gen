@@ -16,7 +16,7 @@ import java.util.Random;
  */
 public abstract class Entity {
 	
-	public static final float GRAVITY_FACTOR = 0.01f;
+	public static final float GRAVITY_FACTOR = 0.04f;
 	public static final float AIR_FRICTION   = 0.01f;
 	
 	protected final WorldBase world;
@@ -51,6 +51,7 @@ public abstract class Entity {
 		
 		this.boundingBox = new AxisAlignedBB();
 		this.setPositionInstant(0, 0, 0);
+		this.setRotation(0, 0);
 		
 		this.debugBoundingBox = new AxisAlignedBB();
 		
@@ -130,6 +131,33 @@ public abstract class Entity {
 	public AxisAlignedBB getDebugBoundingBox() {
 		this.debugBoundingBox.setPosition(this.boundingBox);
 		return this.debugBoundingBox;
+	}
+	
+	public void setRotation(float yaw, float pitch) {
+		
+		this.yaw = yaw;
+		this.pitch = pitch;
+		
+	}
+	
+	public double getPosX() {
+		return posX;
+	}
+	
+	public double getPosY() {
+		return posY;
+	}
+	
+	public double getPosZ() {
+		return posZ;
+	}
+	
+	public float getYaw() {
+		return yaw;
+	}
+	
+	public float getPitch() {
+		return pitch;
 	}
 	
 	/**

@@ -5,7 +5,8 @@ import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
-import fr.theorozier.procgen.common.entity.FallingBlockEntity;
+import fr.theorozier.procgen.common.entity.Entity;
+import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
@@ -35,6 +36,11 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	
 	public static final OptionKey KEY_GENERATE_CHUNKS = new OptionKey("generate_chunks", GLFW.GLFW_KEY_L);
 	public static final OptionKey KEY_SPAWN_FALLING_BLOCK = new OptionKey("spawn_falling_block", GLFW.GLFW_KEY_I);
+	
+	public static final OptionKey KEY_EHEAD_YAW_INC = new OptionKey("entity_head_yaw_inc", GLFW.GLFW_KEY_RIGHT);
+	public static final OptionKey KEY_EHEAD_YAW_DEC = new OptionKey("entity_head_yaw_dec", GLFW.GLFW_KEY_LEFT);
+	public static final OptionKey KEY_EHEAD_PITCH_INC = new OptionKey("entity_head_pitch_inc", GLFW.GLFW_KEY_UP);
+	public static final OptionKey KEY_EHEAD_PITCH_DEC = new OptionKey("entity_head_pitch_dec", GLFW.GLFW_KEY_DOWN);
 	
 	private final WorldRenderer worldRenderer;
 	private final WorldClient testWorld;
@@ -146,6 +152,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.setEscaped(!this.escaped);
 	}
 	
+	private float rotation = 0f;
+	
 	@Override
 	public void windowKeyEvent(int key, int scancode, int action, int mods) {
 		
@@ -170,6 +178,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					
 					PigEntity entity = new PigEntity(serverWorld, (long) (Math.random() * 10000000));
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
+					entity.setRotation(this.rotation, 0);
+					this.rotation += 0.1f;
 					
 					serverWorld.rawAddEntity(entity);
 					
@@ -177,6 +187,26 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 				
 			} else if (Options.TOGGLE_FULLSCREEN.isValid(key, scancode, mods)) {
 				Options.FULLSCREEN.setValue(this.window.toggleFullscreen());
+			} else {
+				
+				Entity entity = this.testWorld.getEntitiesView().isEmpty() ? null : this.testWorld.getEntitiesView().get(0);
+				
+				if (entity instanceof LiveEntity) {
+					
+					LiveEntity lentity = (LiveEntity) entity;
+					
+					if (KEY_EHEAD_YAW_INC.isValid(key, scancode, mods)) {
+						lentity.setHeadRotation(lentity.getHeadYaw() + 0.1f, lentity.getHeadPitch());
+					} else if (KEY_EHEAD_YAW_DEC.isValid(key, scancode, mods)) {
+						lentity.setHeadRotation(lentity.getHeadYaw() - 0.1f, lentity.getHeadPitch());
+					} else if (KEY_EHEAD_PITCH_INC.isValid(key, scancode, mods)) {
+						lentity.setHeadRotation(lentity.getHeadYaw(), lentity.getHeadPitch() + 0.1f);
+					} else if (KEY_EHEAD_PITCH_DEC.isValid(key, scancode, mods)) {
+						lentity.setHeadRotation(lentity.getHeadYaw(), lentity.getHeadPitch() - 0.1f);
+					}
+				
+				}
+				
 			}
 			
 		}

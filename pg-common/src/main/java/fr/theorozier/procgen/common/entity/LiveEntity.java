@@ -5,6 +5,12 @@ import io.sutil.math.MathHelper;
 
 public abstract class LiveEntity extends MotionEntity {
 	
+	protected float headYaw;
+	protected float headPitch;
+	
+	protected float lastHeadYaw;
+	protected float lastHeadPitch;
+	
 	protected int health;
 	protected float fallResistance;
 	
@@ -46,6 +52,44 @@ public abstract class LiveEntity extends MotionEntity {
 			this.damage(DamageSource.FALL, damage / this.fallResistance);
 		}
 		
+	}
+	
+	/**
+	 * Set the head rotation.
+	 * @param yaw Yaw rotation of the head.
+	 * @param pitch Pitch rotation of the head.
+	 */
+	public void setHeadRotation(float yaw, float pitch) {
+		
+		this.headYaw = yaw;
+		this.headPitch = pitch;
+		
+	}
+	
+	@Override
+	protected void setLastPos() {
+		
+		super.setLastPos();
+		
+		this.lastHeadYaw = this.headYaw;
+		this.lastHeadPitch = this.headPitch;
+		
+	}
+	
+	public float getHeadYaw() {
+		return headYaw;
+	}
+	
+	public float getHeadPitch() {
+		return headPitch;
+	}
+	
+	public float getLerpedHeadYaw(float alpha) {
+		return MathHelper.interpolate(alpha, this.headYaw, this.lastHeadYaw);
+	}
+	
+	public float getLerpedHeadPitch(float alpha) {
+		return MathHelper.interpolate(alpha, this.headPitch, this.lastHeadPitch);
 	}
 	
 	public int getHealth() {

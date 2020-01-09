@@ -8,8 +8,14 @@ public abstract class MotionEntityRenderer<E extends MotionEntity> extends Entit
 	@Override
 	public void renderEntity(float alpha, ModelHandler model, E entity) {
 		
-		model.push().translate((float) entity.getLerpedX(alpha), (float) entity.getLerpedY(alpha), (float) entity.getLerpedZ(alpha))/*.rotateY(1.0f)*/.apply();
+		model.push()
+				.translate((float) entity.getLerpedX(alpha), (float) entity.getLerpedY(alpha), (float) entity.getLerpedZ(alpha))
+				.rotateX(entity.getLerpedPitch(alpha))
+				.rotateY(entity.getLerpedYaw(alpha))
+				.apply();
+		
 		this.renderMotionEntity(alpha, model, entity);
+		
 		model.pop();
 		
 	}
