@@ -74,6 +74,8 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 	@Override
 	public void renderMotionEntity(float alpha, ModelHandler model, PigEntity entity) {
 		
+		float walkFrame = (float) Math.sin(entity.getWalkFrame().getLerped(alpha)) * 0.3f;
+		
 		this.body.render();
 		
 		model.push()
@@ -88,22 +90,23 @@ public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 		model.pop();
 		
 		model.push().translate(0, 0.375f, 0.3125f);
-		this.renderTwinLegs(alpha, model, entity);
+		this.renderTwinLegs(walkFrame, model, entity);
 		model.pop();
 		
 		model.push().translate(0, 0.375f, -0.4375f);
-		this.renderTwinLegs(alpha, model, entity);
+		this.renderTwinLegs(walkFrame, model, entity);
 		model.pop();
 		
 	}
 	
-	private void renderTwinLegs(float alpha, ModelHandler model, PigEntity entity) {
+	private void renderTwinLegs(float walkFrame, ModelHandler model, PigEntity entity) {
 		
-		model.push().translateX(-0.1875f).apply();
+		
+		model.push().translateX(-0.1875f).rotateX(walkFrame).apply();
 		this.leg.render();
 		model.pop();
 		
-		model.push().translateX(0.1875f).apply();
+		model.push().translateX(0.1875f).rotateX(-walkFrame).apply();
 		this.leg.render();
 		model.pop();
 		

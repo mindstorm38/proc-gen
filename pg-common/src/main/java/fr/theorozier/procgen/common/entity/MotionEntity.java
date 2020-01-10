@@ -13,6 +13,7 @@ public abstract class MotionEntity extends Entity {
 	protected boolean hasMass;
 	protected boolean onGround;
 	protected double stepHeight;
+	protected boolean moved;
 	
 	protected double velX;
 	protected double velY;
@@ -41,6 +42,7 @@ public abstract class MotionEntity extends Entity {
 		this.hasMass = false;
 		this.onGround = false;
 		this.stepHeight = 0.0;
+		this.moved = false;
 		
 		this.fallDistance = 0;
 		
@@ -74,8 +76,13 @@ public abstract class MotionEntity extends Entity {
 		double dy = this.posY - this.lastY;
 		double dz = this.posZ - this.lastZ;
 		
-		if (dx != 0 || dy != 0 || dz != 0)
+		this.moved = (dx != 0 || dy != 0 || dz != 0);
+		
+		if (this.moved) {
 			this.onMoved(dx, dy, dz);
+		} else {
+			this.onIdle();
+		}
 		
 	}
 	
@@ -186,8 +193,12 @@ public abstract class MotionEntity extends Entity {
 		
 	}
 	
+	protected void onIdle() {
+		// Not used here //
+	}
+	
 	public void onFallen(double distance) {
-		// Not used //
+		// Not used here //
 	}
 	
 	// POSITIONING //
@@ -284,6 +295,34 @@ public abstract class MotionEntity extends Entity {
 	
 	public boolean isOnGround() {
 		return this.onGround;
+	}
+	
+	/**
+	 * Get is this motion entity has moved last tick.
+	 * @return True if this entity has moved last tick.
+	 */
+	public boolean hasMoved() {
+		return moved;
+	}
+	
+	public double getVelX() {
+		return velX;
+	}
+	
+	public double getVelY() {
+		return velY;
+	}
+	
+	public double getVelZ() {
+		return velZ;
+	}
+	
+	// DEBUG //
+	
+	@Override
+	public void debugToConsole() {
+		super.debugToConsole();
+		System.out.println("- OnGround: " + this.onGround);
 	}
 	
 }

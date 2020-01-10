@@ -1,16 +1,17 @@
 package fr.theorozier.procgen.common.entity;
 
+import fr.theorozier.procgen.common.entity.animation.EntityFrame;
 import fr.theorozier.procgen.common.world.WorldBase;
-import io.sutil.math.MathHelper;
 
 public abstract class WalkingEntity extends LiveEntity {
 	
-	protected float walkFrame;
-	protected float lastWalkFrame;
+	protected final EntityFrame walkFrame;
 	
 	public WalkingEntity(WorldBase world, long uid) {
 		
 		super(world, uid);
+		
+		this.walkFrame = new EntityFrame();
 		
 	}
 	
@@ -26,13 +27,9 @@ public abstract class WalkingEntity extends LiveEntity {
 	@Override
 	protected void updateMotion() {
 		
-		this.setLastWalkFrame();
+		this.walkFrame.setLast();
 		super.updateMotion();
 		
-	}
-	
-	public void setLastWalkFrame() {
-		this.lastWalkFrame = this.walkFrame;
 	}
 	
 	// MOVED EVENT //
@@ -43,29 +40,21 @@ public abstract class WalkingEntity extends LiveEntity {
 		super.onMoved(dx, dy, dz);
 		
 		if (this.onGround) {
-		
-			double distSquared = dx * dy * dz;
-			
-			this.walkFrame += distSquared;
-			
-			if (this.walkFrame >= MathHelper.PI_TWICE)
-				this.walkFrame -= MathHelper.PI_TWICE;
-			
+			this.walkFrame.addValue((float) (dx * dx + dy * dy + dz * dz) * 30f);
 		} else {
-			this.walkFrame = 0;
+			this.walkFrame.backToZero(0.3f);
 		}
 		
 	}
 	
-	// LINEAR INTERPOLATION METHODS //
-	
-	public float getLerpedWalkFrame(float alpha) {
-		return MathHelper.interpolate(alpha, this.walkFrame, this.lastWalkFrame);
+	@Override
+	protected void onIdle() {
+		this.walkFrame.backToZero(0.3f);
 	}
 	
 	// PROPERTIES GET & SET //
 	
-	public float getWalkFrame() {
+	public EntityFrame getWalkFrame() {
 		return walkFrame;
 	}
 	

@@ -7,6 +7,7 @@ import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.LiveEntity;
+import fr.theorozier.procgen.common.entity.MotionEntity;
 import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
@@ -41,6 +42,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	public static final OptionKey KEY_EHEAD_YAW_DEC = new OptionKey("entity_head_yaw_dec", GLFW.GLFW_KEY_LEFT);
 	public static final OptionKey KEY_EHEAD_PITCH_INC = new OptionKey("entity_head_pitch_inc", GLFW.GLFW_KEY_UP);
 	public static final OptionKey KEY_EHEAD_PITCH_DEC = new OptionKey("entity_head_pitch_dec", GLFW.GLFW_KEY_DOWN);
+	
+	public static final OptionKey KEY_ENTITY_DEBUG = new OptionKey("entity_debug", GLFW.GLFW_KEY_P);
+	public static final OptionKey KEY_ENTITY_MOVE = new OptionKey("entity_move", GLFW.GLFW_KEY_K);
 	
 	private final WorldRenderer worldRenderer;
 	private final WorldClient testWorld;
@@ -204,7 +208,31 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					} else if (KEY_EHEAD_PITCH_DEC.isValid(key, scancode, mods)) {
 						lentity.setHeadRotation(lentity.getHeadYaw(), lentity.getHeadPitch() - 0.1f);
 					}
+					
+				}
 				
+				if (entity != null) {
+					
+					if (KEY_ENTITY_DEBUG.isValid(key, scancode, mods)) {
+						entity.debugToConsole();
+					}
+					
+				}
+				
+				if (entity instanceof MotionEntity) {
+					
+					MotionEntity mentity = (MotionEntity) entity;
+					
+					if (KEY_ENTITY_MOVE.isValid(key, scancode, mods)) {
+						
+						if (mentity.hasMoved()) {
+							mentity.setVelocity(0, 0, 0);
+						} else {
+							mentity.setVelocity(Math.random() * 0.2f - 0.1f, Math.random(), Math.random() * 0.2f - 0.1f);
+						}
+						
+					}
+					
 				}
 				
 			}

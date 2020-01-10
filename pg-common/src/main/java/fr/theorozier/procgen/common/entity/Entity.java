@@ -259,4 +259,11 @@ public abstract class Entity {
 		return Long.hashCode(this.uid);
 	}
 	
+	/**
+	 * Development helper
+	 */
+	public void debugToConsole() {
+		System.out.println("Debug entity n°" + this.uid + ", type: " + this.getClass().getSimpleName());
+	}
+	
 }
