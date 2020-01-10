@@ -42,6 +42,8 @@ generation.
 
 ## Contribute
 
+Do not hesitate to contribute through issues, either to report real **issues**, or to make **suggestions** for the game !
+
 This game is currently in development, it is not playable but it is
 already possible to move through the world.
 
