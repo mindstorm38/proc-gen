@@ -66,6 +66,15 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.options.addOption(KEY_CROUCH);
 		
 		this.options.addOption(KEY_GENERATE_CHUNKS);
+		this.options.addOption(KEY_SPAWN_FALLING_BLOCK);
+		
+		this.options.addOption(KEY_EHEAD_YAW_INC);
+		this.options.addOption(KEY_EHEAD_YAW_DEC);
+		this.options.addOption(KEY_EHEAD_PITCH_INC);
+		this.options.addOption(KEY_EHEAD_PITCH_DEC);
+		
+		this.options.addOption(KEY_ENTITY_DEBUG);
+		this.options.addOption(KEY_ENTITY_MOVE);
 		
 	}
 	
