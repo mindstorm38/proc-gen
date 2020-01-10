@@ -14,7 +14,7 @@ buildscript {
 
 allprojects {
 
-    version = "0.1.0"
+    version = "0.1.1"
 
 }
 
@@ -24,7 +24,7 @@ subprojects {
     apply(plugin = "com.github.johnrengelman.shadow")
 
     ext {
-        set("msengineVersion", "1.0.7-SNAPSHOT")
+        set("msengineVersion", "1.0.7")
         set("sutilVersion", "1.1.0")
     }
 
@@ -42,9 +42,6 @@ subprojects {
             metadataSources {
                 mavenPom()
                 ignoreGradleMetadataRedirection()
-            }
-            mavenContent {
-                snapshotsOnly()
             }
         }
 
