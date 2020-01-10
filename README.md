@@ -1,5 +1,8 @@
 # ProcGen
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/mindstorm38/proc-gen)
+![GitHub Releases](https://img.shields.io/github/downloads/mindstorm38/proc-gen/latest/total)
+
 This project is a Minecraft clone, I originally created this project
 in order to understand procedural generation and I thought creating
 a MC clone was the best easy way to visualize this type of
