@@ -23,6 +23,8 @@ public abstract class LiveEntity extends MotionEntity {
 		
 	}
 	
+	// BASIC UPDATES //
+	
 	@Override
 	public void update() {
 		
@@ -31,6 +33,16 @@ public abstract class LiveEntity extends MotionEntity {
 		this.updateHealth();
 		
 	}
+	
+	@Override
+	protected void updateMotion() {
+		
+		this.setLastHeadRotation();
+		super.updateMotion();
+		
+	}
+	
+	// HEALTH MANAGEMENT //
 	
 	public void updateHealth() {
 		
@@ -43,8 +55,10 @@ public abstract class LiveEntity extends MotionEntity {
 		this.health -= MathHelper.floorFloatInt(damage);
 	}
 	
+	// FALLEN MOTION EVENTS //
+	
 	@Override
-	public void fallen(double distance) {
+	public void onFallen(double distance) {
 		
 		float damage = (float) (distance - this.fallResistance);
 		
@@ -53,6 +67,8 @@ public abstract class LiveEntity extends MotionEntity {
 		}
 		
 	}
+	
+	// HEAD ROTATION //
 	
 	/**
 	 * Set the head rotation.
@@ -66,23 +82,14 @@ public abstract class LiveEntity extends MotionEntity {
 		
 	}
 	
-	@Override
-	protected void setLastPos() {
-		
-		super.setLastPos();
+	public void setLastHeadRotation() {
 		
 		this.lastHeadYaw = this.headYaw;
 		this.lastHeadPitch = this.headPitch;
 		
 	}
 	
-	public float getHeadYaw() {
-		return headYaw;
-	}
-	
-	public float getHeadPitch() {
-		return headPitch;
-	}
+	// LINEAR INTERPOLATION METHODS //
 	
 	public float getLerpedHeadYaw(float alpha) {
 		return MathHelper.interpolate(alpha, this.headYaw, this.lastHeadYaw);
@@ -90,6 +97,16 @@ public abstract class LiveEntity extends MotionEntity {
 	
 	public float getLerpedHeadPitch(float alpha) {
 		return MathHelper.interpolate(alpha, this.headPitch, this.lastHeadPitch);
+	}
+	
+	// PROPERTIES GET & SET //
+	
+	public float getHeadYaw() {
+		return headYaw;
+	}
+	
+	public float getHeadPitch() {
+		return headPitch;
 	}
 	
 	public int getHealth() {

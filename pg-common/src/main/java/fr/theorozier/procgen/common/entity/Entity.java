@@ -63,6 +63,8 @@ public abstract class Entity {
 		
 	}
 	
+	// MAIN PROPERTIES GETTERS //
+	
 	public WorldBase getWorld() {
 		return this.world;
 	}
@@ -79,11 +81,34 @@ public abstract class Entity {
 		return this.uid;
 	}
 	
+	// BASIC UPDATES //
+	
+	/**
+	 * Common update method called by worlds on each ticks, only use short
+	 * methods calls in this because update can be entirely overrided with
+	 * no super call.
+	 */
+	public void update() {
+		
+		this.updateLifetime();
+		this.updateController();
+		
+	}
+	
+	/**
+	 * Internal method to increment entity lifetime.
+	 */
+	protected void updateLifetime() {
+		++this.lifetime;
+	}
+	
+	// POSITIONING //
+	
 	/**
 	 * Teleport this entity to a position.
-	 * @param x The raw X coordinate.
-	 * @param y The raw Y coordinate.
-	 * @param z The raw Z coordinate.
+	 * @param x The X coordinate.
+	 * @param y The Y coordinate.
+	 * @param z The Z coordinate.
 	 */
 	public void setPositionInstant(double x, double y, double z) {
 		
@@ -98,14 +123,21 @@ public abstract class Entity {
 	/**
 	 * REMEMBER TO OVERRIDE this method (keep calling super) to initiate the
 	 * bounding box coordinates and size.
-	 * @param x The raw X coordinate.
-	 * @param y The raw Y coordinate.
-	 * @param z The raw Z coordinate.
+	 * @param x The X coordinate.
+	 * @param y The Y coordinate.
+	 * @param z The Z coordinate.
 	 */
-	public void setupBoundingBoxPosition(double x, double y, double z) {
+	protected void setupBoundingBoxPosition(double x, double y, double z) {
 		this.boundingBox.setPositionUnsafe(x, y, z, x, y, z);
 	}
 	
+	/**
+	 * Set position of this entity, but not teleported because last position is not set in motion entity.
+	 * Use this to move the entity near to itself.
+	 * @param x The X coordinate.
+	 * @param y The Y coordinate.
+	 * @param z The Z coordinate.
+	 */
 	public void setPosition(double x, double y, double z) {
 		
 		this.boundingBox.move(x - this.posX, y - this.posY, z - this.posZ);
@@ -133,12 +165,49 @@ public abstract class Entity {
 		return this.debugBoundingBox;
 	}
 	
+	// BODY ROTATION //
+	
+	/**
+	 * Set the entity body rotation but not the last rotation for motion entities.
+	 * @param yaw The yaw rotation.
+	 * @param pitch The pitch rotation.
+	 */
 	public void setRotation(float yaw, float pitch) {
 		
 		this.yaw = yaw;
 		this.pitch = pitch;
 		
 	}
+	
+	/**
+	 * Set the entity body rotation but instantly, use this for teleportation with specific rotations.
+	 * @param yaw The yaw rotation.
+	 * @param pitch The pitch rotation.
+	 */
+	public void setRotationInstant(float yaw, float pitch) {
+		this.setRotation(yaw, pitch);
+	}
+	
+	// ENTITY CONTROLLER //
+	
+	/**
+	 * Set the entity controller.
+	 * @param controller Entity controller.
+	 */
+	public void setController(EntityController controller) {
+		this.controller = controller;
+	}
+	
+	/**
+	 * Internal method to update entity controller.
+	 */
+	protected void updateController() {
+		if (this.controller != null) {
+			this.controller.control(this);
+		}
+	}
+	
+	// PROPERTIES GET & SET //
 	
 	public double getPosX() {
 		return posX;
@@ -161,42 +230,6 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * Set the entity controller.
-	 * @param controller Entity controller.
-	 */
-	public void setController(EntityController controller) {
-		this.controller = controller;
-	}
-	
-	/**
-	 * Common update method called by worlds on each ticks, only use short
-	 * methods calls in this because update can be entirely overrided with
-	 * no super call.
-	 */
-	public void update() {
-		
-		this.updateLifetime();
-		this.updateController();
-		
-	}
-	
-	/**
-	 * Internal method to increment entity lifetime.
-	 */
-	protected void updateLifetime() {
-		++this.lifetime;
-	}
-	
-	/**
-	 * Internal method to update entity controller.
-	 */
-	protected void updateController() {
-		if (this.controller != null) {
-			this.controller.control(this);
-		}
-	}
-	
-	/**
 	 * Immutable method to know if an entity is dead.
 	 * @return True if the entity is dead.
 	 */
@@ -210,6 +243,8 @@ public abstract class Entity {
 	public void setDead() {
 		this.dead = true;
 	}
+	
+	// DEFAULT IMPLEMENTATIONS //
 	
 	@Override
 	public boolean equals(Object o) {

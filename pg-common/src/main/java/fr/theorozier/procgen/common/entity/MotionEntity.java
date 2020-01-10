@@ -48,6 +48,8 @@ public abstract class MotionEntity extends Entity {
 		
 	}
 	
+	// BASIC UPDATES //
+	
 	@Override
 	public void update() {
 		
@@ -56,34 +58,25 @@ public abstract class MotionEntity extends Entity {
 		
 	}
 	
+	// MOTION UPDATE //
+	
 	/**
 	 * Internal method to update entity's motion.
 	 */
 	protected void updateMotion() {
 		
 		this.setLastPos();
+		this.setLastRotation();
 		this.updateNaturalVelocity();
 		this.move(this.velX, this.velY, this.velZ);
 		
+		double dx = this.posX - this.lastX;
 		double dy = this.posY - this.lastY;
+		double dz = this.posZ - this.lastZ;
 		
-		if (dy >= 0 || this.onGround) {
-			
-			if (this.onGround)
-				this.fallen(this.fallDistance);
-			
-			this.fallDistance = 0;
-			
-		} else {
-			this.fallDistance -= dy;
-		}
+		if (dx != 0 || dy != 0 || dz != 0)
+			this.onMoved(dx, dy, dz);
 		
-	}
-	
-	@Override
-	public void setPositionInstant(double x, double y, double z) {
-		super.setPositionInstant(x, y, z);
-		this.setLastPos();
 	}
 	
 	@Override
@@ -176,8 +169,72 @@ public abstract class MotionEntity extends Entity {
 		
 	}
 	
-	public void fallen(double distance) { }
+	// MOTION EVENTS //
 	
+	protected void onMoved(double dx, double dy, double dz) {
+		
+		if (dy >= 0 || this.onGround) {
+			
+			if (this.onGround)
+				this.onFallen(this.fallDistance);
+			
+			this.fallDistance = 0;
+			
+		} else {
+			this.fallDistance -= dy;
+		}
+		
+	}
+	
+	public void onFallen(double distance) {
+		// Not used //
+	}
+	
+	// POSITIONING //
+	
+	@Override
+	public void setPositionInstant(double x, double y, double z) {
+		super.setPositionInstant(x, y, z);
+		this.setLastPos();
+	}
+	
+	/**
+	 * Set last x, y, z coordinates to current ones.
+	 */
+	public void setLastPos() {
+		
+		this.lastX = this.posX;
+		this.lastY = this.posY;
+		this.lastZ = this.posZ;
+		
+	}
+	
+	// BODY ROTATION //
+	
+	@Override
+	public void setRotationInstant(float yaw, float pitch) {
+		super.setRotationInstant(yaw, pitch);
+		this.setLastRotation();
+	}
+	
+	/**
+	 * Set last yaw and last pitch rotations values to current values.
+	 */
+	public void setLastRotation() {
+		
+		this.lastYaw = this.yaw;
+		this.lastPitch = this.pitch;
+		
+	}
+	
+	// VELOCITY //
+	
+	/**
+	 * Define instant velocity of this entity.
+	 * @param x X component of velocity.
+	 * @param y Y component of velocity.
+	 * @param z Z component of velocity.
+	 */
 	public void setVelocity(double x, double y, double z) {
 		
 		this.velX = x;
@@ -193,15 +250,7 @@ public abstract class MotionEntity extends Entity {
 		this.velY -= GRAVITY_FACTOR;
 	}
 	
-	protected void setLastPos() {
-		
-		this.lastX = this.posX;
-		this.lastY = this.posY;
-		this.lastZ = this.posZ;
-		this.lastYaw = this.yaw;
-		this.lastPitch = this.pitch;
-		
-	}
+	// LINEAR INTERPOLATION METHODS //
 	
 	public double getLerpedX(float alpha) {
 		return MathHelper.interpolate(alpha, this.posX, this.lastX);
@@ -222,6 +271,8 @@ public abstract class MotionEntity extends Entity {
 	public float getLerpedPitch(float alpha) {
 		return MathHelper.interpolate(alpha, this.pitch, this.lastPitch);
 	}
+	
+	// PROPERTIES GET & SET //
 	
 	public boolean isNoClip() {
 		return this.noClip;
