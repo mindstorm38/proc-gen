@@ -24,7 +24,7 @@ generation.
 - [x] Motion entities
 - [x] Pigs
   - [x] Model
-  - [ ] Animations
+  - [x] Animations ***(New)***
   - [ ] AI
 - [ ] Asynchronous (multi-threaded) chunk generation
 - [ ] Asynchronous world chunk saving on file system

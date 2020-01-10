@@ -32,7 +32,7 @@ public abstract class WalkingEntity extends LiveEntity {
 		
 	}
 	
-	// MOVED EVENT //
+	// MOVED EVENTS //
 	
 	@Override
 	protected void onMoved(double dx, double dy, double dz) {
