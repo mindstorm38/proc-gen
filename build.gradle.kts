@@ -24,7 +24,7 @@ subprojects {
     apply(plugin = "com.github.johnrengelman.shadow")
 
     ext {
-        set("msengineVersion", "1.0.7")
+        set("msengineVersion", "1.0.8-SNAPSHOT")
         set("sutilVersion", "1.1.0")
     }
 
@@ -57,6 +57,10 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
+    }
+
     tasks.named<JavaCompile>("compileJava") {
         options.encoding = "UTF-8"
     }
@@ -67,9 +71,11 @@ subprojects {
         exclude("*.so.git", "*.so.sha1")
     }
 
+    /*
     tasks.register("showConf") {
         configurations.named("runtimeClasspath").get().forEach { println(it) }
     }
+    */
 
 }
 

@@ -204,8 +204,6 @@ public class WorldRenderer implements ModelApplyListener,
 			
 		}
 		
-		glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
-		
 		Matrix4f view = this.camera.getViewMatrix();
 		view.identity();
 		view.rotateX(-this.camera.getLerpedPitch(alpha));
