@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.gui;
+package fr.theorozier.procgen.client.gui.scene;
 
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
