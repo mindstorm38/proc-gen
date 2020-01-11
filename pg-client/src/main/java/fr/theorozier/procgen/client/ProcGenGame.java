@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.client;
 
+import fr.theorozier.procgen.client.gui.TitleScreen;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
@@ -103,7 +104,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.worldRenderer.getCamera().instantTarget();
 		
 		this.guiManager.registerSceneClass("debug", DebugScene.class);
-		this.guiManager.loadScene("debug");
+		this.guiManager.registerSceneClass("title", TitleScreen.class);
+		this.guiManager.loadScene("title");
 		
 		glClearColor(0, 0, 0, 1);
 		
@@ -130,7 +132,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		this.profiler.startSection("world_rendering");
-		this.worldRenderer.render(alpha);
+		//this.worldRenderer.render(alpha);
 		
 		this.profiler.endStartSection("gui");
 		this.guiManager.render(alpha);
