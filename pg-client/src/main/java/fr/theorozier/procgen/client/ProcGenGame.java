@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.client;
 
-import fr.theorozier.procgen.client.gui.scene.TitleScreen;
+import fr.theorozier.procgen.client.gui.screen.TitleScreen;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
-import fr.theorozier.procgen.client.gui.scene.DebugScene;
+import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.LiveEntity;

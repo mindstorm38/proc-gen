@@ -1,11 +1,10 @@
-package fr.theorozier.procgen.client.gui.scene;
+package fr.theorozier.procgen.client.gui;
 
 import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import io.msengine.client.gui.GuiScene;

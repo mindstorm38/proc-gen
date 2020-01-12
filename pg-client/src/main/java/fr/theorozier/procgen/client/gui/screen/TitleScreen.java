@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.gui.scene;
+package fr.theorozier.procgen.client.gui.screen;
 
 import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
