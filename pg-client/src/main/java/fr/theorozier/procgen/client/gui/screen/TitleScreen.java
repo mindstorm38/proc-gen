@@ -1,14 +1,14 @@
 package fr.theorozier.procgen.client.gui.screen;
 
 import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import io.msengine.client.gui.*;
-import io.msengine.client.gui.event.GuiSceneResizedEvent;
 import io.msengine.client.renderer.texture.SimpleTexture;
 import io.msengine.client.renderer.texture.TextureManager;
 
-public class TitleScreen extends GuiScene {
+public class TitleScreen extends Screen {
 	
 	private static final String[] DISCLAIMERS = { "Minecraft is a registered trademark of Mojang AB", "Unofficial Minecraft clone" };
 	
@@ -26,9 +26,13 @@ public class TitleScreen extends GuiScene {
 	
 	public TitleScreen() {
 		
+		super(false);
+		
 		// Background
 		this.backgroundImage = new GuiTexture();
 		this.backgroundImage.setAnchor(0, 0);
+		this.backgroundImage.setColorEnabled(true);
+		this.backgroundImage.setColor(150, 150, 150);
 		this.addChild(this.backgroundImage);
 		
 		// Version
@@ -80,9 +84,6 @@ public class TitleScreen extends GuiScene {
 		this.quitButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.buttonsBlock.addChild(this.quitButton);
 		
-		// Other events
-		this.addEventListener(GuiSceneResizedEvent.class, this::onSceneResized);
-		
 	}
 	
 	@Override
@@ -95,31 +96,31 @@ public class TitleScreen extends GuiScene {
 		
 	}
 	
-	private void onSceneResized(GuiSceneResizedEvent event) {
+	@Override
+	protected void onSceneResized(float width, float height) {
 		
-		float screenWidth = (float) event.getWidth();
-		float screenHeight = (float) event.getHeight();
+		super.onSceneResized(width, height);
 		
 		// Background Image //
-		this.backgroundImage.setPosition(screenWidth * 0.5f, screenHeight * 0.5f);
+		this.backgroundImage.setPosition(width * 0.5f, height * 0.5f);
 		
-		float sceneRatio = screenWidth / screenHeight;
+		float sceneRatio = width / height;
 		float backgroundRatio = this.backgroundTexture.getWidth() / (float) this.backgroundTexture.getHeight();
 		
 		if (sceneRatio > backgroundRatio) {
-			this.backgroundImage.setSize(screenWidth, screenWidth / backgroundRatio);
+			this.backgroundImage.setSize(width, width / backgroundRatio);
 		} else {
-			this.backgroundImage.setSize(screenHeight * backgroundRatio, screenHeight);
+			this.backgroundImage.setSize(height * backgroundRatio, height);
 		}
 		
 		// Version Text //
-		this.versionText.setYPos(screenHeight - 8);
+		this.versionText.setYPos(height - 8);
 		
 		// Disclaimer Texts //
-		this.disclaimerBlock.setPosition(screenWidth - 12, screenHeight - 8);
+		this.disclaimerBlock.setPosition(width - 12, height - 8);
 		
 		// Buttons //
-		this.buttonsBlock.setPosition(screenWidth / 2f, screenHeight / 2f);
+		this.buttonsBlock.setPosition(width / 2f, height / 2f);
 		
 	}
 	
@@ -130,7 +131,7 @@ public class TitleScreen extends GuiScene {
 		} else if (event.getOrigin() == this.multiplayerButton) {
 			System.out.println("multiplayer button clicked");
 		} else if (event.getOrigin() == this.optionsButton) {
-			System.out.println("options button clicked");
+			this.manager.loadScene(OptionsScreen.class);
 		} else if (event.getOrigin() == this.quitButton) {
 			ProcGenGame.getCurrent().stopRunning();
 		}

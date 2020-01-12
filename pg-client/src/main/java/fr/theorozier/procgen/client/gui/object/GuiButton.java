@@ -152,13 +152,22 @@ public class GuiButton extends GuiParent implements
 	@Override
 	public void windowMousePositionEvent(int x, int y) {
 		
-		float xOff = this.xOffset;
-		float yOff = this.yOffset;
-		boolean newOver = x >= xOff && y >= yOff && x < (xOff + this.width) && y < (yOff + this.height);
-		
-		if (newOver != this.over) {
+		if (this.renderable()) {
 			
-			this.over = newOver;
+			float xOff = this.xOffset;
+			float yOff = this.yOffset;
+			boolean newOver = x >= xOff && y >= yOff && x < (xOff + this.width) && y < (yOff + this.height);
+			
+			if (newOver != this.over) {
+				
+				this.over = newOver;
+				this.updateStates();
+				
+			}
+			
+		} else if (this.over) {
+			
+			this.over = false;
 			this.updateStates();
 			
 		}
@@ -168,8 +177,12 @@ public class GuiButton extends GuiParent implements
 	@Override
 	public void windowMouseButtonEvent(int button, int action, int mods) {
 		
-		if (!this.disabled && this.over && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
-			this.fireEvent(new GuiButtonActionEvent());
+		if (this.renderable()) {
+			
+			if (!this.disabled && this.over && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
+				this.fireEvent(new GuiButtonActionEvent());
+			}
+			
 		}
 		
 	}

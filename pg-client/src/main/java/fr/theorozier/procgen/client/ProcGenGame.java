@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.client;
 
+import fr.theorozier.procgen.client.gui.screen.OptionsScreen;
 import fr.theorozier.procgen.client.gui.screen.TitleScreen;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
@@ -105,6 +106,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		this.guiManager.registerSceneClass("debug", DebugScene.class);
 		this.guiManager.registerSceneClass("title", TitleScreen.class);
+		this.guiManager.registerSceneClass("options", OptionsScreen.class);
 		this.guiManager.loadScene("title");
 		
 		glClearColor(0, 0, 0, 1);
