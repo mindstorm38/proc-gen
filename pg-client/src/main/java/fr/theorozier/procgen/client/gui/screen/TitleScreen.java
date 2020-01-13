@@ -60,25 +60,25 @@ public class TitleScreen extends Screen {
 		this.buttonsBlock = new GuiParent();
 		this.addChild(this.buttonsBlock);
 		
-		this.singleplayerButton = new GuiButton(360, 40, "Singleplayer");
+		this.singleplayerButton = new GuiButton(400, 40, "Singleplayer");
 		this.singleplayerButton.setAnchor(0, 0);
 		this.singleplayerButton.setPosition(0, -50);
 		this.singleplayerButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.buttonsBlock.addChild(this.singleplayerButton);
 		
-		this.multiplayerButton = new GuiButton(360, 40, "Multiplayer");
+		this.multiplayerButton = new GuiButton(400, 40, "Multiplayer");
 		this.multiplayerButton.setAnchor(0, 0);
 		this.multiplayerButton.setPosition(0, 0);
 		this.multiplayerButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.buttonsBlock.addChild(this.multiplayerButton);
 		
-		this.optionsButton = new GuiButton(175, 40, "Options");
+		this.optionsButton = new GuiButton(195, 40, "Options");
 		this.optionsButton.setAnchor(1, 0);
 		this.optionsButton.setPosition(-5, 50);
 		this.optionsButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.buttonsBlock.addChild(this.optionsButton);
 		
-		this.quitButton = new GuiButton(175, 40, "Quit game");
+		this.quitButton = new GuiButton(195, 40, "Quit game");
 		this.quitButton.setAnchor(-1, 0);
 		this.quitButton.setPosition(5, 50);
 		this.quitButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
@@ -127,9 +127,9 @@ public class TitleScreen extends Screen {
 	private void onButtonClicked(GuiButtonActionEvent event) {
 		
 		if (event.getOrigin() == this.singleplayerButton) {
-			System.out.println("singleplayer button clicked");
+			this.manager.loadScene(SingleplayerScreen.class);
 		} else if (event.getOrigin() == this.multiplayerButton) {
-			System.out.println("multiplayer button clicked");
+			this.manager.loadScene(MultiplayerScreen.class);
 		} else if (event.getOrigin() == this.optionsButton) {
 			this.manager.loadScene(OptionsScreen.class);
 		} else if (event.getOrigin() == this.quitButton) {
