@@ -21,6 +21,20 @@ void main() {
 	if (frag_color.a < 0.5)
 		discard;
 
+	/*
+	float depth = texture( texture_sampler, out_tex_coord.xy).r;
+	float depth2 = texture( texture_sampler, out_tex_coord.xy + vec2(0,0.002)).r;
+	float depth3 = texture( texture_sampler, out_tex_coord.xy + vec2(0.002,0)).r;
+
+	float fac = abs(depth-depth2) + abs(depth-depth3);
+
+	float intensity = 9050;
+
+	vec4 sub = vec4(vec3(fac) * intensity,0);
+
+	frag_color += sub;
+	*/
+
 	// Compute fog
 	/*
 	if (fog_enabled == 1) {

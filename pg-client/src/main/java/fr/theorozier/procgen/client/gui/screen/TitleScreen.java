@@ -5,6 +5,8 @@ import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import io.msengine.client.gui.*;
+import io.msengine.client.renderer.gui.GUIMaskRectangle;
+import io.msengine.client.renderer.gui.GuiMask;
 import io.msengine.client.renderer.texture.SimpleTexture;
 import io.msengine.client.renderer.texture.TextureManager;
 
