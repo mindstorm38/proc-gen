@@ -29,7 +29,7 @@ public class DebugScene extends GuiScene {
 			
 			this.posTexts[i] = new GuiTextBase();
 			this.posTexts[i].setAnchor(-1f, -1f);
-			this.posTexts[i].setPosition(10f, 10f + (i * 12f));
+			this.posTexts[i].setPosition(20f, 20f + (i * 24f));
 			this.addChild(this.posTexts[i]);
 			
 		}

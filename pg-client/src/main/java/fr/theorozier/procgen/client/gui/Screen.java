@@ -1,16 +1,15 @@
 package fr.theorozier.procgen.client.gui;
 
+import fr.theorozier.procgen.client.gui.object.GuiWidget;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
 import io.msengine.client.gui.GuiTextureMosaic;
 import io.msengine.client.gui.event.GuiSceneResizedEvent;
 import io.msengine.client.renderer.texture.SimpleTexture;
-import io.msengine.client.renderer.texture.TextureManager;
-import io.msengine.client.renderer.texture.TextureWrapMode;
 
 public abstract class Screen extends GuiScene {
 	
-	private static final SimpleTexture TILED_BACKGROUND_TEXTURE = new SimpleTexture("textures/gui/tiled_background.png");
+	protected static final SimpleTexture TILED_BACKGROUND_TEXTURE = new SimpleTexture("textures/gui/tiled_background.png");
 	
 	private final GuiTextureMosaic backgroundMosaic;
 	private final GuiTextColorable titleText;
@@ -68,14 +67,8 @@ public abstract class Screen extends GuiScene {
 		
 		if (this.backgroundMosaic != null) {
 			
-			if (!TextureManager.getInstance().isTextureLoaded(TILED_BACKGROUND_TEXTURE)) {
-				
-				TextureManager.getInstance().loadTexture(TILED_BACKGROUND_TEXTURE);
-				TILED_BACKGROUND_TEXTURE.getTextureObject().setWrap(TextureWrapMode.REPEAT, TextureWrapMode.REPEAT);
-				
-			}
-			
-			this.backgroundMosaic.setTexture(TILED_BACKGROUND_TEXTURE);
+			SimpleTexture texture = GuiWidget.loadTiledBackgroundTexture();
+			this.backgroundMosaic.setTexture(texture);
 			
 		}
 		

@@ -23,7 +23,7 @@ public class GuiButton extends GuiParent implements
 	private final GuiTextColorable textObject;
 	
 	private boolean disabled;
-	private boolean over;
+	private boolean mouseOver;
 	
 	public GuiButton(float width, float height, String text) {
 		
@@ -42,7 +42,7 @@ public class GuiButton extends GuiParent implements
 		this.setWidth(width);
 		
 		this.disabled = false;
-		this.over = false;
+		this.mouseOver = false;
 		
 		this.updateStates();
 		
@@ -127,8 +127,8 @@ public class GuiButton extends GuiParent implements
 		
 	}
 	
-	public boolean isOver() {
-		return this.over;
+	public boolean isMouseOver() {
+		return this.mouseOver;
 	}
 	
 	private void updateStates() {
@@ -138,7 +138,7 @@ public class GuiButton extends GuiParent implements
 			this.textureObject.setState(STATE_DISABLED);
 			this.textObject.setTextColor(115, 115, 115);
 			
-		} else if (this.over) {
+		} else if (this.mouseOver) {
 			
 			this.textureObject.setState(STATE_OVER);
 			this.textObject.setTextColor(243, 245, 211);
@@ -157,20 +157,18 @@ public class GuiButton extends GuiParent implements
 		
 		if (this.renderable()) {
 			
-			float xOff = this.xOffset;
-			float yOff = this.yOffset;
-			boolean newOver = x >= xOff && y >= yOff && x < (xOff + this.width) && y < (yOff + this.height);
+			boolean newOver = this.isPointOver(x, y);
 			
-			if (newOver != this.over) {
+			if (newOver != this.mouseOver) {
 				
-				this.over = newOver;
+				this.mouseOver = newOver;
 				this.updateStates();
 				
 			}
 			
-		} else if (this.over) {
+		} else if (this.mouseOver) {
 			
-			this.over = false;
+			this.mouseOver = false;
 			this.updateStates();
 			
 		}
@@ -182,7 +180,7 @@ public class GuiButton extends GuiParent implements
 		
 		if (this.renderable()) {
 			
-			if (!this.disabled && this.over && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
+			if (!this.disabled && this.mouseOver && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
 				this.fireEvent(new GuiButtonActionEvent());
 			}
 			

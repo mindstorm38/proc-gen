@@ -39,7 +39,7 @@ public class OptionsScreen extends Screen {
 		this.controlsButton.setPosition(0, 0);
 		this.buttonsBlock.addChild(this.controlsButton);
 		
-		// Back to title screen button
+		// Done button
 		this.doneButton = new GuiButton(300, 40, "Done");
 		this.doneButton.setAnchor(0, 0);
 		this.doneButton.setPosition(0, 50);
@@ -59,7 +59,7 @@ public class OptionsScreen extends Screen {
 	
 	private void onButtonClicked(GuiButtonActionEvent event) {
 		
-		if (event.getOrigin() == this.doneButton) {
+		if (event.isOrigin(this.doneButton)) {
 			
 			if (this.previousScene != null) {
 				this.manager.loadScene(this.previousScene);
