@@ -21,7 +21,7 @@ public class GuiScrollableContainer extends io.msengine.client.gui.GuiScrollable
 		this.backgroundMosaic.setPosition(0, 0);
 		this.backgroundMosaic.setTileSize(64, 64);
 		this.backgroundMosaic.setColorEnabled(true);
-		this.backgroundMosaic.setColor(50, 50, 50);
+		this.backgroundMosaic.setColor(40, 40, 40);
 		this.addChild(this.backgroundMosaic, this.getInternal());
 		
 		this.topShade = new GuiColorCustom(cidx -> cidx == 0 || cidx == 1 ? SHADE_COLOR : SHADE_TRANSPARENT);
@@ -31,7 +31,6 @@ public class GuiScrollableContainer extends io.msengine.client.gui.GuiScrollable
 		this.addChild(this.topShade);
 		
 		this.bottomShade = new GuiColorCustom(cidx -> cidx == 2 || cidx == 3 ? SHADE_COLOR : SHADE_TRANSPARENT);
-		this.bottomShade.updateColors();
 		this.bottomShade.setAnchor(-1, 1);
 		this.bottomShade.setXPos(0);
 		this.bottomShade.setHeight(20);

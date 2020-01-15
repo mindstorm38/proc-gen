@@ -1,9 +1,6 @@
 package fr.theorozier.procgen.client;
 
-import fr.theorozier.procgen.client.gui.screen.MultiplayerScreen;
-import fr.theorozier.procgen.client.gui.screen.OptionsScreen;
-import fr.theorozier.procgen.client.gui.screen.SingleplayerScreen;
-import fr.theorozier.procgen.client.gui.screen.TitleScreen;
+import fr.theorozier.procgen.client.gui.screen.*;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
@@ -110,6 +107,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.registerSceneClass("title", TitleScreen.class);
 		this.guiManager.registerSceneClass("options", OptionsScreen.class);
 		this.guiManager.registerSceneClass("sp_main", SingleplayerScreen.class);
+		this.guiManager.registerSceneClass("sp_create_world", CreateWorldScreen.class);
 		this.guiManager.registerSceneClass("mp_main", MultiplayerScreen.class);
 		this.guiManager.loadScene("title");
 		

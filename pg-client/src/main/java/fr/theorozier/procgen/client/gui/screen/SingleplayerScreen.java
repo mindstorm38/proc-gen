@@ -12,6 +12,7 @@ public class SingleplayerScreen extends Screen {
 	
 	private final GuiParent buttonsBlock;
 	private final GuiButton doneButton;
+	private final GuiButton createWorldButton;
 	
 	public SingleplayerScreen() {
 		
@@ -29,10 +30,16 @@ public class SingleplayerScreen extends Screen {
 		
 		// Done button
 		this.doneButton = new GuiButton(200, 40, "Done");
-		this.doneButton.setAnchor(0, 0);
-		this.doneButton.setPosition(0, 0);
+		this.doneButton.setAnchor(-1, 0);
+		this.doneButton.setPosition(5, 0);
 		this.doneButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.buttonsBlock.addChild(this.doneButton);
+		
+		this.createWorldButton = new GuiButton(200, 40, "Create world ...");
+		this.createWorldButton.setAnchor(1, 0);
+		this.createWorldButton.setPosition(-5, 0);
+		this.createWorldButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
+		this.buttonsBlock.addChild(this.createWorldButton);
 		
 	}
 	
@@ -41,9 +48,11 @@ public class SingleplayerScreen extends Screen {
 		if (event.isOrigin(this.doneButton)) {
 			
 			if (this.previousScene != null) {
-				this.manager.loadScene(this.previousScene);
+				this.manager.loadScene(TitleScreen.class);
 			}
 			
+		} else if (event.isOrigin(this.createWorldButton)) {
+			this.manager.loadScene(CreateWorldScreen.class);
 		}
 		
 	}
