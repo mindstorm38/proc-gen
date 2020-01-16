@@ -133,7 +133,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	@Override
 	protected void render(float alpha) {
 		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
 		
 		this.profiler.startSection("world_rendering");

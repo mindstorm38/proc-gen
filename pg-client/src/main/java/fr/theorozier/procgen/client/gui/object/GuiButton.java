@@ -36,6 +36,7 @@ public class GuiButton extends GuiParent implements
 		
 		this.textObject = new GuiTextColorable(text);
 		this.textObject.setAnchor(0, 0);
+		this.textObject.setIgnoreUnderline(true);
 		this.addChild(this.textObject);
 		
 		this.setHeight(height);
@@ -91,8 +92,8 @@ public class GuiButton extends GuiParent implements
 		float textScale = height / this.textureObject.getDefaultHeight();
 		
 		this.textureObject.setHeight(height);
-		this.textObject.setYPos((height / 2f) + 1);
-		this.textObject.setTextScale(textScale);
+		this.textObject.setYPos((height / 2f) - textScale);
+		this.textObject.setHeight(textScale * 8);
 		this.textObject.setShadowOffsetX(textScale);
 		this.textObject.setShadowOffsetY(textScale);
 		

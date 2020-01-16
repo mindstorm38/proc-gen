@@ -2,17 +2,17 @@ package fr.theorozier.procgen.client.gui.screen;
 
 import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
+import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import io.msengine.client.gui.GuiParent;
-import io.msengine.client.gui.GuiTextInput;
 
 public class CreateWorldScreen extends Screen {
 
 	private final GuiParent mainBlock;
+	private final GuiTextInput worldNameInput;
+	private final GuiTextInput worldSeedInput;
 	private final GuiButton createButton;
 	private final GuiButton cancelButton;
-	
-	private final GuiTextInput testInput;
 	
 	public CreateWorldScreen() {
 		
@@ -22,8 +22,21 @@ public class CreateWorldScreen extends Screen {
 		this.mainBlock = new GuiParent();
 		this.addChild(this.mainBlock);
 		
+		// World name input
+		this.worldNameInput = new GuiTextInput("Enter the world name");
+		this.worldNameInput.setPosition(0, -100);
+		this.worldNameInput.setSize(400, 40);
+		this.mainBlock.addChild(this.worldNameInput);
+		
+		// World seed input
+		this.worldSeedInput = new GuiTextInput("World seed (optional)");
+		this.worldSeedInput.setPosition(0, -50);
+		this.worldSeedInput.setSize(400, 40);
+		this.mainBlock.addChild(this.worldSeedInput);
+		
 		// Create world button
 		this.createButton = new GuiButton(400, 40, "Create world ...");
+		this.createButton.setPosition(0, 0);
 		this.mainBlock.addChild(this.createButton);
 		
 		// Cancel button
@@ -31,11 +44,6 @@ public class CreateWorldScreen extends Screen {
 		this.cancelButton.setPosition(0, 100);
 		this.cancelButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.mainBlock.addChild(this.cancelButton);
-		
-		this.testInput = new GuiTextInput();
-		this.testInput.setPosition(0, 200);
-		this.testInput.setSize(200, 40);
-		this.mainBlock.addChild(this.testInput);
 		
 	}
 	
