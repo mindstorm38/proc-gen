@@ -180,7 +180,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		if (action == GLFW.GLFW_PRESS) {
 			
 			if (key == GLFW.GLFW_KEY_ESCAPE) {
-				this.toggleEscaped();
+				//this.toggleEscaped();
 			} else if (KEY_GENERATE_CHUNKS.isValid(key, scancode, mods)) {
 				
 				Camera3D cam = this.worldRenderer.getCamera();
