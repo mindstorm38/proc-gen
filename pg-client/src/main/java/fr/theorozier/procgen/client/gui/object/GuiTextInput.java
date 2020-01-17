@@ -88,6 +88,11 @@ public class GuiTextInput extends GuiParent {
 	
 	private void textInputChanged(GuiTextInputChangedEvent event) {
 		this.placeholder.setVisible(event.getValue().isEmpty());
+		this.fireEvent(new GuiTextInputChangedEvent(event.getValue()));
+	}
+	
+	public GuiTextColorable getPlaceholder() {
+		return this.placeholder;
 	}
 	
 }

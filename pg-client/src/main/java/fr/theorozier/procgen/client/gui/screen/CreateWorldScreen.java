@@ -1,18 +1,24 @@
 package fr.theorozier.procgen.client.gui.screen;
 
+import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import io.msengine.client.gui.GuiParent;
+import io.msengine.client.gui.GuiTextColorable;
+import io.msengine.client.gui.event.GuiTextInputChangedEvent;
 
 public class CreateWorldScreen extends Screen {
 
 	private final GuiParent mainBlock;
 	private final GuiTextInput worldNameInput;
+	private final GuiTextColorable futureWorldIdentifier;
 	private final GuiTextInput worldSeedInput;
 	private final GuiButton createButton;
 	private final GuiButton cancelButton;
+	
+	private String worldIdentifier;
 	
 	public CreateWorldScreen() {
 		
@@ -24,9 +30,20 @@ public class CreateWorldScreen extends Screen {
 		
 		// World name input
 		this.worldNameInput = new GuiTextInput("Enter the world name");
-		this.worldNameInput.setPosition(0, -100);
+		this.worldNameInput.setPosition(0, -130);
 		this.worldNameInput.setSize(400, 40);
+		this.worldNameInput.addEventListener(GuiTextInputChangedEvent.class, this::onTextInputChanged);
 		this.mainBlock.addChild(this.worldNameInput);
+		
+		// Future world identifier
+		this.futureWorldIdentifier = new GuiTextColorable();
+		this.futureWorldIdentifier.setIgnoreUnderline(true);
+		this.futureWorldIdentifier.setAnchor(0, 0);
+		this.futureWorldIdentifier.setPosition(0, -94);
+		this.futureWorldIdentifier.setHeight(16);
+		this.futureWorldIdentifier.setTextColor(120, 120, 120);
+		this.updateFutureFileName("");
+		this.mainBlock.addChild(this.futureWorldIdentifier);
 		
 		// World seed input
 		this.worldSeedInput = new GuiTextInput("World seed (optional)");
@@ -63,6 +80,22 @@ public class CreateWorldScreen extends Screen {
 				this.manager.loadScene(this.previousScene);
 			}
 		}
+		
+	}
+	
+	private void onTextInputChanged(GuiTextInputChangedEvent event) {
+		
+		if (event.isOrigin(this.worldNameInput)) {
+			this.updateFutureFileName(event.getValue());
+		}
+		
+	}
+	
+	private void updateFutureFileName(String value) {
+		
+		ProcGenGame pg = (ProcGenGame) ProcGenGame.getCurrent();
+		this.worldIdentifier = pg.getWorldList().makeValidIdentifierFromName(value);
+		this.futureWorldIdentifier.setText("Folder '" + this.worldIdentifier + "'");
 		
 	}
 	

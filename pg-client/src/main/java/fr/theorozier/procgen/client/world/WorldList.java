@@ -1,15 +1,21 @@
 package fr.theorozier.procgen.client.world;
 
 import java.io.*;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
 
 public class WorldList {
+	
+	private static final Pattern REMOVE_DIACRITICAL_MARKS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+	private static final Pattern REMOVE_ALL_NON_ASCII_PATTERN     = Pattern.compile("[^a-z0-9_]");
+	private static final int MAX_IDENTIFIER_LENGTH                = 32;
 	
 	private final File worldsDirectory;
 	private final Map<String, Entry> worldEntries;
@@ -68,6 +74,35 @@ public class WorldList {
 	
 	public Map<String, Entry> getWorldEntriesView() {
 		return this.worldEntriesView;
+	}
+	
+	public String makeValidIdentifierFromName(String name) {
+	
+		if (name.length() > MAX_IDENTIFIER_LENGTH)
+			name = name.substring(0, MAX_IDENTIFIER_LENGTH);
+		
+		String identifier = Normalizer.normalize(name.toLowerCase(), Normalizer.Form.NFD);
+		identifier = REMOVE_DIACRITICAL_MARKS_PATTERN.matcher(identifier).replaceAll("");
+		identifier = REMOVE_ALL_NON_ASCII_PATTERN.matcher(identifier).replaceAll("_");
+		
+		if (this.worldEntries.containsKey(identifier)) {
+			
+			String newId = identifier + '0';
+			
+			for (int uid = 1; uid < 256 && this.worldEntries.containsKey(newId); ++uid) {
+				newId = identifier + uid;
+			}
+			
+			if (this.worldEntries.containsKey(newId)) {
+				identifier = "cant_make_id";
+			} else {
+				identifier = newId;
+			}
+			
+		}
+		
+		return identifier;
+		
 	}
 	
 	private static boolean decodeWorldDescriptionToEntry(File file, Entry entry) {
