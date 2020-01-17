@@ -37,6 +37,7 @@ public class TitleScreen extends Screen {
 		
 		// Version
 		this.versionText = new GuiTextBase("ProcGen Beta 0.1.2");
+		this.versionText.setHeight(20);
 		this.versionText.setAnchor(-1, 1);
 		this.versionText.setXPos(12);
 		this.addChild(this.versionText);
@@ -51,7 +52,8 @@ public class TitleScreen extends Screen {
 			
 			disclaimerTexts[i] = new GuiTextBase(DISCLAIMERS[i]);
 			disclaimerTexts[i].setAnchor(1, 1);
-			disclaimerTexts[i].setPosition(0, (-i * (disclaimerTexts[i].getHeight() + 4)));
+			disclaimerTexts[i].setHeight(20);
+			disclaimerTexts[i].setPosition(0, (-i * (20 + 4)));
 			this.disclaimerBlock.addChild(disclaimerTexts[i]);
 			
 		}

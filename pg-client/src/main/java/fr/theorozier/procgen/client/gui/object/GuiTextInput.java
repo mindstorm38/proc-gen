@@ -65,15 +65,16 @@ public class GuiTextInput extends GuiParent {
 		
 		float scale = height / this.backgroundTexture.getDefaultHeight();
 		float fontHeight = scale * 8;
+		float inputPos = scale * 6;
 		
 		this.backgroundTexture.setHeight(height);
 		
-		this.placeholder.setXPos(8 * scale);
+		this.placeholder.setXPos(inputPos);
 		this.placeholder.setYPos(height / 2);
 		this.placeholder.setHeight(fontHeight);
 		
-		this.input.setXPos(3 * scale);
-		this.input.setScrollPadding(5 * scale);
+		this.input.setXPos(inputPos);
+		this.input.setScrollPadding(10 * scale);
 		this.updateInputWidth();
 		this.input.setHeight(height);
 		this.input.getText().setHeight(fontHeight);

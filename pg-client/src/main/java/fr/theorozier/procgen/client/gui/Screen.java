@@ -9,8 +9,6 @@ import io.msengine.client.renderer.texture.SimpleTexture;
 
 public abstract class Screen extends GuiScene {
 	
-	protected static final SimpleTexture TILED_BACKGROUND_TEXTURE = new SimpleTexture("textures/gui/tiled_background.png");
-	
 	private final GuiTextureMosaic backgroundMosaic;
 	private final GuiTextColorable titleText;
 	
@@ -37,7 +35,7 @@ public abstract class Screen extends GuiScene {
 			this.titleText = new GuiTextColorable(title);
 			this.titleText.setAnchor(0, -1);
 			this.titleText.setYPos(40);
-			this.titleText.setTextScale(3);
+			this.titleText.setHeight(30);
 			this.titleText.setTextColor(230, 230, 230);
 			this.titleText.setShadowOffset(3, 3);
 			this.addChild(this.titleText);
