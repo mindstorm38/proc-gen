@@ -2,6 +2,7 @@ package fr.theorozier.procgen.client;
 
 import fr.theorozier.procgen.client.gui.screen.*;
 import fr.theorozier.procgen.client.world.WorldClient;
+import fr.theorozier.procgen.client.world.WorldList;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
@@ -23,6 +24,7 @@ import io.msengine.client.util.camera.Camera3D;
 import io.msengine.common.util.GameProfiler;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.File;
 import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -47,6 +49,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	public static final OptionKey KEY_ENTITY_DEBUG = new OptionKey("entity_debug", GLFW.GLFW_KEY_P);
 	public static final OptionKey KEY_ENTITY_MOVE = new OptionKey("entity_move", GLFW.GLFW_KEY_K);
 	
+	private final WorldList worldList;
+	
 	private final WorldRenderer worldRenderer;
 	private final WorldClient testWorld;
 	
@@ -55,6 +59,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	public ProcGenGame(RenderGameOptions options) {
 		
 		super(options);
+		
+		this.worldList = new WorldList(new File(this.getAppdata(), "worlds"));
 		
 		this.worldRenderer = new WorldRenderer();
 		this.testWorld = new WorldSinglePlayer(new WorldServer(BetaChunkGenerator.PROVIDER));
