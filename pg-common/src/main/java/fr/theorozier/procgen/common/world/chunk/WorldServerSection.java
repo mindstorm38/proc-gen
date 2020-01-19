@@ -71,7 +71,7 @@ public class WorldServerSection extends WorldSection {
 	// FIXME TEMP MONO THREAD WORLD GENERATION METHOD
 	public void generate() {
 		
-		ChunkGenerator generator = this.getWorld().getChunkManager().getGenerator();
+		ChunkGenerator generator = this.getWorld().getChunkGenerator();
 		WorldServerChunk chunk;
 		
 		ImmutableSectionPosition pos = this.getSectionPos();

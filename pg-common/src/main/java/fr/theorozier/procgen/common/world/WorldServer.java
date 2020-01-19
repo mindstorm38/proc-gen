@@ -6,29 +6,38 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class WorldServer extends WorldBase {
 	
 	public static final int NEAR_CHUNK_LOADING = 4;
 	
+	private final WorldDimensionManager dimensionManager;
+	
 	private final long seed;
 	private final Random random;
-	private final ChunkManager manager;
+	private final ChunkGeneratorProvider chunkGeneratorProvider;
+	private final ChunkGenerator chunkGenerator;
 	
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	public WorldServer(long seed, ChunkGeneratorProvider provider) {
+	public WorldServer(WorldDimensionManager dimensionManager, long seed, ChunkGeneratorProvider provider) {
+		
+		this.dimensionManager = dimensionManager;
 		
 		this.seed = seed;
 		this.random = new Random(seed);
-		this.manager = new ChunkManager(this, provider.create(this));
+		this.chunkGeneratorProvider = provider;
+		this.chunkGenerator = provider.create(this);
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
@@ -37,8 +46,8 @@ public class WorldServer extends WorldBase {
 	
 	// PROPERTIES //
 	
-	public WorldServer(ChunkGeneratorProvider provider) {
-		this(new Random().nextLong(), provider);
+	public WorldDimensionManager getDimensionManager() {
+		return this.dimensionManager;
 	}
 	
 	public long getSeed() {
@@ -49,8 +58,12 @@ public class WorldServer extends WorldBase {
 		return this.random;
 	}
 	
-	public ChunkManager getChunkManager() {
-		return this.manager;
+	public ChunkGeneratorProvider getChunkGeneratorProvider() {
+		return this.chunkGeneratorProvider;
+	}
+	
+	public ChunkGenerator getChunkGenerator() {
+		return this.chunkGenerator;
 	}
 	
 	/**
@@ -67,7 +80,6 @@ public class WorldServer extends WorldBase {
 		
 		super.update();
 		
-		this.manager.tick();
 		this.blockTickList.tick();
 		
 		this.entities.forEach(Entity::update);

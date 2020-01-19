@@ -11,8 +11,9 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.entity.MotionEntity;
 import fr.theorozier.procgen.common.entity.PigEntity;
-import fr.theorozier.procgen.common.world.WorldGroupManager;
+import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
@@ -27,6 +28,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -51,7 +53,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	public static final OptionKey KEY_ENTITY_MOVE = new OptionKey("entity_move", GLFW.GLFW_KEY_K);
 	
 	private final WorldList worldList;
-	private WorldGroupManager servedWorldGroup;
+	private WorldDimensionManager servedWorldGroup;
 	
 	private final WorldRenderer worldRenderer;
 	private final WorldClient testWorld;
@@ -65,7 +67,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.worldList = new WorldList(new File(this.getAppdata(), "worlds"));
 		
 		this.worldRenderer = new WorldRenderer();
-		this.testWorld = new WorldSinglePlayer(new WorldServer(BetaChunkGenerator.PROVIDER));
+		this.testWorld = new WorldSinglePlayer(new WorldServer(null, new Random().nextLong(), WorldGenerators.BETA_CHUNK_PROVIDER));
 		
 		this.options.addOption(KEY_FORWARD);
 		this.options.addOption(KEY_BACKWARD);

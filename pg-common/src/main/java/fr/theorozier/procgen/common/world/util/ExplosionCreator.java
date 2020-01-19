@@ -1,4 +1,6 @@
-package fr.theorozier.procgen.common.world;
+package fr.theorozier.procgen.common.world.util;
+
+import fr.theorozier.procgen.common.world.WorldServer;
 
 import java.util.Random;
 

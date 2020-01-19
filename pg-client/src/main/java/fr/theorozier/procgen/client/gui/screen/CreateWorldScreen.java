@@ -6,6 +6,7 @@ import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import io.msengine.client.gui.GuiParent;
+import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
 import io.msengine.client.gui.event.GuiTextInputChangedEvent;
 
@@ -39,21 +40,21 @@ public class CreateWorldScreen extends Screen {
 		this.futureWorldIdentifier = new GuiTextColorable();
 		this.futureWorldIdentifier.setIgnoreUnderline(true);
 		this.futureWorldIdentifier.setAnchor(0, 0);
-		this.futureWorldIdentifier.setPosition(0, -94);
-		this.futureWorldIdentifier.setHeight(16);
+		this.futureWorldIdentifier.setPosition(0, -44);
+		this.futureWorldIdentifier.setHeight(8);
 		this.futureWorldIdentifier.setTextColor(120, 120, 120);
-		this.updateFutureFileName("");
 		this.mainBlock.addChild(this.futureWorldIdentifier);
 		
 		// World seed input
 		this.worldSeedInput = new GuiTextInput("World seed (optional)");
-		this.worldSeedInput.setPosition(0, -50);
+		this.worldSeedInput.setPosition(0, -80);
 		this.worldSeedInput.setSize(400, 40);
 		this.mainBlock.addChild(this.worldSeedInput);
 		
 		// Create world button
 		this.createButton = new GuiButton(400, 40, "Create world ...");
 		this.createButton.setPosition(0, 0);
+		this.createButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.mainBlock.addChild(this.createButton);
 		
 		// Cancel button
@@ -62,6 +63,15 @@ public class CreateWorldScreen extends Screen {
 		this.cancelButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.mainBlock.addChild(this.cancelButton);
 		
+		
+		this.updateFutureFileName("");
+		
+	}
+	
+	@Override
+	protected void loaded(Class<? extends GuiScene> previousScene) {
+		super.loaded(previousScene);
+		this.worldNameInput.setInputActive(true);
 	}
 	
 	@Override
@@ -76,9 +86,21 @@ public class CreateWorldScreen extends Screen {
 	private void onButtonClicked(GuiButtonActionEvent event) {
 		
 		if (event.isOrigin(this.cancelButton)) {
+			
 			if (this.previousScene != null) {
 				this.manager.loadScene(this.previousScene);
 			}
+			
+		} else if (event.isOrigin(this.createButton)) {
+		
+			String worldName = this.worldNameInput.getInputText();
+			
+			if (!this.worldIdentifier.isEmpty() && !worldName.isEmpty()) {
+			
+			
+			
+			}
+		
 		}
 		
 	}
@@ -96,6 +118,8 @@ public class CreateWorldScreen extends Screen {
 		ProcGenGame pg = (ProcGenGame) ProcGenGame.getCurrent();
 		this.worldIdentifier = pg.getWorldList().makeValidIdentifierFromName(value);
 		this.futureWorldIdentifier.setText("Folder '" + this.worldIdentifier + "'");
+		
+		this.createButton.setDisabled(this.worldIdentifier.isEmpty());
 		
 	}
 	

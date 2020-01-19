@@ -14,8 +14,6 @@ import io.sutil.math.MathHelper;
 
 public class BetaChunkGenerator extends ChunkGenerator {
 	
-	public static final ChunkGeneratorProvider PROVIDER = world -> new BetaChunkGenerator(world.getSeed());
-	
 	private static final BlockState BEDROCK_STATE = Blocks.BEDROCK.getDefaultState();
 	private static final BlockState STONE_STATE = Blocks.STONE.getDefaultState();
 	private static final BlockState WATER_STATE = Blocks.WATER.getDefaultState();

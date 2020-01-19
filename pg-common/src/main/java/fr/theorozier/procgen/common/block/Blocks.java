@@ -5,7 +5,7 @@ import fr.theorozier.procgen.common.block.state.BlockState;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Blocks {
+public final class Blocks {
 	
 	private static final Map<Short, Block> uidRegister = new HashMap<>();
 	private static final Map<String, Block> identifierRegister = new HashMap<>();
@@ -70,5 +70,7 @@ public class Blocks {
 	public static BlockState getBlockState(short uid) {
 		return uidStateRegister.get(uid);
 	}
+	
+	private Blocks() {}
 	
 }
