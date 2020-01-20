@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
  */
 public class WorldDimensionManager {
 	
-	private final WorldDimensionHandler<?> handler;
+	private final WorldDimensionHandler handler;
 	
 	private final File worldDirectory;
 	private final File playersDirectory;
@@ -33,7 +33,7 @@ public class WorldDimensionManager {
 	
 	private final ExecutorService generatorComputer;
 	
-	public WorldDimensionManager(WorldDimensionHandler<?> handler, File worldDirectory) {
+	public WorldDimensionManager(WorldDimensionHandler handler, File worldDirectory) {
 		
 		this.handler = handler;
 		this.worldDirectory = worldDirectory;
@@ -62,7 +62,7 @@ public class WorldDimensionManager {
 	 * Only call when this world dimension was created.
 	 */
 	public void created(WorldGenerationOption option) {
-		this.handler.worldCreatedRaw(this, option);
+		this.handler.worldCreated(this, option);
 	}
 	
 	/**
