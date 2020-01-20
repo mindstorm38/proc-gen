@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.gen;
+package fr.theorozier.procgen.common.world.gen.biome;
 
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.biome.Biomes;

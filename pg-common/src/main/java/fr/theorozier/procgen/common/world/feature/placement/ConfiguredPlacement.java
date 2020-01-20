@@ -4,7 +4,7 @@ import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.feature.placement.config.PlacementConfig;
-import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 
 import java.util.Random;

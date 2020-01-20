@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
-import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;

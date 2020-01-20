@@ -6,14 +6,12 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
-import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class WorldServer extends WorldBase {

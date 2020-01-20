@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.gen;
+package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldServer;
@@ -8,6 +8,7 @@ import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
+import fr.theorozier.procgen.common.world.gen.biome.BiomeProvider;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;

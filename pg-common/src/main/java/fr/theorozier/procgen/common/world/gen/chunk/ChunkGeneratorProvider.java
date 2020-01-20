@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.gen;
+package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.world.WorldServer;
 

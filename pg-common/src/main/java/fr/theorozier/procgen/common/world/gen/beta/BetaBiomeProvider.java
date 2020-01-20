@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.gen.beta;
 
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.biome.Biomes;
-import fr.theorozier.procgen.common.world.gen.WeatherBiomeProvider;
+import fr.theorozier.procgen.common.world.gen.biome.WeatherBiomeProvider;
 
 public class BetaBiomeProvider extends WeatherBiomeProvider {
 	

@@ -1,8 +1,10 @@
 package fr.theorozier.procgen.common.world;
 
-import fr.theorozier.procgen.common.world.gen.ChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.ChunkGeneratorProvider;
-import fr.theorozier.procgen.common.world.gen.DimensionHandler;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.WorldDimensionHandler;
+import fr.theorozier.procgen.common.world.gen.WorldIncompatException;
+import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 
 import java.io.File;
 import java.util.HashMap;
@@ -10,9 +12,16 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ *
+ * A save and creation manager for real world, composed of multiple dimensions.
+ *
+ * @author Theo Rozier
+ *
+ */
 public class WorldDimensionManager {
 	
-	private final DimensionHandler handler;
+	private final WorldDimensionHandler<?> handler;
 	
 	private final File worldDirectory;
 	private final File playersDirectory;
@@ -24,7 +33,7 @@ public class WorldDimensionManager {
 	
 	private final ExecutorService generatorComputer;
 	
-	public WorldDimensionManager(DimensionHandler handler, File worldDirectory) {
+	public WorldDimensionManager(WorldDimensionHandler<?> handler, File worldDirectory) {
 		
 		this.handler = handler;
 		this.worldDirectory = worldDirectory;
@@ -49,7 +58,18 @@ public class WorldDimensionManager {
 		return this.worldDirectory;
 	}
 	
-	public void load() {
+	/**
+	 * Only call when this world dimension was created.
+	 */
+	public void created(WorldGenerationOption option) {
+		this.handler.worldCreatedRaw(this, option);
+	}
+	
+	/**
+	 * Load the world, this happen when creating a world, or on open.
+	 * @throws WorldIncompatException Potential incompatibility error, if the world can't
+	 */
+	public void load() throws WorldIncompatException {
 	
 		// TODO : Here, load all dimensions from the world directory
 		
@@ -83,6 +103,12 @@ public class WorldDimensionManager {
 		return world == null ? null : world.getChunkGeneratorProvider();
 	}
 	
+	/**
+	 * Check if a dimension in this world is using a specific chunk generator.
+	 * @param identifier The dimension identifier.
+	 * @param generatorClass The generator class.
+	 * @return True if the world's chunk generator is of class <code>generatorClass</code>, also return true if there is no dimensions with this identifier.
+	 */
 	public boolean isDimensionUsingChunkGenerator(String identifier, Class<? extends ChunkGenerator> generatorClass) {
 		
 		WorldServer world = this.dimensionsWorlds.get(identifier);
@@ -90,7 +116,7 @@ public class WorldDimensionManager {
 		if (world != null) {
 			return world.getChunkGenerator().getClass().equals(generatorClass);
 		} else {
-			return false;
+			return true;
 		}
 		
 	}
