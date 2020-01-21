@@ -6,7 +6,7 @@ import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import fr.theorozier.procgen.common.world.gen.WorldIncompatException;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 
-public class BetaWorldDimensionHandler implements WorldDimensionHandler<WorldGenerationOption> {
+public class BetaWorldDimensionHandler implements WorldDimensionHandler {
 	
 	public static final String OVERWORLD_DIMENSION = "overworld";
 	

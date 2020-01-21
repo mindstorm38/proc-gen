@@ -2,10 +2,7 @@ package fr.theorozier.procgen.client.world;
 
 import java.io.*;
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -26,6 +23,9 @@ public class WorldList {
 		this.worldsDirectory = worldsDirectory;
 		this.worldEntries = new HashMap<>();
 		this.worldEntriesView = Collections.unmodifiableMap(this.worldEntries);
+		
+		if (worldsDirectory.isFile())
+			throw new IllegalStateException("The worlds directory already exists but it's a file.");
 		
 		if (!worldsDirectory.isDirectory())
 			worldsDirectory.mkdirs();
@@ -94,7 +94,7 @@ public class WorldList {
 			}
 			
 			if (this.worldEntries.containsKey(newId)) {
-				identifier = "cant_make_id";
+				identifier = "cant_make_id_" + Math.abs(new Random().nextInt());
 			} else {
 				identifier = newId;
 			}
@@ -105,6 +105,41 @@ public class WorldList {
 		
 	}
 	
+	/**
+	 * Make directory of a specified world and create the world description into.
+	 * @param worldIdentifier The world identifier.
+	 * @param worldName The world name.
+	 * @return The file directory created for the world. If null returned, a warning message has been logged.
+	 */
+	public File createNewWorldDirectory(String worldIdentifier, String worldName) {
+		
+		if (this.worldEntries.containsKey(worldIdentifier)) {
+			
+			LOGGER.warning("Can't create new world directory for '" + worldIdentifier + "' because a world already has this name in internal list entries.");
+			return null;
+			
+		}
+		
+		File file = new File(this.worldsDirectory, worldIdentifier);
+		
+		if (file.exists()) {
+			
+			LOGGER.warning("Can't create new world directory for '" + worldIdentifier + "' because a file or dir already exists with this name.");
+			return null;
+			
+		}
+		
+		file.mkdir();
+		return file;
+		
+	}
+	
+	/**
+	 * Decode a world description file to a world list entry.
+	 * @param file The world description file.
+	 * @param entry The world list entry.
+	 * @return True if the world description has been successfuly read.
+	 */
 	private static boolean decodeWorldDescriptionToEntry(File file, Entry entry) {
 		
 		try {
@@ -133,6 +168,8 @@ public class WorldList {
 				
 			}
 			
+			reader.close();
+			
 			return true;
 			
 		} catch (IOException e) {
@@ -142,6 +179,28 @@ public class WorldList {
 			
 		}
 	
+	}
+	
+	private static boolean encodeWorldDescriptionFromEntry(File file, Entry entry) {
+		
+		try {
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(entry.getName());
+			writer.newLine();
+			writer.write(Long.toString(entry.getLastPlayed()));
+			writer.newLine();
+			writer.close();
+			
+			return true;
+			
+		} catch (IOException e) {
+			
+			LOGGER.log(Level.WARNING, "Failed to write world description file.", e);
+			return false;
+			
+		}
+		
 	}
 	
 	/**

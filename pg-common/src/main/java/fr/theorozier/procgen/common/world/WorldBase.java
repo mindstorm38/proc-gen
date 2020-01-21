@@ -19,7 +19,8 @@ import java.util.function.Consumer;
 
 /**
  *
- * Base world class storing data needed for client and server.
+ * Base world class storing data needed for client and server.<br>
+ * In reality this a world dimension, stored and managed by a {@link WorldDimensionManager}.
  *
  * @author Theo Rozier
  *

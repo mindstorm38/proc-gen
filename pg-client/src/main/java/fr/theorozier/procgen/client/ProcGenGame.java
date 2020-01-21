@@ -14,7 +14,6 @@ import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.WorldGenerators;
-import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
 import io.msengine.client.option.OptionKey;
@@ -53,7 +52,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	public static final OptionKey KEY_ENTITY_MOVE = new OptionKey("entity_move", GLFW.GLFW_KEY_K);
 	
 	private final WorldList worldList;
-	private WorldDimensionManager servedWorldGroup;
+	private WorldDimensionManager servedWorld;
 	
 	private final WorldRenderer worldRenderer;
 	private final WorldClient testWorld;
@@ -176,10 +175,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		return this.worldList;
 	}
 	
-	public void createWorld(String name, long seed) {
-	
-	
-	
+	public void setServedWorld(WorldDimensionManager worldDimensionManager) {
+		this.servedWorld = worldDimensionManager;
 	}
 	
 	// Legacy //
