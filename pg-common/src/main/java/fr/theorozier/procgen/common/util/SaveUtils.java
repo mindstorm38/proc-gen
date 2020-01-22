@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.util;
 
+import java.io.File;
 import java.util.regex.Pattern;
 
 /**
@@ -37,6 +38,21 @@ public class SaveUtils {
 			throw new IllegalStateException("The name '" + name + "' is not suited for data saving in " + containerName + ".");
 		
 		return name;
+		
+	}
+	
+	/**
+	 * Try to make a directory, if this entry already exists as a file, an exception with a specific message is thrown.
+	 * @param file The file entry to make directory.
+	 * @param errorMessage The exception message.
+	 */
+	public static void mkdirOrThrowException(File file, String errorMessage) {
+		
+		if (file.isFile())
+			throw new IllegalStateException(errorMessage);
+		
+		if (!file.isDirectory())
+			file.mkdirs();
 		
 	}
 	

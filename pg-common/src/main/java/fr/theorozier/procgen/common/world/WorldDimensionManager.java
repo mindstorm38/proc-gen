@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.world;
 
+import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.WorldDimensionHandler;
@@ -35,12 +36,11 @@ public class WorldDimensionManager {
 	
 	public WorldDimensionManager(WorldDimensionHandler handler, File worldDirectory) {
 		
+		SaveUtils.mkdirOrThrowException(worldDirectory, "The world directory already exists but it's a file.");
+		
 		this.handler = handler;
+		
 		this.worldDirectory = worldDirectory;
-		
-		if (!worldDirectory.isDirectory())
-			worldDirectory.mkdirs();
-		
 		this.playersDirectory = new File(worldDirectory, "players");
 		this.dimensionsDirectory = new File(worldDirectory, "dims");
 		

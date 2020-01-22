@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.client.world;
 
+import fr.theorozier.procgen.common.util.SaveUtils;
+
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
@@ -13,6 +15,7 @@ public class WorldList {
 	private static final Pattern REMOVE_DIACRITICAL_MARKS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 	private static final Pattern REMOVE_ALL_NON_ASCII_PATTERN     = Pattern.compile("[^a-z0-9_]");
 	private static final int MAX_IDENTIFIER_LENGTH                = 32;
+	private static final String WORLD_DESCRIPTION_FILE            = "description";
 	
 	private final File worldsDirectory;
 	private final Map<String, Entry> worldEntries;
@@ -20,15 +23,11 @@ public class WorldList {
 	
 	public WorldList(File worldsDirectory) {
 		
+		SaveUtils.mkdirOrThrowException(worldsDirectory, "The worlds directory already exists but it's a file.");
+		
 		this.worldsDirectory = worldsDirectory;
 		this.worldEntries = new HashMap<>();
 		this.worldEntriesView = Collections.unmodifiableMap(this.worldEntries);
-		
-		if (worldsDirectory.isFile())
-			throw new IllegalStateException("The worlds directory already exists but it's a file.");
-		
-		if (!worldsDirectory.isDirectory())
-			worldsDirectory.mkdirs();
 		
 	}
 	
@@ -120,17 +119,39 @@ public class WorldList {
 			
 		}
 		
-		File file = new File(this.worldsDirectory, worldIdentifier);
+		File dir = new File(this.worldsDirectory, worldIdentifier);
 		
-		if (file.exists()) {
+		if (dir.exists()) {
 			
 			LOGGER.warning("Can't create new world directory for '" + worldIdentifier + "' because a file or dir already exists with this name.");
 			return null;
 			
 		}
 		
-		file.mkdir();
-		return file;
+		dir.mkdir();
+		
+		Entry listEntry = new Entry(dir, worldIdentifier);
+		listEntry.setName(worldName);
+		
+		File descriptionFile = new File(dir, WORLD_DESCRIPTION_FILE);
+		
+		if (!encodeWorldDescriptionFromEntry(descriptionFile, listEntry)) {
+			
+			LOGGER.warning("Failed to the world description file for '" + worldIdentifier + "'.");
+			
+			// Delete description file if created and the directory, to avoid problem with re-try of creation of this world.
+			if (descriptionFile.exists())
+				descriptionFile.delete();
+			
+			dir.delete();
+			
+			return null;
+			
+		}
+		
+		this.worldEntries.put(worldIdentifier, listEntry);
+		
+		return dir;
 		
 	}
 	
@@ -181,6 +202,12 @@ public class WorldList {
 	
 	}
 	
+	/**
+	 * Encode a world description file from a world list entry.
+	 * @param file The description file.
+	 * @param entry The world list entry.
+	 * @return True if the world description was successfuly written.
+	 */
 	private static boolean encodeWorldDescriptionFromEntry(File file, Entry entry) {
 		
 		try {
@@ -213,7 +240,7 @@ public class WorldList {
 		if (!dir.isDirectory())
 			return null;
 		
-		File descriptionFile = new File(dir, "description");
+		File descriptionFile = new File(dir, WORLD_DESCRIPTION_FILE);
 		return descriptionFile.isFile() ? descriptionFile : null;
 		
 	}
