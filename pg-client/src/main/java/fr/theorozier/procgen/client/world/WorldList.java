@@ -82,6 +82,20 @@ public class WorldList {
 		return this.worldEntriesView;
 	}
 	
+	/**
+	 * Check if a world identifier is not already used.
+	 * @param identifier A world identifier.
+	 * @return True if this identifier is already used.
+	 */
+	public boolean isWorldIdentifierValid(String identifier) {
+		return this.worldEntries.containsKey(identifier);
+	}
+	
+	/**
+	 * Create a valid identifier from a world name.
+	 * @param name A world name.
+	 * @return A valid identifier that can be used to create a world directory.
+	 */
 	public String makeValidIdentifierFromName(String name) {
 	
 		if (name.length() > MAX_IDENTIFIER_LENGTH)

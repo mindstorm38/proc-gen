@@ -70,7 +70,6 @@ public class CreateWorldScreen extends Screen {
 		this.cancelButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.mainBlock.addChild(this.cancelButton);
 		
-		
 		this.updateFutureFileName("");
 		
 	}

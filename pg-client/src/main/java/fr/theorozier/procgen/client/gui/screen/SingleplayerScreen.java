@@ -66,6 +66,7 @@ public class SingleplayerScreen extends Screen {
 		super.loaded(previousScene);
 		
 		GuiParent scrollInternal = this.scrollableContainer.getInternal();
+		
 		List<WorldList.Entry> entries = new ArrayList<>(this.worldList.reload().values());
 		
 		int missingSize = entries.size() - this.listLines.size();
@@ -85,6 +86,8 @@ public class SingleplayerScreen extends Screen {
 				yPos += 40;
 				
 			}
+			
+			scrollInternal.setHeight(yPos);
 			
 		}
 		
