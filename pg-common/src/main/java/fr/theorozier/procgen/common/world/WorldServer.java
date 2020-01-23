@@ -12,10 +12,9 @@ import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
+import io.sutil.pool.FixedObjectPool;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class WorldServer extends WorldBase {
 	
@@ -31,7 +30,8 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	protected final Map<SectionPositioned, WorldSection> primitiveSections;
+	private final Map<SectionPositioned, WorldSection> primitiveSections;
+	private final HashSet<SectionPositioned> chunkLoadingPositions;
 	
 	public WorldServer(WorldDimensionManager dimensionManager, long seed, ChunkGeneratorProvider provider) {
 		
@@ -46,6 +46,7 @@ public class WorldServer extends WorldBase {
 		this.seaLevel = 63;
 		
 		this.primitiveSections = new HashMap<>();
+		this.chunkLoadingPositions = new HashSet<>();
 		
 	}
 	
@@ -84,6 +85,8 @@ public class WorldServer extends WorldBase {
 	public void update() {
 		
 		super.update();
+		
+		this.updateChunkLoadingPositions();
 		
 		this.blockTickList.tick();
 		
@@ -155,6 +158,28 @@ public class WorldServer extends WorldBase {
 	
 	public ImmutableBlockPosition getBlockHeightAt(Heightmap.Type type, SectionPositioned pos) {
 		return new ImmutableBlockPosition(pos, this.getHeightAt(type, pos));
+	}
+	
+	// CHUNK LOADING //
+	
+	public void addChunkLoadingPosition(SectionPositioned sectionPositioned) {
+		this.chunkLoadingPositions.add(sectionPositioned);
+	}
+	
+	public void removeChunkLoadingPosition(SectionPositioned sectionPositioned) {
+		this.chunkLoadingPositions.remove(sectionPositioned);
+	}
+	
+	private void updateChunkLoadingPositions() {
+		
+		for (SectionPositioned poses : this.chunkLoadingPositions) {
+			this.forEachSectionPosNear(poses.getX(), poses.getZ(), NEAR_CHUNK_LOADING, this::loadSection);
+		}
+		
+	}
+	
+	private void tryLoadChunk(SectionPosition sectionPosition) {
+		// TODO
 	}
 	
 	// FIXME : TEMPORARY FOR MONOTHREAD GENERATION

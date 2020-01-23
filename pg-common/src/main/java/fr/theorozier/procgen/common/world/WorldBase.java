@@ -240,11 +240,13 @@ public abstract class WorldBase {
 		int xmax = sectionPos.getX() + range;
 		int zmax = sectionPos.getZ() + range;
 		
-		SectionPosition temp = new SectionPosition();
-		
-		for (int xv = minPos.getX(); xv <= xmax; ++xv)
-			for (int zv = minPos.getZ(); zv <= zmax; ++zv)
-				consumer.accept(temp.set(xv, zv));
+		try (FixedObjectPool<SectionPosition>.PoolObject obj = SectionPosition.POOL.acquire()) {
+			
+			for (int xv = minPos.getX(); xv <= xmax; ++xv)
+				for (int zv = minPos.getZ(); zv <= zmax; ++zv)
+					consumer.accept(obj.get().set(xv, zv));
+			
+		}
 		
 	}
 	
