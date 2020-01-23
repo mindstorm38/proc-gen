@@ -4,6 +4,7 @@ import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
+import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
@@ -12,6 +13,8 @@ import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class WorldServer extends WorldBase {
@@ -28,6 +31,8 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
+	protected final Map<SectionPositioned, WorldSection> primitiveSections;
+	
 	public WorldServer(WorldDimensionManager dimensionManager, long seed, ChunkGeneratorProvider provider) {
 		
 		this.dimensionManager = dimensionManager;
@@ -39,6 +44,8 @@ public class WorldServer extends WorldBase {
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
+		
+		this.primitiveSections = new HashMap<>();
 		
 	}
 	

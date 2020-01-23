@@ -32,10 +32,28 @@ public abstract class ChunkGenerator {
 		
 	}
 	
+	public long getSeed() {
+		return this.seed;
+	}
+	
 	public void genBiomes(WorldServerSection section, SectionPositioned pos) {
 		
 		Biome[] biomes = this.biomeProvider.getBiomes(pos.getX() << 4, pos.getZ() << 4, 16, 16);
 		section.setBiomes(biomes);
+		
+	}
+	
+	public void genSectionBase(WorldServerSection section, SectionPositioned pos) {
+		
+		WorldServerChunk chunk;
+		for (int y = 0; y < section.getWorld().getVerticalChunkCount(); ++y) {
+			
+			chunk = new WorldServerChunk(section.getWorld(), section, new ImmutableBlockPosition(pos, y));
+			section.setChunkAt(y, chunk);
+			
+			this.genBase(chunk, chunk.getChunkPos());
+			
+		}
 		
 	}
 	

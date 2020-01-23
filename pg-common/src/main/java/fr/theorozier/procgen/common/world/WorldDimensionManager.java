@@ -3,9 +3,7 @@ package fr.theorozier.procgen.common.world;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
-import fr.theorozier.procgen.common.world.gen.WorldDimensionHandler;
 import fr.theorozier.procgen.common.world.gen.WorldIncompatException;
-import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 
 import java.io.File;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ import java.util.concurrent.Executors;
  */
 public class WorldDimensionManager {
 	
-	private final WorldDimensionHandler handler;
+	//private final WorldDimensionHandler handler;
 	
 	private final File worldDirectory;
 	private final File playersDirectory;
@@ -34,21 +32,18 @@ public class WorldDimensionManager {
 	
 	private final ExecutorService generatorComputer;
 	
-	public WorldDimensionManager(WorldDimensionHandler handler, File worldDirectory) {
+	public WorldDimensionManager(File worldDirectory) {
 		
 		SaveUtils.mkdirOrThrowException(worldDirectory, "The world directory already exists but it's a file.");
 		
-		this.handler = handler;
+		//this.handler = handler;
 		
 		this.worldDirectory = worldDirectory;
 		this.playersDirectory = new File(worldDirectory, "players");
 		this.dimensionsDirectory = new File(worldDirectory, "dims");
 		
-		if (!this.playersDirectory.isDirectory())
-			this.playersDirectory.mkdirs();
-		
-		if (!this.dimensionsDirectory.isDirectory())
-			this.dimensionsDirectory.mkdirs();
+		SaveUtils.mkdirOrThrowException(this.playersDirectory, "The players directory already exists but it's a file.");
+		SaveUtils.mkdirOrThrowException(this.dimensionsDirectory, "The dimensions directory already exists but it's a file.");
 		
 		this.generatorComputer = Executors.newFixedThreadPool(2);
 		
@@ -58,12 +53,12 @@ public class WorldDimensionManager {
 		return this.worldDirectory;
 	}
 	
-	/**
+	/*
 	 * Only call when this world dimension was created.
 	 */
-	public void created(WorldGenerationOption option) {
+	/*public void created(WorldGenerationOption option) {
 		this.handler.worldCreated(this, option);
-	}
+	}*/
 	
 	/**
 	 * Load the world, this happen when creating a world, or on open.
@@ -73,7 +68,7 @@ public class WorldDimensionManager {
 	
 		// TODO : Here, load all dimensions from the world directory
 		
-		this.handler.worldLoaded(this);
+		//this.handler.worldLoaded(this);
 	
 	}
 	

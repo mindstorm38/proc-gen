@@ -6,16 +6,21 @@ import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
+import fr.theorozier.procgen.common.world.WorldDimensionManager;
+import fr.theorozier.procgen.common.world.gen.WorldGenerators;
+import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
 import io.msengine.client.gui.event.GuiTextInputChangedEvent;
 
 import java.io.File;
+import java.util.Random;
 
 public class CreateWorldScreen extends Screen {
 	
 	private final WorldList worldList;
+	private final Random seedRandom;
 	
 	private final GuiParent mainBlock;
 	private final GuiTextInput worldNameInput;
@@ -31,6 +36,7 @@ public class CreateWorldScreen extends Screen {
 		super("Create world...");
 		
 		this.worldList = ProcGenGame.getGameInstance().getWorldList();
+		this.seedRandom = new Random();
 		
 		// Main block
 		this.mainBlock = new GuiParent();
@@ -105,6 +111,13 @@ public class CreateWorldScreen extends Screen {
 				
 				File worldDir = this.worldList.createNewWorldDirectory(this.worldIdentifier, worldName);
 				
+				if (worldDir != null) {
+					
+					WorldDimensionManager servedWorld = new WorldDimensionManager(worldDir);
+					ProcGenGame.getGameInstance().setServedWorld(servedWorld);
+					
+				}
+				
 				System.out.println("world dir : " + worldDir);
 				
 			}
@@ -127,6 +140,21 @@ public class CreateWorldScreen extends Screen {
 		this.futureWorldIdentifier.setText("Folder '" + this.worldIdentifier + "'");
 		
 		this.createButton.setDisabled(this.worldIdentifier.isEmpty());
+		
+	}
+	
+	private long getWorldSeed() {
+		
+		String seedRaw = this.worldNameInput.getInputText();
+		
+		if (seedRaw.isEmpty())
+			return this.seedRandom.nextLong();
+		
+		try {
+			return Long.parseLong(seedRaw);
+		} catch (NumberFormatException e) {
+			return WorldGenerationOption.getSeedFromString(seedRaw);
+		}
 		
 	}
 	
