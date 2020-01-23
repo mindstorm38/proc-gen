@@ -5,13 +5,18 @@ import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
+import fr.theorozier.procgen.client.world.WorldList;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
 import io.msengine.client.gui.event.GuiTextInputChangedEvent;
 
-public class CreateWorldScreen extends Screen {
+import java.io.File;
 
+public class CreateWorldScreen extends Screen {
+	
+	private final WorldList worldList;
+	
 	private final GuiParent mainBlock;
 	private final GuiTextInput worldNameInput;
 	private final GuiTextColorable futureWorldIdentifier;
@@ -24,6 +29,8 @@ public class CreateWorldScreen extends Screen {
 	public CreateWorldScreen() {
 		
 		super("Create world...");
+		
+		this.worldList = ProcGenGame.getGameInstance().getWorldList();
 		
 		// Main block
 		this.mainBlock = new GuiParent();
@@ -92,13 +99,15 @@ public class CreateWorldScreen extends Screen {
 			}
 			
 		} else if (event.isOrigin(this.createButton)) {
-		
+			
 			String worldName = this.worldNameInput.getInputText();
 			
 			if (!this.worldIdentifier.isEmpty() && !worldName.isEmpty()) {
-			
-			
-			
+				
+				File worldDir = this.worldList.createNewWorldDirectory(this.worldIdentifier, worldName);
+				
+				System.out.println("world dir : " + worldDir);
+				
 			}
 		
 		}
@@ -115,8 +124,7 @@ public class CreateWorldScreen extends Screen {
 	
 	private void updateFutureFileName(String value) {
 		
-		ProcGenGame pg = (ProcGenGame) ProcGenGame.getCurrent();
-		this.worldIdentifier = pg.getWorldList().makeValidIdentifierFromName(value);
+		this.worldIdentifier = this.worldList.makeValidIdentifierFromName(value);
 		this.futureWorldIdentifier.setText("Folder '" + this.worldIdentifier + "'");
 		
 		this.createButton.setDisabled(this.worldIdentifier.isEmpty());

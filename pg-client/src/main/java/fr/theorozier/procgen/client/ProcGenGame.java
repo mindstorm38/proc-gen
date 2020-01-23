@@ -51,6 +51,12 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	public static final OptionKey KEY_ENTITY_DEBUG = new OptionKey("entity_debug", GLFW.GLFW_KEY_P);
 	public static final OptionKey KEY_ENTITY_MOVE = new OptionKey("entity_move", GLFW.GLFW_KEY_K);
 	
+	public static ProcGenGame getGameInstance() {
+		return (ProcGenGame) getCurrent();
+	}
+	
+	// Class //
+	
 	private final WorldList worldList;
 	private WorldDimensionManager servedWorld;
 	

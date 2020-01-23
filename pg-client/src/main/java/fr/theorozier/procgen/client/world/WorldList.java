@@ -31,7 +31,12 @@ public class WorldList {
 		
 	}
 	
-	public void reload() {
+	/**
+	 * Reload known world list entries.
+	 * @return The internal world list entries view.
+	 * @see #getWorldEntriesView()
+	 */
+	public Map<String, Entry> reload() {
 		
 		ArrayList<String> deprecatedWorlds = new ArrayList<>();
 		
@@ -68,6 +73,8 @@ public class WorldList {
 			return false;
 			
 		});
+		
+		return this.worldEntriesView;
 		
 	}
 	
@@ -283,6 +290,16 @@ public class WorldList {
 		
 		public void setLastPlayed(long lastPlayed) {
 			this.lastPlayed = lastPlayed;
+		}
+		
+		@Override
+		public String toString() {
+			return "Entry{" +
+					"directory=" + directory +
+					", identifier='" + identifier + '\'' +
+					", name='" + name + '\'' +
+					", lastPlayed=" + lastPlayed +
+					'}';
 		}
 		
 	}
