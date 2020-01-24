@@ -170,8 +170,11 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.update();
 		this.profiler.endSection();
 		
-		if (this.testWorld != null)
-			this.testWorld.update();
+		//if (this.testWorld != null)
+		//	this.testWorld.update();
+		
+		if (this.servedWorld != null)
+			this.servedWorld.update();
 		
 	}
 	

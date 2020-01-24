@@ -96,7 +96,7 @@ public abstract class WorldBase {
 	 * Internal method to get a section at specific position.
 	 * @param x The X section coordinate.
 	 * @param z The Z section coordinate.
-	 * @return Section at this position, or <b>NULL</b> if no section there.
+	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
 	 */
 	protected WorldSection getSectionAt(int x, int z) {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
@@ -104,8 +104,24 @@ public abstract class WorldBase {
 		}
 	}
 	
+	/**
+	 * Internal method to get a section at specific block position.
+	 * @param x The X block coordinate.
+	 * @param z The Y block coordinate.
+	 * @return Section where the block is positionned, or <b>NULL</b> if no section loaded there.
+	 */
 	protected WorldSection getSectionAtBlock(int x, int z) {
 		return this.getSectionAt(x >> 4, z >> 4);
+	}
+	
+	public boolean isSectionLoadedAt(int x, int z) {
+		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
+			return this.sections.containsKey(pos.get().set(x, z));
+		}
+	}
+	
+	public boolean isSectionLoadedAtBlock(int x, int z) {
+		return this.isSectionLoadedAt(x >> 4, z >> 4);
 	}
 	
 	// CHUNKS //

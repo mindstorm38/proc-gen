@@ -1,15 +1,17 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.util.SaveUtils;
+import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
+import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.WorldIncompatException;
+import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -20,23 +22,19 @@ import java.util.concurrent.Executors;
  */
 public class WorldDimensionManager {
 	
-	//private final WorldDimensionHandler handler;
-	
 	private final File worldDirectory;
 	private final File playersDirectory;
 	private final File dimensionsDirectory;
 	
 	private final Map<String, File> dimensionsFiles = new HashMap<>();
 	private final Map<String, WorldServer> dimensionsWorlds = new HashMap<>();
-	private WorldServer[] dimensions;
+	private WorldServer[] dimensions = {};
 	
-	private final ExecutorService generatorComputer;
+	private final PriorityThreadPoolExecutor generatorComputer;
 	
 	public WorldDimensionManager(File worldDirectory) {
 		
 		SaveUtils.mkdirOrThrowException(worldDirectory, "The world directory already exists but it's a file.");
-		
-		//this.handler = handler;
 		
 		this.worldDirectory = worldDirectory;
 		this.playersDirectory = new File(worldDirectory, "players");
@@ -45,20 +43,13 @@ public class WorldDimensionManager {
 		SaveUtils.mkdirOrThrowException(this.playersDirectory, "The players directory already exists but it's a file.");
 		SaveUtils.mkdirOrThrowException(this.dimensionsDirectory, "The dimensions directory already exists but it's a file.");
 		
-		this.generatorComputer = Executors.newFixedThreadPool(2);
+		this.generatorComputer = new PriorityThreadPoolExecutor(4, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 		
 	}
 	
 	public File getWorldDirectory() {
 		return this.worldDirectory;
 	}
-	
-	/*
-	 * Only call when this world dimension was created.
-	 */
-	/*public void created(WorldGenerationOption option) {
-		this.handler.worldCreated(this, option);
-	}*/
 	
 	/**
 	 * Load the world, this happen when creating a world, or on open.
@@ -67,12 +58,10 @@ public class WorldDimensionManager {
 	public void load() throws WorldIncompatException {
 	
 		// TODO : Here, load all dimensions from the world directory
-		
-		//this.handler.worldLoaded(this);
 	
 	}
 	
-	public void createNewDimension(String identifier, long seed, ChunkGeneratorProvider provider) {
+	public WorldServer createNewDimension(String identifier, long seed, ChunkGeneratorProvider provider) {
 		
 		if (this.dimensionsWorlds.containsKey(identifier))
 			throw new IllegalArgumentException("The dimension '" + identifier + "' already exists this manager !");
@@ -86,6 +75,8 @@ public class WorldDimensionManager {
 		newDimensions[this.dimensions.length] = newDim;
 		
 		this.dimensions = newDimensions;
+		
+		return newDim;
 		
 	}
 	
@@ -122,6 +113,10 @@ public class WorldDimensionManager {
 			dim.update();
 		}
 		
+	}
+	
+	Future<WorldPrimitiveSection> submitWorldLoadingTask(WorldPrimitiveSection section, PriorityRunnable run) {
+		return this.generatorComputer.submit(run, section);
 	}
 
 }

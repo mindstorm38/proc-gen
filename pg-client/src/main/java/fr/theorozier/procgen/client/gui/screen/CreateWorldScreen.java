@@ -7,8 +7,10 @@ import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
+import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
+import fr.theorozier.procgen.common.world.position.SectionPosition;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
@@ -111,14 +113,27 @@ public class CreateWorldScreen extends Screen {
 				
 				File worldDir = this.worldList.createNewWorldDirectory(this.worldIdentifier, worldName);
 				
+				System.out.println("world dir : " + worldDir);
+				
 				if (worldDir != null) {
 					
-					WorldDimensionManager servedWorld = new WorldDimensionManager(worldDir);
-					ProcGenGame.getGameInstance().setServedWorld(servedWorld);
+					try {
+						
+						WorldDimensionManager servedWorld = new WorldDimensionManager(worldDir);
+						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
+						
+						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_CHUNK_PROVIDER);
+						
+						SectionPosition sectionPosition = new SectionPosition(0, 0);
+						world.addChunkLoadingPosition(sectionPosition);
+						
+						System.out.println("Chunk loading position added " + sectionPosition);
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					
 				}
-				
-				System.out.println("world dir : " + worldDir);
 				
 			}
 		

@@ -3,18 +3,21 @@ package fr.theorozier.procgen.common.world;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
+import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
-import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
 import io.sutil.pool.FixedObjectPool;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class WorldServer extends WorldBase {
 	
@@ -30,7 +33,9 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	private final Map<SectionPositioned, WorldSection> primitiveSections;
+	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections;
+	private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections;
+	private final List<Future<WorldPrimitiveSection>> loadingSectionsFutures;
 	private final HashSet<SectionPositioned> chunkLoadingPositions;
 	
 	public WorldServer(WorldDimensionManager dimensionManager, long seed, ChunkGeneratorProvider provider) {
@@ -46,6 +51,8 @@ public class WorldServer extends WorldBase {
 		this.seaLevel = 63;
 		
 		this.primitiveSections = new HashMap<>();
+		this.loadingSections = new HashMap<>();
+		this.loadingSectionsFutures = new ArrayList<>();
 		this.chunkLoadingPositions = new HashSet<>();
 		
 	}
@@ -87,6 +94,7 @@ public class WorldServer extends WorldBase {
 		super.update();
 		
 		this.updateChunkLoadingPositions();
+		this.updateChunkLoading();
 		
 		this.blockTickList.tick();
 		
@@ -173,13 +181,97 @@ public class WorldServer extends WorldBase {
 	private void updateChunkLoadingPositions() {
 		
 		for (SectionPositioned poses : this.chunkLoadingPositions) {
-			this.forEachSectionPosNear(poses.getX(), poses.getZ(), NEAR_CHUNK_LOADING, this::loadSection);
+			this.forEachSectionPosNear(poses.getX(), poses.getZ(), NEAR_CHUNK_LOADING, this::tryLoadSection);
 		}
 		
 	}
 	
-	private void tryLoadChunk(SectionPosition sectionPosition) {
-		// TODO
+	private void tryLoadSection(SectionPosition sectionPosition) {
+		
+		int x = sectionPosition.getX();
+		int z = sectionPosition.getZ();
+		
+		if (!this.isSectionLoadedAtBlock(x, z) && !this.isSectionLoadingAt(x, z)) {
+			
+			System.out.println("Section " + sectionPosition + " is not loaded, creating new one ...");
+			
+			WorldPrimitiveSection newPrimitive = new WorldPrimitiveSection(this, sectionPosition);
+			this.primitiveSections.put(sectionPosition, newPrimitive);
+			this.submitSectionNextStatusLoadingTask(sectionPosition, newPrimitive);
+			
+		}
+	
+	}
+	
+	private void updateChunkLoading() {
+	
+		Iterator<Future<WorldPrimitiveSection>> loadingSectionFuturesIt = this.loadingSectionsFutures.iterator();
+		Future<WorldPrimitiveSection> future;
+		WorldPrimitiveSection section = null;
+		
+		ArrayList<WorldPrimitiveSection> doneSections = new ArrayList<>();
+		
+		while (loadingSectionFuturesIt.hasNext()) {
+			
+			future = loadingSectionFuturesIt.next();
+			
+			if (future.isDone()) {
+				
+				try {
+					
+					section = future.get();
+					section.gotoNextStatus();
+					
+					System.out.println("==> Section at " + section.getSectionPos() + " loaded status " + section.getStatus().getIdentifier());
+					
+					doneSections.add(section);
+					
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+				
+				loadingSectionFuturesIt.remove();
+				
+				if (section != null) {
+					this.loadingSections.remove(section.getSectionPos());
+				}
+				
+			}
+			
+		}
+		
+		for (WorldPrimitiveSection doneSection : doneSections) {
+			this.submitSectionNextStatusLoadingTask(doneSection.getSectionPos(), doneSection);
+		}
+	
+	}
+	
+	private void submitSectionNextStatusLoadingTask(SectionPositioned pos, WorldPrimitiveSection section) {
+		
+		PriorityRunnable task = section.getNextStatusLoadingTask(this, 0);
+		
+		if (task != null) {
+			
+			System.out.println("Section at " + pos + " loading status " + section.getStatus().getNext().getIdentifier() + "...");
+			
+			Future<WorldPrimitiveSection> taskFuture = this.dimensionManager.submitWorldLoadingTask(section, task);
+			this.loadingSections.put(pos, taskFuture);
+			this.loadingSectionsFutures.add(taskFuture);
+			
+		}
+		
+	}
+	
+	public WorldPrimitiveSection getPrimitiveSectionAt(int x, int z) {
+		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
+			return this.primitiveSections.get(pos.get().set(x, z));
+		}
+	}
+	
+	public boolean isSectionLoadingAt(int x, int z) {
+		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
+			return this.primitiveSections.containsKey(pos.get().set(x, z));
+		}
 	}
 	
 	// FIXME : TEMPORARY FOR MONOTHREAD GENERATION
