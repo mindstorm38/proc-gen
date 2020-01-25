@@ -67,7 +67,7 @@ public abstract class WorldSectionStatus {
 	private final String identifier;
 	private final String prevId, nextId;
 	private final boolean requireSameAround;
-	private WorldSectionStatus prev, next;
+	private WorldSectionStatus prev, next; // TODO : check if previous is useful
 	
 	public WorldSectionStatus(int order, String identifier, String prevId, String nextId, boolean requireSameAround) {
 		

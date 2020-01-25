@@ -10,6 +10,7 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
@@ -95,6 +96,10 @@ public class WorldServer extends WorldBase {
 		
 		this.updateChunkLoadingPositions();
 		this.updateChunkLoading();
+		
+		System.out.println("DEBUG MAP AFTER");
+		this.debugLoadingChunkAround(0, 0, 5);
+		System.out.println();
 		
 		this.blockTickList.tick();
 		
@@ -186,18 +191,34 @@ public class WorldServer extends WorldBase {
 		
 	}
 	
+	private int getDistanceToLoaders(SectionPositioned sectionPos) {
+		
+		return this.chunkLoadingPositions.stream()
+				.mapToInt(sp -> (int) sp.distSquared(sectionPos.getX(), sectionPos.getZ()))
+				.min()
+				.orElse(0);
+		
+	}
+	
 	private void tryLoadSection(SectionPosition sectionPosition) {
 		
 		int x = sectionPosition.getX();
 		int z = sectionPosition.getZ();
 		
-		if (!this.isSectionLoadedAtBlock(x, z) && !this.isSectionLoadingAt(x, z)) {
+		if (!this.isSectionLoadedAtBlock(x, z) && !this.loadingSections.containsKey(sectionPosition)) {
 			
-			System.out.println("Section " + sectionPosition + " is not loaded, creating new one ...");
+			WorldPrimitiveSection primitive = this.getPrimitiveSectionAt(x, z);
+			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
 			
-			WorldPrimitiveSection newPrimitive = new WorldPrimitiveSection(this, sectionPosition);
-			this.primitiveSections.put(sectionPosition, newPrimitive);
-			this.submitSectionNextStatusLoadingTask(sectionPosition, newPrimitive);
+			if (primitive == null) {
+				
+				primitive = new WorldPrimitiveSection(this, sectionPosition);
+				primitive.setStatus(WorldSectionStatus.EMPTY);
+				this.primitiveSections.put(immutableSectionPosition, primitive);
+				
+			}
+			
+			this.submitSectionNextStatusLoadingTask(immutableSectionPosition, primitive, this.getDistanceToLoaders(sectionPosition));
 			
 		}
 	
@@ -209,8 +230,6 @@ public class WorldServer extends WorldBase {
 		Future<WorldPrimitiveSection> future;
 		WorldPrimitiveSection section = null;
 		
-		ArrayList<WorldPrimitiveSection> doneSections = new ArrayList<>();
-		
 		while (loadingSectionFuturesIt.hasNext()) {
 			
 			future = loadingSectionFuturesIt.next();
@@ -221,10 +240,6 @@ public class WorldServer extends WorldBase {
 					
 					section = future.get();
 					section.gotoNextStatus();
-					
-					System.out.println("==> Section at " + section.getSectionPos() + " loaded status " + section.getStatus().getIdentifier());
-					
-					doneSections.add(section);
 					
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
@@ -239,20 +254,14 @@ public class WorldServer extends WorldBase {
 			}
 			
 		}
-		
-		for (WorldPrimitiveSection doneSection : doneSections) {
-			this.submitSectionNextStatusLoadingTask(doneSection.getSectionPos(), doneSection);
-		}
 	
 	}
 	
-	private void submitSectionNextStatusLoadingTask(SectionPositioned pos, WorldPrimitiveSection section) {
+	private void submitSectionNextStatusLoadingTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
 		
-		PriorityRunnable task = section.getNextStatusLoadingTask(this, 0);
+		PriorityRunnable task = section.getNextStatusLoadingTask(this, distanceToLoaders);
 		
 		if (task != null) {
-			
-			System.out.println("Section at " + pos + " loading status " + section.getStatus().getNext().getIdentifier() + "...");
 			
 			Future<WorldPrimitiveSection> taskFuture = this.dimensionManager.submitWorldLoadingTask(section, task);
 			this.loadingSections.put(pos, taskFuture);
@@ -272,6 +281,84 @@ public class WorldServer extends WorldBase {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
 			return this.primitiveSections.containsKey(pos.get().set(x, z));
 		}
+	}
+	
+	public void debugLoadingChunkAround(int x, int z, int range) {
+		
+		int minX = x - range;
+		int minZ = z - range;
+		
+		int maxX = x + range;
+		int maxZ = z + range;
+		
+		WorldPrimitiveSection section;
+		WorldSectionStatus status;
+		
+		System.out.print("   ");
+		for (x = minX; x <= maxX; ++x) {
+			if (x >= 0) System.out.print(' ');
+			System.out.print(x);
+		}
+		System.out.println();
+		
+		for (z = minZ; z <= maxZ; ++z) {
+			
+			if (z >= 0) System.out.print(' ');
+			System.out.print(z);
+			System.out.print(" ");
+			
+			for (x = minX; x <= maxX; ++x) {
+				
+				section = this.getPrimitiveSectionAt(x, z);
+				
+				if (section == null) {
+					System.out.print("  ");
+				} else {
+					
+					status = section.getStatus();
+					
+					System.out.print(' ');
+					
+					if (status == WorldSectionStatus.EMPTY) {
+						System.out.print("e");
+					} else if (status == WorldSectionStatus.BIOMES) {
+						System.out.print("b");
+					} else if (status == WorldSectionStatus.BASE) {
+						System.out.print("t");
+					} else if (status == WorldSectionStatus.SURFACE) {
+						System.out.print("s");
+					} else if (status == WorldSectionStatus.FEATURES) {
+						System.out.print("f");
+					} else if (status == WorldSectionStatus.FINISHED) {
+						System.out.print("O");
+					} else {
+						System.out.print("?");
+					}
+					
+					/*if (status == WorldSectionStatus.EMPTY) {
+						System.out.print("0");
+					} else if (status == WorldSectionStatus.BIOMES) {
+						System.out.print("1");
+					} else if (status == WorldSectionStatus.BASE) {
+						System.out.print("2");
+					} else if (status == WorldSectionStatus.SURFACE) {
+						System.out.print("3");
+					} else if (status == WorldSectionStatus.FEATURES) {
+						System.out.print("4");
+					} else if (status == WorldSectionStatus.FINISHED) {
+						System.out.print("O");
+					} else {
+						System.out.print("?");
+					}*/
+					
+				}
+				
+			}
+			
+			System.out.println();
+			
+		}
+		
 	}
 	
 	// FIXME : TEMPORARY FOR MONOTHREAD GENERATION
