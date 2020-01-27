@@ -27,15 +27,15 @@ generation.
 
 > Do not forget to save your custom settings before launching a new version of the game, because I add lot of debug keys to the game each release.
 
-## This content is coming
+## TODO List
 
 - [x] Motion entities
 - [x] Pigs
   - [x] Model
   - [x] Animations ***(New in 0.1.1)***
   - [ ] AI
-- [ ] Asynchronous (multi-threaded) chunk generation
-- [ ] Asynchronous world chunk saving on file system
+- [x] Asynchronous (multi-threaded) chunk generation
+- [ ] Asynchronous world chunk saving on file system *(actively working on)*
 - [ ] Items
 - [ ] All-model falling blocks
 - [ ] TNT
