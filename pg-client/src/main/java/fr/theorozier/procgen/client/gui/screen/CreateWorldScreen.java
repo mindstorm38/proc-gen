@@ -7,10 +7,10 @@ import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
+import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
-import fr.theorozier.procgen.common.world.position.SectionPosition;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
@@ -124,10 +124,10 @@ public class CreateWorldScreen extends Screen {
 						
 						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_CHUNK_PROVIDER);
 						
-						SectionPosition sectionPosition = new SectionPosition(0, 0);
-						world.addChunkLoadingPosition(sectionPosition);
+						WorldLoadingPosition loadingPosition = new WorldLoadingPosition(0, 0);
+						world.addWorldLoadingPosition(loadingPosition);
 						
-						System.out.println("Chunk loading position added " + sectionPosition);
+						System.out.println("Chunk loading position added " + loadingPosition);
 						
 					} catch (Exception e) {
 						e.printStackTrace();

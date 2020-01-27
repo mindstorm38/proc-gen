@@ -3,6 +3,7 @@ package fr.theorozier.procgen.common.world.chunk;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
@@ -13,13 +14,20 @@ import java.util.Map;
 
 public class WorldServerSection extends WorldSection {
 	
-	private final Map<Heightmap.Type, Heightmap> heightmaps;
+	protected final Map<Heightmap.Type, Heightmap> heightmaps;
 	
 	public WorldServerSection(WorldServer world, SectionPositioned position) {
 		
 		super(world, position);
 		
 		this.heightmaps = new EnumMap<>(Heightmap.Type.class);
+		
+	}
+	
+	public WorldServerSection(WorldPrimitiveSection primitiveSection) {
+		
+		super(primitiveSection.getWorld(), primitiveSection.getSectionPos());
+		this.heightmaps = primitiveSection.heightmaps;
 		
 	}
 	

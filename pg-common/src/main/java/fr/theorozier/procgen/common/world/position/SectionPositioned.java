@@ -13,6 +13,10 @@ public interface SectionPositioned {
 		return dx * dx + dz * dz;
 	}
 	
+	default float distSquared(SectionPositioned other) {
+		return this.distSquared(other.getX(), other.getZ());
+	}
+	
 	static int hashCode(SectionPositioned sectionPos) {
 		int result = 31 + sectionPos.getX();
 		result = 31 * result + sectionPos.getZ();

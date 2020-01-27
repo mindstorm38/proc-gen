@@ -21,10 +21,6 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		return this.status;
 	}
 	
-	public final void setStatus(WorldSectionStatus status) {
-		this.status = status;
-	}
-	
 	public final void gotoNextStatus() {
 		
 		WorldSectionStatus status = this.status.getNext();
@@ -53,9 +49,11 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			
 			for (int x = this.getSectionPos().getX() - 1; x <= maxX; ++x) {
 				for (int z = this.getSectionPos().getZ() - 1; z <= maxZ; ++z) {
-					other = world.getPrimitiveSectionAt(x, z);
-					if (other == null || !other.getStatus().isAsLeastAt(this.status)) {
-						return null;
+					if (!world.isSectionLoadedAt(x, z)) {
+						other = world.getPrimitiveSectionAt(x, z);
+						if (other == null || !other.getStatus().isAsLeastAt(this.status)) {
+							return null;
+						}
 					}
 				}
 			}

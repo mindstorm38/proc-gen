@@ -34,10 +34,12 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections;
-	private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections;
-	private final List<Future<WorldPrimitiveSection>> loadingSectionsFutures;
-	private final HashSet<SectionPositioned> chunkLoadingPositions;
+	// Keep using SectionPosioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones.
+	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
+	private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
+	private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
+	
+	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
 	
 	public WorldServer(WorldDimensionManager dimensionManager, long seed, ChunkGeneratorProvider provider) {
 		
@@ -50,11 +52,6 @@ public class WorldServer extends WorldBase {
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
-		
-		this.primitiveSections = new HashMap<>();
-		this.loadingSections = new HashMap<>();
-		this.loadingSectionsFutures = new ArrayList<>();
-		this.chunkLoadingPositions = new HashSet<>();
 		
 	}
 	
@@ -175,26 +172,26 @@ public class WorldServer extends WorldBase {
 	
 	// CHUNK LOADING //
 	
-	public void addChunkLoadingPosition(SectionPositioned sectionPositioned) {
-		this.chunkLoadingPositions.add(sectionPositioned);
+	public void addWorldLoadingPosition(WorldLoadingPosition sectionPositioned) {
+		this.worldLoadingPositions.add(sectionPositioned);
 	}
 	
-	public void removeChunkLoadingPosition(SectionPositioned sectionPositioned) {
-		this.chunkLoadingPositions.remove(sectionPositioned);
+	public void removeWorldLoadingPosition(WorldLoadingPosition sectionPositioned) {
+		this.worldLoadingPositions.remove(sectionPositioned);
 	}
 	
 	private void updateChunkLoadingPositions() {
 		
-		for (SectionPositioned poses : this.chunkLoadingPositions) {
-			this.forEachSectionPosNear(poses.getX(), poses.getZ(), NEAR_CHUNK_LOADING, this::tryLoadSection);
+		for (WorldLoadingPosition poses : this.worldLoadingPositions) {
+			this.forEachSectionPosNear(poses.getX(), poses.getZ(), poses.getLoadingRadius(), this::tryLoadSection);
 		}
 		
 	}
 	
 	private int getDistanceToLoaders(SectionPositioned sectionPos) {
 		
-		return this.chunkLoadingPositions.stream()
-				.mapToInt(sp -> (int) sp.distSquared(sectionPos.getX(), sectionPos.getZ()))
+		return this.worldLoadingPositions.stream()
+				.mapToInt(sp -> (int) sp.distSquared(sectionPos))
 				.min()
 				.orElse(0);
 		
@@ -205,18 +202,13 @@ public class WorldServer extends WorldBase {
 		int x = sectionPosition.getX();
 		int z = sectionPosition.getZ();
 		
-		if (!this.isSectionLoadedAtBlock(x, z) && !this.loadingSections.containsKey(sectionPosition)) {
-			
-			WorldPrimitiveSection primitive = this.getPrimitiveSectionAt(x, z);
+		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoadingAt(x, z)) {
+		
 			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
+			WorldPrimitiveSection primitive = new WorldPrimitiveSection(this, immutableSectionPosition);
 			
-			if (primitive == null) {
-				
-				primitive = new WorldPrimitiveSection(this, sectionPosition);
-				primitive.setStatus(WorldSectionStatus.EMPTY);
-				this.primitiveSections.put(immutableSectionPosition, primitive);
-				
-			}
+			this.primitiveSections.put(immutableSectionPosition, primitive);
+			this.primitiveSectionsList.add(immutableSectionPosition);
 			
 			this.submitSectionNextStatusLoadingTask(immutableSectionPosition, primitive, this.getDistanceToLoaders(sectionPosition));
 			
@@ -226,35 +218,51 @@ public class WorldServer extends WorldBase {
 	
 	private void updateChunkLoading() {
 	
-		Iterator<Future<WorldPrimitiveSection>> loadingSectionFuturesIt = this.loadingSectionsFutures.iterator();
+		Iterator<ImmutableSectionPosition> primitiveSectionsIt = this.primitiveSectionsList.iterator();
+		ImmutableSectionPosition pos;
 		Future<WorldPrimitiveSection> future;
-		WorldPrimitiveSection section = null;
+		WorldPrimitiveSection section;
 		
-		while (loadingSectionFuturesIt.hasNext()) {
+		while (primitiveSectionsIt.hasNext()) {
 			
-			future = loadingSectionFuturesIt.next();
+			pos = primitiveSectionsIt.next();
+			future = this.loadingSections.get(pos);
 			
-			if (future.isDone()) {
-				
-				try {
+			if (future == null ) {
+			
+				section = this.primitiveSections.get(pos);
+				this.submitSectionNextStatusLoadingTask(pos, section, this.getDistanceToLoaders(pos));
+			
+			} else {
+			
+				if (future.isDone()) {
 					
-					section = future.get();
-					section.gotoNextStatus();
+					try {
+						
+						section = future.get();
+						section.gotoNextStatus();
+						
+						if (section.isFinished()) {
+							
+							this.sections.put(pos, new WorldServerSection(section));
+							
+							this.primitiveSections.remove(pos);
+							primitiveSectionsIt.remove();
+							
+						}
+						
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					} finally {
+						this.loadingSections.remove(pos);
+					}
 					
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
-				
-				loadingSectionFuturesIt.remove();
-				
-				if (section != null) {
-					this.loadingSections.remove(section.getSectionPos());
 				}
 				
 			}
 			
 		}
-	
+		
 	}
 	
 	private void submitSectionNextStatusLoadingTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
@@ -265,7 +273,6 @@ public class WorldServer extends WorldBase {
 			
 			Future<WorldPrimitiveSection> taskFuture = this.dimensionManager.submitWorldLoadingTask(section, task);
 			this.loadingSections.put(pos, taskFuture);
-			this.loadingSectionsFutures.add(taskFuture);
 			
 		}
 		
@@ -320,36 +327,20 @@ public class WorldServer extends WorldBase {
 					System.out.print(' ');
 					
 					if (status == WorldSectionStatus.EMPTY) {
-						System.out.print("e");
+						System.out.print("\u001B[34mE\u001B[0m");
 					} else if (status == WorldSectionStatus.BIOMES) {
-						System.out.print("b");
+						System.out.print("\u001B[35mB\u001B[0m");
 					} else if (status == WorldSectionStatus.BASE) {
-						System.out.print("t");
+						System.out.print("\u001B[31mT\u001B[0m");
 					} else if (status == WorldSectionStatus.SURFACE) {
-						System.out.print("s");
+						System.out.print("\u001B[33mS\u001B[0m");
 					} else if (status == WorldSectionStatus.FEATURES) {
-						System.out.print("f");
+						System.out.print("\u001B[32mF\u001B[0m");
 					} else if (status == WorldSectionStatus.FINISHED) {
 						System.out.print("O");
 					} else {
 						System.out.print("?");
 					}
-					
-					/*if (status == WorldSectionStatus.EMPTY) {
-						System.out.print("0");
-					} else if (status == WorldSectionStatus.BIOMES) {
-						System.out.print("1");
-					} else if (status == WorldSectionStatus.BASE) {
-						System.out.print("2");
-					} else if (status == WorldSectionStatus.SURFACE) {
-						System.out.print("3");
-					} else if (status == WorldSectionStatus.FEATURES) {
-						System.out.print("4");
-					} else if (status == WorldSectionStatus.FINISHED) {
-						System.out.print("O");
-					} else {
-						System.out.print("?");
-					}*/
 					
 				}
 				

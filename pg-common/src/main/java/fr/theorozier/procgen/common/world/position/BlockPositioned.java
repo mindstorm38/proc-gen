@@ -13,6 +13,10 @@ public interface BlockPositioned extends SectionPositioned {
 		return dx * dx + dy * dy + dz * dz;
 	}
 	
+	default float distSquared(BlockPositioned other) {
+		return this.distSquared(other.getX(), other.getY(), other.getZ());
+	}
+	
 	static int hashCode(BlockPositioned blockPos) {
 		int result = 31 + blockPos.getX();
 		result = 31 * result + blockPos.getY();
