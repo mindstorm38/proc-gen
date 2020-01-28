@@ -135,7 +135,11 @@ public class WorldServer extends WorldBase {
 	// SECTIONS //
 	
 	protected WorldServerSection getSectionAt(int x, int z) {
-		return (WorldServerSection) super.getSectionAt(x, z);
+		if (this.isSectionLoadingAt(x, z)) {
+			return this.getPrimitiveSectionAt(x, z);
+		} else {
+			return (WorldServerSection) super.getSectionAt(x, z);
+		}
 	}
 	
 	protected WorldServerSection getSectionAtBlock(int x, int z) {

@@ -5,7 +5,7 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 public class WorldLoadingPosition extends SectionPosition {
 
-	public static final int DEFAULT_LOADING_RADIUS = 4;
+	public static final int DEFAULT_LOADING_RADIUS = 8;
 	public static final int MAX_LOADING_RADIUS = 32;
 	
 	private int loadingRadius = DEFAULT_LOADING_RADIUS;

@@ -4,6 +4,7 @@ import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
+import io.sutil.ThreadUtils;
 
 public class WorldPrimitiveSection extends WorldServerSection {
 	
@@ -68,7 +69,10 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			}
 			
 			public void run() {
+				
 				next.generate(world.getChunkGenerator(), WorldPrimitiveSection.this);
+				ThreadUtils.safesleep(10); // TODO Remove this
+				
 			}
 			
 		};
