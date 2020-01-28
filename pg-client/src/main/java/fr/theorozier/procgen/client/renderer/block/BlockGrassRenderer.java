@@ -49,7 +49,7 @@ public class BlockGrassRenderer extends BlockRenderer {
 		if (faces.isBottom()) {
 			
 			dataArray.faceBottom(x, y, z, 1, 1);
-			dataArray.faceBottomColor(color, OCCLUSION_FACTOR, occlData);
+			dataArray.faceBottomColor(Color.WHITE, OCCLUSION_FACTOR, occlData);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.BOTTOM));
 			dataArray.faceIndices();
 			
