@@ -27,6 +27,10 @@ public class WorldServerSection extends WorldSection {
 	public WorldServerSection(WorldPrimitiveSection primitiveSection) {
 		
 		super(primitiveSection.getWorld(), primitiveSection.getSectionPos());
+		
+		primitiveSection.forEachChunk(chunk -> this.chunks[chunk.getChunkPos().getY()] = chunk);
+		System.arraycopy(primitiveSection.biomes, 0, this.biomes, 0, 256);
+		
 		this.heightmaps = primitiveSection.heightmaps;
 		
 	}
@@ -73,35 +77,6 @@ public class WorldServerSection extends WorldSection {
 		}
 		
 		return map.get(x, z);
-		
-	}
-	
-	// FIXME TEMP MONO THREAD WORLD GENERATION METHOD
-	public void generate() {
-		
-		ChunkGenerator generator = this.getWorld().getChunkGenerator();
-		WorldServerChunk chunk;
-		
-		ImmutableSectionPosition pos = this.getSectionPos();
-		generator.genBiomes(this, pos);
-		
-		for (int y = 0; y < this.getWorld().getVerticalChunkCount(); ++y) {
-		
-			chunk = new WorldServerChunk(this.getWorld(), this, new ImmutableBlockPosition(pos, y));
-			this.setChunkAt(y, chunk);
-			
-			generator.genBase(chunk, chunk.getChunkPos());
-			
-		}
-	
-		generator.genSurface(this, pos);
-		generator.genFeatures(this, pos);
-		
-		this.forEachChunk(loadedChunk -> {
-			this.getWorld().getEventManager().fireListeners(WorldLoadingListener.class, l -> {
-				l.worldChunkLoaded(this.getWorld(), loadedChunk);
-			});
-		});
 		
 	}
 	

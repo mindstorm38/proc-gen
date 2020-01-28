@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.client.gui.screen;
 
 import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiTextInput;
@@ -120,14 +121,12 @@ public class CreateWorldScreen extends Screen {
 					try {
 						
 						WorldDimensionManager servedWorld = new WorldDimensionManager(worldDir);
+						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_CHUNK_PROVIDER);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
-						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_CHUNK_PROVIDER);
+						world.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
 						
-						WorldLoadingPosition loadingPosition = new WorldLoadingPosition(0, 0);
-						world.addWorldLoadingPosition(loadingPosition);
-						
-						System.out.println("Chunk loading position added " + loadingPosition);
+						this.manager.loadScene(DebugScene.class);
 						
 					} catch (Exception e) {
 						e.printStackTrace();

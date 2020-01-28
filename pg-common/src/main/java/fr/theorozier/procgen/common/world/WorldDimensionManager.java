@@ -107,6 +107,14 @@ public class WorldDimensionManager {
 		
 	}
 	
+	public WorldServer getDimension(String identifier) {
+		return this.dimensionsWorlds.get(identifier);
+	}
+	
+	public WorldServer getMainDimension() {
+		return this.dimensions.length == 0 ? null : this.dimensions[0];
+	}
+	
 	public void update() {
 		
 		for (WorldServer dim : this.dimensions) {

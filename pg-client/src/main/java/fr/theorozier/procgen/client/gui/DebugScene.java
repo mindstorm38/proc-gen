@@ -30,6 +30,7 @@ public class DebugScene extends GuiScene {
 			this.posTexts[i] = new GuiTextBase();
 			this.posTexts[i].setAnchor(-1f, -1f);
 			this.posTexts[i].setPosition(20f, 20f + (i * 24f));
+			this.posTexts[i].setHeight(20);
 			this.addChild(this.posTexts[i]);
 			
 		}

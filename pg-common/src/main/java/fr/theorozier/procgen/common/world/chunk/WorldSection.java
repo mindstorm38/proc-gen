@@ -21,8 +21,8 @@ public class WorldSection {
 	private final WorldBase world;
 	private final ImmutableSectionPosition position;
 	
-	private final Biome[] biomes;
-	private final WorldChunk[] chunks;
+	protected final Biome[] biomes;
+	protected final WorldChunk[] chunks;
 	
 	public WorldSection(WorldBase world, SectionPositioned position) {
 		
@@ -66,7 +66,7 @@ public class WorldSection {
 		this.chunks[y] = chunk;
 	}
 	
-	protected void forEachChunk(Consumer<WorldChunk> cons) {
+	public void forEachChunk(Consumer<WorldChunk> cons) {
 		
 		for (int y = 0; y < this.chunks.length; y++)
 			if (this.chunks[y] != null)

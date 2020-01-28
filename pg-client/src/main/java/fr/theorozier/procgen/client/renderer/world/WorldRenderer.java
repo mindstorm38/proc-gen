@@ -142,11 +142,14 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	public void render(float alpha) {
 		
+		if (!this.ready)
+			return;
+		
 		if (!this.escaped) {
 			
 			this.profiler.startSection("camera");
 			
-			float speedMult = alpha * 0.5f;
+			float speedMult = alpha * 2.0f;
 			boolean changed = false;
 			
 			if (this.window.isKeyPressed(ProcGenGame.KEY_FORWARD.getKeyCode())) {
@@ -194,6 +197,8 @@ public class WorldRenderer implements ModelApplyListener,
 				this.profiler.startSection("update_view_pos");
 				this.chunkRenderManager.updateViewPosition(this.camera);
 				this.profiler.endSection();
+				
+				ProcGenGame.getGameInstance().getTestLoadingPosition().set(MathHelper.floorFloatInt(this.camera.getTargetX()), MathHelper.floorFloatInt(this.camera.getTargetZ()));
 				
 			}
 			

@@ -12,6 +12,6 @@ import fr.theorozier.procgen.common.world.WorldBase;
  */
 public abstract class WorldClient extends WorldBase {
 	
-
+	public abstract void unload();
 
 }

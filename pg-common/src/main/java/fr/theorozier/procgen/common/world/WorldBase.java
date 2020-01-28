@@ -9,6 +9,7 @@ import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
+import fr.theorozier.procgen.common.world.event.WorldMethodEventManager;
 import fr.theorozier.procgen.common.world.position.*;
 import io.msengine.common.util.event.MethodEventManager;
 import io.sutil.math.MathHelper;
@@ -40,11 +41,7 @@ public abstract class WorldBase {
 		
 		this.time = 0L;
 		
-		this.eventManager = new MethodEventManager(
-				WorldChunkListener.class,
-				WorldLoadingListener.class,
-				WorldEntityListener.class
-		);
+		this.eventManager = new WorldMethodEventManager();
 		
 	}
 	
@@ -122,6 +119,10 @@ public abstract class WorldBase {
 	
 	public boolean isSectionLoadedAtBlock(int x, int z) {
 		return this.isSectionLoadedAt(x >> 4, z >> 4);
+	}
+	
+	public void forEachSection(Consumer<WorldSection> cons) {
+		this.sections.values().forEach(cons);
 	}
 	
 	// CHUNKS //

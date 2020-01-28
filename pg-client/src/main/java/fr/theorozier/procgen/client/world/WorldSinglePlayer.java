@@ -11,6 +11,8 @@ import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
+import java.util.Objects;
+
 public class WorldSinglePlayer extends WorldClient implements
 		WorldLoadingListener,
 		WorldChunkListener,
@@ -20,11 +22,23 @@ public class WorldSinglePlayer extends WorldClient implements
 	
 	public WorldSinglePlayer(WorldServer server) {
 		
-		this.server = server;
+		this.server = Objects.requireNonNull(server, "World server expected for a WorldSinglePlayer");
+		
+		server.forEachSection(sec -> this.sections.put(sec.getSectionPos(), sec));
+		server.getEntitiesView().forEach(this::addEntity);
 		
 		server.getEventManager().addEventListener(WorldLoadingListener.class, this);
 		server.getEventManager().addEventListener(WorldChunkListener.class, this);
 		server.getEventManager().addEventListener(WorldEntityListener.class, this);
+		
+	}
+	
+	@Override
+	public void unload() {
+		
+		this.server.getEventManager().removeEventListener(WorldLoadingListener.class, this);
+		this.server.getEventManager().removeEventListener(WorldChunkListener.class, this);
+		this.server.getEventManager().removeEventListener(WorldEntityListener.class, this);
 		
 	}
 	
@@ -35,7 +49,7 @@ public class WorldSinglePlayer extends WorldClient implements
 	@Override
 	public void update() {
 		
-		this.server.update();
+		// this.server.update(); FIXME : No longer needed because DimensionManager update them.
 		
 		super.update();
 		

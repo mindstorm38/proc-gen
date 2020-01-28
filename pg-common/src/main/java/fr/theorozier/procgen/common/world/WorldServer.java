@@ -7,6 +7,7 @@ import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
@@ -34,7 +35,7 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	// Keep using SectionPosioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones.
+	// Keep using SectionPositioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones.
 	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
 	private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
 	private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
@@ -94,9 +95,9 @@ public class WorldServer extends WorldBase {
 		this.updateChunkLoadingPositions();
 		this.updateChunkLoading();
 		
-		System.out.println("DEBUG MAP AFTER");
-		this.debugLoadingChunkAround(0, 0, 5);
-		System.out.println();
+		//System.out.println("DEBUG MAP AFTER");
+		//this.debugLoadingChunkAround(0, 0, 5);
+		//System.out.println();
 		
 		this.blockTickList.tick();
 		
@@ -244,10 +245,17 @@ public class WorldServer extends WorldBase {
 						
 						if (section.isFinished()) {
 							
-							this.sections.put(pos, new WorldServerSection(section));
+							WorldServerSection newSection = new WorldServerSection(section);
+							this.sections.put(pos, newSection);
 							
 							this.primitiveSections.remove(pos);
 							primitiveSectionsIt.remove();
+							
+							newSection.forEachChunk(chunk ->
+								this.eventManager.fireListeners(WorldLoadingListener.class, l ->
+									l.worldChunkLoaded(this, chunk)
+								)
+							);
 							
 						}
 						
@@ -350,28 +358,6 @@ public class WorldServer extends WorldBase {
 			
 		}
 		
-	}
-	
-	// FIXME : TEMPORARY FOR MONOTHREAD GENERATION
-	public void loadSection(SectionPosition pos) {
-		
-		WorldServerSection section = this.getSectionAt(pos.getX(), pos.getZ());
-		
-		if (section == null) {
-			
-			ImmutableSectionPosition immutable = new ImmutableSectionPosition(pos);
-			
-			section = new WorldServerSection(this, immutable);
-			this.sections.put(immutable, section);
-			
-			section.generate();
-			
-		}
-		
-	}
-	
-	public void loadNear(float x, float z) {
-		this.forEachSectionPosNear(x, z, NEAR_CHUNK_LOADING, this::loadSection);
 	}
 	
 	// FIXME : TEMPORARY FOR ENTITY TESTING

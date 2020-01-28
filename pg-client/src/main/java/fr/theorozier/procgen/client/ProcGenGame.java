@@ -12,8 +12,8 @@ import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.entity.MotionEntity;
 import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
+import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
 import io.msengine.client.option.OptionKey;
@@ -27,7 +27,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -59,9 +58,11 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	
 	private final WorldList worldList;
 	private WorldDimensionManager servedWorld;
+	private WorldClient clientWorld;
+	
+	private final WorldLoadingPosition testLoadingPosition = new WorldLoadingPosition();
 	
 	private final WorldRenderer worldRenderer;
-	private final WorldClient testWorld;
 	
 	private boolean escaped = false;
 	
@@ -72,7 +73,6 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.worldList = new WorldList(new File(this.getAppdata(), "worlds"));
 		
 		this.worldRenderer = new WorldRenderer();
-		this.testWorld = new WorldSinglePlayer(new WorldServer(null, new Random().nextLong(), WorldGenerators.BETA_CHUNK_PROVIDER));
 		
 		this.options.addOption(KEY_FORWARD);
 		this.options.addOption(KEY_BACKWARD);
@@ -114,7 +114,6 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.worldRenderer.init();
 		this.setEscaped(true);
 		
-		this.worldRenderer.renderWorld(this.testWorld);
 		this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
 		this.worldRenderer.getCamera().instantTarget();
 		
@@ -152,7 +151,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
 		
 		this.profiler.startSection("world_rendering");
-		//this.worldRenderer.render(alpha);
+		this.worldRenderer.render(alpha);
 		
 		this.profiler.endStartSection("gui");
 		this.guiManager.render(alpha);
@@ -170,11 +169,11 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.update();
 		this.profiler.endSection();
 		
-		//if (this.testWorld != null)
-		//	this.testWorld.update();
-		
 		if (this.servedWorld != null)
 			this.servedWorld.update();
+		
+		if (this.clientWorld != null)
+			this.clientWorld.update();
 		
 	}
 	
@@ -185,7 +184,32 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	}
 	
 	public void setServedWorld(WorldDimensionManager worldDimensionManager) {
+		
+		if (this.servedWorld == worldDimensionManager)
+			return;
+		
+		if (this.clientWorld != null) {
+			
+			this.clientWorld.unload();
+			this.clientWorld = null;
+			
+		}
+		
 		this.servedWorld = worldDimensionManager;
+		
+		if (this.servedWorld != null) {
+		
+			this.clientWorld = new WorldSinglePlayer(this.servedWorld.getMainDimension());
+			this.worldRenderer.renderWorld(this.clientWorld);
+			
+		} else {
+			this.worldRenderer.renderWorld(null);
+		}
+		
+	}
+	
+	public WorldLoadingPosition getTestLoadingPosition() {
+		return this.testLoadingPosition;
 	}
 	
 	// Legacy //
@@ -210,19 +234,19 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		if (action == GLFW.GLFW_PRESS) {
 			
 			if (key == GLFW.GLFW_KEY_ESCAPE) {
-				//this.toggleEscaped();
+				this.toggleEscaped();
 			} else if (KEY_GENERATE_CHUNKS.isValid(key, scancode, mods)) {
 				
-				Camera3D cam = this.worldRenderer.getCamera();
+				//Camera3D cam = this.worldRenderer.getCamera();
 				
-				if (this.testWorld instanceof WorldSinglePlayer)
-					((WorldSinglePlayer) this.testWorld).getServerWorld().loadNear(cam.getX(), cam.getZ());
+				//if (this.clientWorld instanceof WorldSinglePlayer)
+				//	((WorldSinglePlayer) this.clientWorld).getServerWorld().loadNear(cam.getX(), cam.getZ());
 				
 			} else if (KEY_SPAWN_FALLING_BLOCK.isValid(key, scancode, mods)) {
 				
-				if (this.testWorld instanceof WorldSinglePlayer) {
+				if (this.clientWorld instanceof WorldSinglePlayer) {
 					
-					WorldServer serverWorld = ((WorldSinglePlayer) this.testWorld).getServerWorld();
+					WorldServer serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
 					
 					Camera3D cam = this.worldRenderer.getCamera();
 					
@@ -239,7 +263,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 				Options.FULLSCREEN.setValue(this.window.toggleFullscreen());
 			} else {
 				
-				Entity entity = this.testWorld.getEntitiesView().isEmpty() ? null : this.testWorld.getEntitiesView().get(0);
+				Entity entity = this.clientWorld.getEntitiesView().isEmpty() ? null : this.clientWorld.getEntitiesView().get(0);
 				
 				if (entity instanceof LiveEntity) {
 					
