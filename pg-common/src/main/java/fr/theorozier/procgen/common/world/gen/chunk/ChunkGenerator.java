@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.world.gen.chunk;
 
+import com.google.common.base.Enums;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.biome.Biome;
@@ -14,6 +15,7 @@ import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
 
+import java.util.EnumSet;
 import java.util.Random;
 
 public abstract class ChunkGenerator {
@@ -55,6 +57,8 @@ public abstract class ChunkGenerator {
 			
 		}
 		
+		section.recomputeHeightmap(EnumSet.of(Heightmap.Type.WORLD_BASE_SURFACE, Heightmap.Type.WORLD_BASE_WATER_SURFACE));
+		
 	}
 	
 	public abstract void genBase(WorldServerChunk chunk, BlockPositioned pos);
@@ -79,6 +83,9 @@ public abstract class ChunkGenerator {
 			for (int z = 0; z < 16; ++z) {
 				
 				height = (short) (section.getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, x, z) - 1);
+				
+				if (pos.getX() == 0 && pos.getZ() == 0)
+					System.out.println("Height at " + x + "/" + z + " : " + height);
 				
 				biome = section.getBiomeAt(x, z);
 				surface = height > seaLimit ? biome.getSurface() : biome.getUnderwaterSurface();

@@ -11,6 +11,7 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 public class WorldServerSection extends WorldSection {
 	
@@ -78,6 +79,22 @@ public class WorldServerSection extends WorldSection {
 		
 		return map.get(x, z);
 		
+	}
+	
+	/**
+	 * Force recompute height map of specified type.
+	 * @param types Heightmap types set to recompute.
+	 */
+	public void recomputeHeightmap(Set<Heightmap.Type> types) {
+		Heightmap.updateSectionHeightmaps(this, types);
+	}
+	
+	/**
+	 * Force recompute height map of specified type.
+	 * @param type The heightmap type to recompute.
+	 */
+	public void recomputeHeightmap(Heightmap.Type type) {
+		this.recomputeHeightmap(EnumSet.of(type));
 	}
 	
 }

@@ -250,10 +250,6 @@ public class WorldServer extends WorldBase {
 						
 						if (section.isFinished()) {
 							
-							if (section.isZeroZero()) {
-								System.out.println("Section 0,0 finished ... " + section.getStatus().getIdentifier());
-							}
-							
 							WorldServerSection newSection = new WorldServerSection(section);
 							this.sections.put(pos, newSection);
 							

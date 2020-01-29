@@ -56,12 +56,7 @@ public class Heightmap {
 	
 	public static void updateSectionHeightmaps(WorldServerSection section, Set<Type> types) {
 	
-		boolean zeroZero = section.getSectionPos().getX() == 0 && section.getSectionPos().getZ() == 0;
-		
 		int yStart = section.getWorld().getHeightLimit() - 1;
-		
-		if (zeroZero)
-			System.out.println("yStart:" + yStart);
 		
 		BlockState block;
 		Heightmap map;
@@ -79,9 +74,6 @@ public class Heightmap {
 				for (int y = yStart; y >= 0; --y) {
 					
 					block = section.getBlockAt(x, y, z);
-					
-					if (zeroZero)
-						System.out.println("block:" + block);
 					
 					while (iterator.hasNext()) {
 						
