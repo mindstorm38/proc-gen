@@ -22,9 +22,16 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		return this.status;
 	}
 	
+	public boolean isZeroZero() {
+		return this.getSectionPos().getX() == 0 && this.getSectionPos().getZ() == 0;
+	}
+	
 	public final void gotoNextStatus() {
 		
 		WorldSectionStatus status = this.status.getNext();
+		
+		if (this.isZeroZero())
+			System.out.println("Section 0,0 status from " + this.status.getIdentifier() + " to " + status.getIdentifier());
 		
 		if (status != null)
 			this.status = status;
@@ -41,6 +48,9 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		
 		if (next == null)
 			return null;
+		
+		if (this.isZeroZero())
+			System.out.println("Section 0,0 try loading task from status " + this.status.getIdentifier() + " to " + next.getIdentifier());
 		
 		if (next.doRequireSameAround()) {
 			
@@ -69,6 +79,10 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			}
 			
 			public void run() {
+				
+				if (WorldPrimitiveSection.this.isZeroZero()) {
+					System.out.println("Running generation for section 0,0 for status " + next.getIdentifier());
+				}
 				
 				next.generate(world.getChunkGenerator(), WorldPrimitiveSection.this);
 				ThreadUtils.safesleep(10); // TODO Remove this

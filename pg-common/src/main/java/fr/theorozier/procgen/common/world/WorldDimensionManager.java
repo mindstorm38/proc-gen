@@ -7,6 +7,8 @@ import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.WorldIncompatException;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
+import io.msengine.common.util.GameProfiler;
+import io.sutil.profiler.Profiler;
 
 import java.io.File;
 import java.util.HashMap;
@@ -21,6 +23,8 @@ import java.util.concurrent.Future;
  *
  */
 public class WorldDimensionManager {
+	
+	private static final Profiler PROFILER = GameProfiler.getInstance();
 	
 	private final File worldDirectory;
 	private final File playersDirectory;
@@ -117,9 +121,13 @@ public class WorldDimensionManager {
 	
 	public void update() {
 		
+		PROFILER.startSection("world_dims");
+		
 		for (WorldServer dim : this.dimensions) {
 			dim.update();
 		}
+		
+		PROFILER.endSection();
 		
 	}
 	

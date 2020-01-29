@@ -274,8 +274,12 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	public void update() {
 		
+		this.profiler.startSection("terrain_map");
 		this.terrainMap.tick();
+		this.profiler.endSection();
+		
 		this.chunkRenderManager.update();
+		
 		this.camera.update();
 		
 	}

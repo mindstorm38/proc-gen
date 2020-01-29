@@ -6,6 +6,10 @@ import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
 
+import java.util.logging.Level;
+
+import static io.msengine.common.util.GameLogger.LOGGER;
+
 public class ChunkDirectLayerData extends ChunkLayerData {
 	
 	public ChunkDirectLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
@@ -31,7 +35,13 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 		
 		this.rebuildArrays(() -> {
 			this.foreachBlocks((bx, by, bz, block, renderer, faces) -> {
-				renderer.getRenderData(this.world, block, bx, by, bz, bx + this.roX, by, bz + this.roZ, faces, terrainMap, this.dataArray);
+				
+				try {
+					renderer.getRenderData(this.world, block, bx, by, bz, bx + this.roX, by, bz + this.roZ, faces, terrainMap, this.dataArray);
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, "Failed to render a block at " + bx + "/" + by + "/" + bz, e);
+				}
+				
 			});
 		});
 		

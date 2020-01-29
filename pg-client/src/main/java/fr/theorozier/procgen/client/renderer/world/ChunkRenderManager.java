@@ -68,7 +68,7 @@ public class ChunkRenderManager {
 		this.setLayerHandler(BlockRenderLayer.OPAQUE, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.CUTOUT, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.CUTOUT_NOT_CULLED, ChunkDirectLayerData::new);
-		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkSortedLayerData::new);
+		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkDirectLayerData::new);
 		
 		this.chunkComputer = Executors.newFixedThreadPool(2);
 		this.chunkUpdates = new HashMap<>();
@@ -105,6 +105,8 @@ public class ChunkRenderManager {
 	
 	void update() {
 		
+		this.profiler.startSection("chunk_render_update");
+		
 		Iterator<Future<ChunkUpdateDescriptor>> chunkUpdatesIt = this.chunkUpdatesDescriptors.iterator();
 		Future<ChunkUpdateDescriptor> future;
 		ChunkUpdateDescriptor descriptor = null;
@@ -122,25 +124,31 @@ public class ChunkRenderManager {
 					renderer = this.chunkRenderers.get(descriptor.getChunkPosition());
 					// TODO renderer is sometimes NULL
 					
+					if (renderer != null) {
+						renderer.chunkUpdateDone(descriptor.getRenderLayer());
+					}
+					
+					this.chunkUpdates.remove(descriptor);
+					
 				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
-				
-				if (renderer != null) {
-					renderer.chunkUpdateDone(descriptor.getRenderLayer());
+					
+					if (e.getCause() != null) {
+						
+						e.getCause().printStackTrace();
+						
+					}
+					
 				}
 				
 				chunkUpdatesIt.remove();
-				
-				if (descriptor != null) {
-					this.chunkUpdates.remove(descriptor);
-				}
 				
 			}
 			
 		}
 		
 		this.chunkRenderersList.forEach(ChunkRenderer::update);
+		
+		this.profiler.endSection();
 		
 	}
 	

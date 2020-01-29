@@ -21,5 +21,6 @@ tasks.create<JavaExec>("run") {
     dependsOn("shadowJar")
     main = mainClass
     classpath = files(tasks.named<Jar>("shadowJar").get().archiveFile)
+    jvmArgs = listOf("-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder")
 
 }

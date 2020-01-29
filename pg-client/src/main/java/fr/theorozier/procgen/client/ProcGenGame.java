@@ -7,6 +7,7 @@ import fr.theorozier.procgen.client.world.WorldSinglePlayer;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.entity.MotionEntity;
@@ -14,6 +15,9 @@ import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
+import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.position.BlockPosition;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
 import io.msengine.client.option.OptionKey;
@@ -23,6 +27,7 @@ import io.msengine.client.renderer.window.CursorMode;
 import io.msengine.client.renderer.window.listener.WindowKeyEventListener;
 import io.msengine.client.util.camera.Camera3D;
 import io.msengine.common.util.GameProfiler;
+import io.sutil.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
@@ -106,7 +111,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		TextureMap.setDebugAtlases(true);
 		Blocks.computeStatesUids();
 		this.profiler.setEnabled(true);
-		GameProfiler.WARNING_TIME_LIMIT = 50000000L;
+		GameProfiler.WARNING_TIME_LIMIT = 100000000L;
 		
 		this.window.addKeyEventListener(this);
 		this.window.setFullscreen(Options.FULLSCREEN.getValue());
@@ -237,10 +242,40 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 				this.toggleEscaped();
 			} else if (KEY_GENERATE_CHUNKS.isValid(key, scancode, mods)) {
 				
-				//Camera3D cam = this.worldRenderer.getCamera();
-				
-				//if (this.clientWorld instanceof WorldSinglePlayer)
-				//	((WorldSinglePlayer) this.clientWorld).getServerWorld().loadNear(cam.getX(), cam.getZ());
+				if (this.clientWorld instanceof WorldSinglePlayer) {
+					
+					WorldServer serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
+					
+					Camera3D cam = this.worldRenderer.getCamera();
+					
+					final int range = 6;
+					final int rangeSq = range * range;
+					
+					int cx = MathHelper.floorFloatInt(cam.getX());
+					int cy = MathHelper.floorFloatInt(cam.getY());
+					int cz = MathHelper.floorFloatInt(cam.getZ());
+					
+					BlockPosition pos = new BlockPosition();
+					BlockState airState = Blocks.AIR.getDefaultState();
+					
+					for (int dx = -range; dx <= range; ++dx) {
+						for (int dz = -range; dz <= range; ++dz) {
+							for (int dy = -range; dy <= range; ++dy) {
+								
+								if ((dx * dx + dy * dy + dz * dz) > rangeSq)
+									continue;
+								
+								pos.set(cx + dx, cy + dy, cz + dz);
+								serverWorld.setBlockAt(pos, airState);
+								
+								serverWorld.getEventManager().fireListeners(WorldChunkListener.class,
+										l -> l.worldChunkBlockChanged(serverWorld, serverWorld.getChunkAtBlock(pos), pos, airState));
+								
+							}
+						}
+					}
+					
+				}
 				
 			} else if (KEY_SPAWN_FALLING_BLOCK.isValid(key, scancode, mods)) {
 				

@@ -61,6 +61,9 @@ public abstract class ChunkGenerator {
 	
 	public void genSurface(WorldServerSection section, SectionPositioned pos) {
 		
+		if (pos.getX() == 0 && pos.getZ() == 0)
+			System.out.println("Gen surface for 0,0");
+		
 		WorldServer world = section.getWorld();
 		int seaLimit = world.getSeaLevel() - 2;
 		

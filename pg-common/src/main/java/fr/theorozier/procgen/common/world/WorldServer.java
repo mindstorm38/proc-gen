@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 public class WorldServer extends WorldBase {
 	
 	public static final int NEAR_CHUNK_LOADING = 4;
+	public static final int MAX_LOADING_ACTIONS_COUNT = 64;
 	
 	private final WorldDimensionManager dimensionManager;
 	
@@ -208,7 +209,7 @@ public class WorldServer extends WorldBase {
 		int z = sectionPosition.getZ();
 		
 		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoadingAt(x, z)) {
-		
+			
 			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
 			WorldPrimitiveSection primitive = new WorldPrimitiveSection(this, immutableSectionPosition);
 			
@@ -222,7 +223,7 @@ public class WorldServer extends WorldBase {
 	}
 	
 	private void updateChunkLoading() {
-	
+		
 		Iterator<ImmutableSectionPosition> primitiveSectionsIt = this.primitiveSectionsList.iterator();
 		ImmutableSectionPosition pos;
 		Future<WorldPrimitiveSection> future;
@@ -248,6 +249,10 @@ public class WorldServer extends WorldBase {
 						section.gotoNextStatus();
 						
 						if (section.isFinished()) {
+							
+							if (section.isZeroZero()) {
+								System.out.println("Section 0,0 finished ... " + section.getStatus().getIdentifier());
+							}
 							
 							WorldServerSection newSection = new WorldServerSection(section);
 							this.sections.put(pos, newSection);
