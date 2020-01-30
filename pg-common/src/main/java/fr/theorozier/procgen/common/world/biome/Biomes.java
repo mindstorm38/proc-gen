@@ -25,6 +25,7 @@ public class Biomes {
 	public static final SavannaBiome        SAVANNA = registerBiome(new SavannaBiome(8, "savanna"));
 	public static final TaigaBiome            TAIGA = registerBiome(new TaigaBiome(9, "taiga"));
 	public static final JungleBiome          JUNGLE = registerBiome(new JungleBiome(10, "jungle"));
+	public static final MountainsBiome    MOUNTAINS = registerBiome(new MountainsBiome(11, "moutains"));
 	
 	public static <B extends Biome> B registerBiome(B biome) {
 	
