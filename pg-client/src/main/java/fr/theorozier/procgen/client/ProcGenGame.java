@@ -15,7 +15,6 @@ import fr.theorozier.procgen.common.entity.PigEntity;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import io.msengine.client.game.DefaultRenderGame;
