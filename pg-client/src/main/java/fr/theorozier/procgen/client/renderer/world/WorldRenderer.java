@@ -35,11 +35,12 @@ public class WorldRenderer implements ModelApplyListener,
 		WorldChunkListener,
 		WorldEntityListener {
 	
+	private static final Profiler PROFILER = GameProfiler.getInstance();
+	
 	private static final int RENDER_OFFSET_BASE  = 2048;
 	private static final int RENDER_OFFSET_SHIFT = 12; // Step : 4096 (2^12)
 	
 	private final Window window;
-	private final Profiler profiler;
 	
 	private final WorldShaderManager shaderManager;
 	private final TextureMap terrainMap;
@@ -67,7 +68,6 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.window = Window.getInstance();
 		this.window.addFramebufferSizeEventListener(this);
-		this.profiler = GameProfiler.getInstance();
 		
 		this.shaderManager = new WorldShaderManager();
 		this.terrainMap = new TextureMap("textures/blocks", TextureMap.PNG_FILTER);
@@ -147,7 +147,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		if (!this.escaped) {
 			
-			this.profiler.startSection("camera");
+			PROFILER.startSection("camera");
 			
 			float speedMult = alpha * 2.0f;
 			boolean changed = false;
@@ -194,9 +194,9 @@ public class WorldRenderer implements ModelApplyListener,
 				}
 				*/
 				
-				this.profiler.startSection("update_view_pos");
+				PROFILER.startSection("update_view_pos");
 				this.chunkRenderManager.updateViewPosition(this.camera);
-				this.profiler.endSection();
+				PROFILER.endSection();
 				
 				ProcGenGame.getGameInstance().getTestLoadingPosition().set(MathHelper.floorFloatInt(this.camera.getTargetX()), MathHelper.floorFloatInt(this.camera.getTargetZ()));
 				
@@ -205,7 +205,7 @@ public class WorldRenderer implements ModelApplyListener,
 			//this.camera.updateViewMatrix(alpha, this.renderOffsetX, 0, this.renderOffsetZ);
 			//this.camera.updateRotatedViewMatrix(alpha);
 			
-			this.profiler.endSection();
+			PROFILER.endSection();
 			
 		}
 		
@@ -223,14 +223,14 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.shaderManager.use();
 		
-		this.profiler.startSection("render_skybox");
+		PROFILER.startSection("render_skybox");
 		this.shaderManager.setGlobalOffset(0, 0, 0);
 		this.renderSkyBox();
 		
-		this.profiler.endStartSection("render_chunks");
+		PROFILER.endStartSection("render_chunks");
 		// this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		this.renderChunks();
-		this.profiler.endSection();
+		PROFILER.endSection();
 		
 		// this.shaderManager.setGlobalOffset(0, 0, 0);
 		this.entityRenderManager.render(alpha);
@@ -274,9 +274,9 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	public void update() {
 		
-		this.profiler.startSection("terrain_map");
+		PROFILER.startSection("terrain_map");
 		this.terrainMap.tick();
-		this.profiler.endSection();
+		PROFILER.endSection();
 		
 		this.chunkRenderManager.update();
 		

@@ -32,7 +32,7 @@ public class DebugScene extends GuiScene {
 		this.game = (ProcGenGame) ProcGenGame.getCurrent();
 		this.worldRenderer = this.game.getWorldRenderer();
 		
-		this.posTexts = new GuiTextBase[15];
+		this.posTexts = new GuiTextBase[36];
 		for (int i = 0; i < this.posTexts.length; i++) {
 			
 			this.posTexts[i] = new GuiTextBase();
@@ -70,10 +70,18 @@ public class DebugScene extends GuiScene {
 			
 		}
 		
-		this.posTexts[10].setText(getSectionDebug(PROFILER.getSection("root.update")));
+		/*this.posTexts[10].setText(getSectionDebug(PROFILER.getSection("root.update")));
 		this.posTexts[11].setText(getSectionDebug(PROFILER.getSection("root.update.world_renderer_update")));
 		this.posTexts[12].setText(getSectionDebug(PROFILER.getSection("root.update.world_dims")));
-		this.posTexts[13].setText(getSectionDebug(PROFILER.getSection("root.render")));
+		this.posTexts[13].setText(getSectionDebug(PROFILER.getSection("root.render")));*/
+		
+		int idx = 8;
+		for (String line : PROFILER.getSummaryString().split("\n")) {
+			this.posTexts[idx++].setText(line);
+			if (idx >= this.posTexts.length) {
+				break;
+			}
+		}
 		
 	}
 	
