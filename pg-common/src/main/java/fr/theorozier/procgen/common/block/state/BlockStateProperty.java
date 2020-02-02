@@ -22,6 +22,11 @@ public abstract class BlockStateProperty<T> {
 	
 	public abstract String getValueName(T value);
 	
+	@SuppressWarnings("unchecked")
+	public String getValueNameSafe(Object rawValue) {
+		return this.getValueName((T) rawValue);
+	}
+	
 	@Override
 	public String toString() {
 		return "BlockStateProperty{" +

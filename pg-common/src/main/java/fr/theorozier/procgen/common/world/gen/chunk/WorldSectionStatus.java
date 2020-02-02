@@ -13,35 +13,35 @@ public abstract class WorldSectionStatus {
 		statusRegister.put(status.getIdentifier(), status);
 	}
 	
-	public static final WorldSectionStatus EMPTY = new WorldSectionStatus(0 ,"empty", null, "biomes", false) {
+	public static final WorldSectionStatus EMPTY = new WorldSectionStatus(0 ,"empty", "biomes", false) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {}
 	};
 	
-	public static final WorldSectionStatus BIOMES = new WorldSectionStatus(1, "biomes", "empty", "base", false) {
+	public static final WorldSectionStatus BIOMES = new WorldSectionStatus(1, "biomes", "base", false) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {
 			generator.genBiomes(section, section.getSectionPos());
 		}
 	};
 	
-	public static final WorldSectionStatus BASE = new WorldSectionStatus(2,"base", "biomes", "surface", false) {
+	public static final WorldSectionStatus BASE = new WorldSectionStatus(2,"base", "surface", false) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {
 			generator.genSectionBase(section, section.getSectionPos());
 		}
 	};
 	
-	public static final WorldSectionStatus SURFACE = new WorldSectionStatus(3, "surface", "base", "features", false) {
+	public static final WorldSectionStatus SURFACE = new WorldSectionStatus(3, "surface", "features", false) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {
 			generator.genSurface(section, section.getSectionPos());
 		}
 	};
 	
-	public static final WorldSectionStatus FEATURES = new WorldSectionStatus(4, "features", "surface", "finished", true) {
+	public static final WorldSectionStatus FEATURES = new WorldSectionStatus(4, "features", "finished", true) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {
 			generator.genFeatures(section, section.getSectionPos());
 		}
 	};
 	
-	public static final WorldSectionStatus FINISHED = new WorldSectionStatus(1000, "finished", "features", null, false) {
+	public static final WorldSectionStatus FINISHED = new WorldSectionStatus(1000, "finished", null, false) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {}
 	};
 	
@@ -55,7 +55,6 @@ public abstract class WorldSectionStatus {
 		registerStatus(FINISHED);
 		
 		statusRegister.values().forEach(status -> {
-			status.prev = status.prevId == null ? null : statusRegister.get(status.prevId);
 			status.next = status.nextId == null ? null : statusRegister.get(status.nextId);
 		});
 		
@@ -65,15 +64,14 @@ public abstract class WorldSectionStatus {
 	
 	private final int order;
 	private final String identifier;
-	private final String prevId, nextId;
+	private final String nextId;
 	private final boolean requireSameAround;
-	private WorldSectionStatus prev, next; // TODO : check if previous is useful
+	private WorldSectionStatus next;
 	
-	public WorldSectionStatus(int order, String identifier, String prevId, String nextId, boolean requireSameAround) {
+	public WorldSectionStatus(int order, String identifier, String nextId, boolean requireSameAround) {
 		
 		this.order = order;
 		this.identifier = identifier;
-		this.prevId = prevId;
 		this.nextId = nextId;
 		this.requireSameAround = requireSameAround;
 		
@@ -91,16 +89,8 @@ public abstract class WorldSectionStatus {
 		return this.identifier;
 	}
 	
-	public WorldSectionStatus getPrevious() {
-		return this.prev;
-	}
-	
 	public WorldSectionStatus getNext() {
 		return this.next;
-	}
-	
-	public boolean isFirst() {
-		return this.prev == null;
 	}
 	
 	public boolean isLast() {

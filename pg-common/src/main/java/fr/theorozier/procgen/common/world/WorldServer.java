@@ -3,8 +3,10 @@ package fr.theorozier.procgen.common.world;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
+import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
+import fr.theorozier.procgen.common.world.chunk.WorldSectionBlockRegistry;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
@@ -15,18 +17,25 @@ import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
+import io.sutil.buffer.ByteUtils;
+import io.sutil.buffer.VariableBuffer;
 import io.sutil.pool.FixedObjectPool;
 
+import java.io.*;
+import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.zip.GZIPOutputStream;
 
 public class WorldServer extends WorldBase {
 	
 	public static final int NEAR_CHUNK_LOADING = 4;
-	public static final int MAX_LOADING_ACTIONS_COUNT = 64;
 	
 	private final WorldDimensionManager dimensionManager;
+	private final File worldDir;
+	private final File sectionsDir;
+	private final File sectionsBackupDir;
 	
 	private final long seed;
 	private final Random random;
@@ -36,20 +45,27 @@ public class WorldServer extends WorldBase {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	// Keep using SectionPositioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones.
+	// Keep using SectionPositioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones as keys.
 	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
 	private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
 	private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
+	private final Map<SectionPositioned, Boolean> savedSections = new HashMap<>();
 	
 	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
 	
-	public WorldServer(WorldDimensionManager dimensionManager, long seed, ChunkGeneratorProvider provider) {
+	public WorldServer(WorldDimensionManager dimensionManager, File worldDir, long seed, ChunkGeneratorProvider provider) {
 		
-		this.dimensionManager = dimensionManager;
+		this.dimensionManager = Objects.requireNonNull(dimensionManager);
+		this.worldDir = Objects.requireNonNull(worldDir);
+		this.sectionsDir = new File(worldDir, "sections");
+		this.sectionsBackupDir = new File(worldDir, "sections_bk");
+		
+		SaveUtils.mkdirOrThrowException(this.sectionsDir, "Chunks directory already exists but it's not a directory.");
+		SaveUtils.mkdirOrThrowException(this.sectionsBackupDir, "Chunks backup directory already exists but it's not a directory.");
 		
 		this.seed = seed;
 		this.random = new Random(seed);
-		this.chunkGeneratorProvider = provider;
+		this.chunkGeneratorProvider = Objects.requireNonNull(provider);
 		this.chunkGenerator = provider.create(this);
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
@@ -95,10 +111,6 @@ public class WorldServer extends WorldBase {
 		
 		this.updateChunkLoadingPositions();
 		this.updateChunkLoading();
-		
-		//System.out.println("DEBUG MAP AFTER");
-		//this.debugLoadingChunkAround(0, 0, 5);
-		//System.out.println();
 		
 		this.blockTickList.tick();
 		
@@ -208,7 +220,7 @@ public class WorldServer extends WorldBase {
 		int x = sectionPosition.getX();
 		int z = sectionPosition.getZ();
 		
-		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoadingAt(x, z)) {
+		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoadingAt(x, z) && !this.isSectionSaved(sectionPosition)) {
 			
 			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
 			WorldPrimitiveSection primitive = new WorldPrimitiveSection(this, immutableSectionPosition);
@@ -261,6 +273,18 @@ public class WorldServer extends WorldBase {
 									l.worldChunkLoaded(this, chunk)
 								)
 							);
+							
+							PriorityRunnable saveTask = new PriorityRunnable() {
+								
+								public int getPriority() { return 0; }
+								
+								public void run() {
+									WorldServer.this.saveSection(newSection);
+								}
+								
+							};
+							
+							this.dimensionManager.submitWorldLoadingTask(null, saveTask);
 							
 						}
 						
@@ -363,6 +387,76 @@ public class WorldServer extends WorldBase {
 			
 		}
 		
+	}
+	
+	// SECTIONS SAVING //
+	
+	public boolean isSectionSaved(SectionPositioned pos) {
+		
+		return this.savedSections.computeIfAbsent(pos, p ->
+				new File(this.sectionsDir, getSectionFileName(p.immutableSectionPos())).isFile());
+		
+	}
+	
+	public void saveSection(WorldServerSection section) {
+		
+		File sectionFile = new File(this.sectionsDir, getSectionFileName(section.getSectionPos()));
+		
+		if (sectionFile.isDirectory())
+			throw new IllegalStateException("The section at " + section.getSectionPos() + " can't be saved because a directory already exists with the name '" + sectionFile.getPath() + "'.");
+		
+		try {
+			
+			OutputStream stream = new GZIPOutputStream(new FileOutputStream(sectionFile));
+			
+			WorldSectionBlockRegistry blockRegistry = new WorldSectionBlockRegistry();
+			
+			VariableBuffer headerBuf = new VariableBuffer(ByteOrder.BIG_ENDIAN, 256);
+			VariableBuffer sectionBuf = new VariableBuffer(ByteOrder.BIG_ENDIAN);
+			VariableBuffer chunkBuf = new VariableBuffer(ByteOrder.BIG_ENDIAN, 8192);
+			
+			int chunkCount = this.getVerticalChunkCount();
+			int chunkSize;
+			
+			for (int y = 0; y < chunkCount; ++y) {
+				
+				chunkBuf.setWriteIndex(0);
+				section.getChunkAt(y).saveChunk(blockRegistry, chunkBuf);
+				chunkSize = chunkBuf.getWriteIndex();
+				
+				sectionBuf.writeInteger(chunkSize);
+				
+				if (chunkSize != 0)
+					sectionBuf.writeBuffer(chunkBuf, chunkSize);
+				
+			}
+			
+			blockRegistry.foreachStates((state, uid) -> {
+				
+				headerBuf.writeShort(uid);
+				headerBuf.writeStringIndexed(state.getBlock().getIdentifier());
+				headerBuf.writeUnsignedByte((short) state.getPropertiesCount()); // Using byte because state with so much properties can not be stored.
+				
+				state.getProperties().forEach((property, value) -> {
+					headerBuf.writeStringIndexed(property.getName());
+					headerBuf.writeStringIndexed(property.getValueNameSafe(value)); // Should never throw cast exceptions
+				});
+				
+			});
+			
+			stream.write(headerBuf.getBytes(), 0, headerBuf.getWriteIndex());
+			stream.write(sectionBuf.getBytes(), 0, sectionBuf.getWriteIndex());
+			
+			stream.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static String getSectionFileName(SectionPositioned pos) {
+		return pos.getX() + "." + pos.getZ() + ".pgs";
 	}
 	
 	// FIXME : TEMPORARY FOR ENTITY TESTING

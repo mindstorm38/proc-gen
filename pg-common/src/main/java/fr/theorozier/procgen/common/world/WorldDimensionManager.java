@@ -65,12 +65,22 @@ public class WorldDimensionManager {
 	
 	}
 	
+	/**
+	 * Create a new dimension if not already existing.
+	 * @param identifier The world dimension identifier.
+	 * @param seed The dimension seed for generation.
+	 * @param provider The chunk provider to use for this world.
+	 * @return The new dimension's world instance.
+	 */
 	public WorldServer createNewDimension(String identifier, long seed, ChunkGeneratorProvider provider) {
 		
 		if (this.dimensionsWorlds.containsKey(identifier))
 			throw new IllegalArgumentException("The dimension '" + identifier + "' already exists this manager !");
 		
-		WorldServer newDim = new WorldServer(this, seed, provider);
+		File worldDir = new File(this.dimensionsDirectory, identifier);
+		worldDir.mkdirs();
+		
+		WorldServer newDim = new WorldServer(this, worldDir, seed, provider);
 		
 		this.dimensionsWorlds.put(identifier, newDim);
 		

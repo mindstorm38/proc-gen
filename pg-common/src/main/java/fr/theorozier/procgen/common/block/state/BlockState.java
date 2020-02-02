@@ -47,6 +47,14 @@ public class BlockState {
 		this.uid = uid;
 	}
 	
+	public int getPropertiesCount() {
+		return this.properties.size();
+	}
+	
+	public ImmutableMap<BlockStateProperty<?>, ?> getProperties() {
+		return this.properties;
+	}
+	
 	public void setupBoundingBoxes() {
 		
 		this.boundingBoxes.clear();
