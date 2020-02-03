@@ -2,14 +2,13 @@ package fr.theorozier.procgen.common.world.biome.surface;
 
 import fr.theorozier.procgen.common.block.Blocks;
 
-public class DesertSurface extends BiomeSurface {
+public class BeachSurface extends BiomeSurface {
 	
-	public DesertSurface() {
+	public BeachSurface() {
 		
-		super(6);
+		super(3);
 		
 		this.addLayer(0, Blocks.SAND);
-		this.addLayer(3, Blocks.SANDSTONE);
 		
 	}
 	

@@ -20,6 +20,7 @@ public final class Blocks {
 	public static final BlockLeaves LEAVES  = registerBlock(new BlockLeaves(7, "leaves"));
 	public static final Block SAND          = registerBlock(new Block(8, "sand"));
 	public static final Block SANDSTONE     = registerBlock(new Block(9, "sandstone"));
+	public static final Block GRAVEL        = registerBlock(new Block(10, "gravel"));
 	
 	public static final Block COAL_ORE      = registerBlock(new Block(20, "coal_ore"));
 	public static final Block IRON_ORE      = registerBlock(new Block(21, "iron_ore"));

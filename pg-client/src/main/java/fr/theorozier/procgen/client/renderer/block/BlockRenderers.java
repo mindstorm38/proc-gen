@@ -20,6 +20,7 @@ public class BlockRenderers {
 		registerRenderer(Blocks.LEAVES, new BlockCubeRenderer("leaves_fancy", true));
 		registerRenderer(Blocks.SAND, new BlockCubeRenderer("sand"));
 		registerRenderer(Blocks.SANDSTONE, new BlockSandstoneRenderer());
+		registerRenderer(Blocks.GRAVEL, new BlockCubeRenderer("gravel"));
 		
 		registerRenderer(Blocks.COAL_ORE, new BlockCubeRenderer("coal_ore"));
 		registerRenderer(Blocks.IRON_ORE, new BlockCubeRenderer("iron_ore"));
