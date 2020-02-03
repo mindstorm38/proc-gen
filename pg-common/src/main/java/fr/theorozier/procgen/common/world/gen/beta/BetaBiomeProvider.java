@@ -36,9 +36,9 @@ public class BetaBiomeProvider extends WeatherBiomeProvider {
 		Biome[][] biomesMap = {
 				{ TUNDRA, TUNDRA, TUNDRA, RIVER,  MOUNTAINS, RIVER,    SAVANNA,  DESERT       },
 				{ OCEAN,  TAIGA,  RIVER,  TUNDRA, MOUNTAINS, RIVER,    SAVANNA,  DESERT_HILL  },
-				{ OCEAN,  OCEAN,  RIVER,  FOREST, FOREST,    RIVER,    SAVANNA,  SAVANNA      },
-				{ OCEAN,  OCEAN,  OCEAN,  FOREST, FOREST,    RIVER,    PLAIN,    SAVANNA      },
-				{ OCEAN,  OCEAN,  OCEAN,  OCEAN,  RIVER,     PLAIN,    PLAIN,    LOW_HILL     },
+				{ OCEAN,  OCEAN,  TAIGA,  FOREST, FOREST,    RIVER,    SAVANNA,  SAVANNA      },
+				{ OCEAN,  OCEAN,  OCEAN,  FOREST, RIVER,     RIVER,    PLAIN,    SAVANNA      },
+				{ OCEAN,  OCEAN,  OCEAN,  OCEAN,  FOREST,    PLAIN,    PLAIN,    LOW_HILL     },
 				{ OCEAN,  OCEAN,  OCEAN,  OCEAN,  OCEAN,     LOW_HILL, RIVER,    RIVER        },
 				{ OCEAN,  OCEAN,  OCEAN,  OCEAN,  OCEAN,     OCEAN,    JUNGLE,   JUNGLE       },
 				{ OCEAN,  OCEAN,  OCEAN,  OCEAN,  OCEAN,     OCEAN,    OCEAN,    JUNGLE       }

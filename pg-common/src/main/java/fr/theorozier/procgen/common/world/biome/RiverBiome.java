@@ -4,7 +4,7 @@ public class RiverBiome extends Biome {
 	
 	public RiverBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.23f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.23f, 3f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 	}
 	
