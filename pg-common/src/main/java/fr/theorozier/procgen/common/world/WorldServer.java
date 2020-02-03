@@ -17,7 +17,6 @@ import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
-import io.sutil.buffer.ByteUtils;
 import io.sutil.buffer.VariableBuffer;
 import io.sutil.pool.FixedObjectPool;
 
@@ -274,7 +273,8 @@ public class WorldServer extends WorldBase {
 								)
 							);
 							
-							PriorityRunnable saveTask = new PriorityRunnable() {
+							/*
+							this.dimensionManager.submitOtherTask(new PriorityRunnable() {
 								
 								public int getPriority() { return 0; }
 								
@@ -282,9 +282,8 @@ public class WorldServer extends WorldBase {
 									WorldServer.this.saveSection(newSection);
 								}
 								
-							};
-							
-							this.dimensionManager.submitWorldLoadingTask(null, saveTask);
+							});
+							*/
 							
 						}
 						
@@ -430,6 +429,8 @@ public class WorldServer extends WorldBase {
 					sectionBuf.writeBuffer(chunkBuf, chunkSize);
 				
 			}
+			
+			
 			
 			blockRegistry.foreachStates((state, uid) -> {
 				

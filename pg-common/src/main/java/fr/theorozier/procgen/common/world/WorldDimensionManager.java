@@ -144,5 +144,9 @@ public class WorldDimensionManager {
 	Future<WorldPrimitiveSection> submitWorldLoadingTask(WorldPrimitiveSection section, PriorityRunnable run) {
 		return this.generatorComputer.submit(run, section);
 	}
+	
+	void submitOtherTask(PriorityRunnable run) {
+		this.generatorComputer.submit(run);
+	}
 
 }
