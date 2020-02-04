@@ -18,8 +18,8 @@ public class WeatherBiomeProvider extends BiomeProvider {
 		
 		super(seed);
 		
-		this.tempNoise = new OctaveSimplexNoise(getTempSeed(seed), 4, 0.4f, 2f);
-		this.humidityNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.4f, 2f);
+		this.tempNoise = new OctaveSimplexNoise(getTempSeed(seed), 4, 0.4f, 2.5f);
+		this.humidityNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.4f, 2.5f);
 		this.saltNoise = new OctaveSimplexNoise(getHumiditySeed(seed), 4, 0.4f, 2f);
 		
 		this.setWeatherMap(new float[0], new float[0], new Biome[][]{{Biomes.EMPTY}});

@@ -27,9 +27,9 @@ public class BetaChunkGenerator extends ChunkGenerator {
 		
 		super(seed, new BetaBiomeProvider(seed));
 		
-		this.baseNoise = new OctaveSimplexNoise(seed, 16, 0.4f, 2.0f);
+		this.baseNoise = new OctaveSimplexNoise(seed, 16, 0.6f, 2.0f);
 		
-		this.noiseHorizontalGranularity = 4;
+		this.noiseHorizontalGranularity = 8;
 		this.noiseHorizontalSize = 16 / this.noiseHorizontalGranularity;
 		
 	}

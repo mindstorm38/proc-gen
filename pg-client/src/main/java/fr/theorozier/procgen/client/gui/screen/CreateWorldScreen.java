@@ -49,6 +49,7 @@ public class CreateWorldScreen extends Screen {
 		this.worldNameInput = new GuiTextInput("Enter the world name");
 		this.worldNameInput.setPosition(0, -130);
 		this.worldNameInput.setSize(400, 40);
+		this.worldNameInput.setInputText("New world");
 		this.worldNameInput.addEventListener(GuiTextInputChangedEvent.class, this::onTextInputChanged);
 		this.mainBlock.addChild(this.worldNameInput);
 		
@@ -79,7 +80,7 @@ public class CreateWorldScreen extends Screen {
 		this.cancelButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.mainBlock.addChild(this.cancelButton);
 		
-		this.updateFutureFileName("");
+		this.updateFutureFileName(this.worldNameInput.getInputText());
 		
 	}
 	
@@ -121,7 +122,7 @@ public class CreateWorldScreen extends Screen {
 					try {
 						
 						WorldDimensionManager servedWorld = new WorldDimensionManager(worldDir);
-						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_CHUNK_PROVIDER);
+						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_3D_CHUNK_PROVIDER);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
 						world.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());

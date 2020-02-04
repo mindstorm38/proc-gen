@@ -65,9 +65,6 @@ public abstract class ChunkGenerator {
 	
 	public void genSurface(WorldServerSection section, SectionPositioned pos) {
 		
-		if (pos.getX() == 0 && pos.getZ() == 0)
-			System.out.println("Gen surface for 0,0");
-		
 		WorldServer world = section.getWorld();
 		int seaLimit = world.getSeaLevel() - 2;
 		
@@ -83,9 +80,6 @@ public abstract class ChunkGenerator {
 			for (int z = 0; z < 16; ++z) {
 				
 				height = (short) (section.getHeightAt(Heightmap.Type.WORLD_BASE_SURFACE, x, z) - 1);
-				
-				if (pos.getX() == 0 && pos.getZ() == 0)
-					System.out.println("Height at " + x + "/" + z + " : " + height);
 				
 				biome = section.getBiomeAt(x, z);
 				surface = height > seaLimit ? biome.getSurface() : biome.getUnderwaterSurface();

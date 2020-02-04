@@ -4,7 +4,7 @@ public class TundraBiome extends Biome {
 	
 	public TundraBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.26f, 5f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.26f, 6f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		this.getFoliageColor().setAll(103, 164, 103);
 		this.getGrassColor().setAll(103, 164, 103);

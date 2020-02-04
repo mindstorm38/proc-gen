@@ -87,7 +87,11 @@ public class GuiTextInput extends GuiParent {
 	}
 	
 	public String getInputText() {
-		return this.input.getText().getText();
+		return this.input.getInputText();
+	}
+	
+	public void setInputText(String text) {
+		this.input.setInputText(text);
 	}
 	
 	private void updateInputWidth() {
