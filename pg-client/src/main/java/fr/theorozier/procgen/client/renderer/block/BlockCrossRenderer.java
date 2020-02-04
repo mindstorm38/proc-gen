@@ -28,11 +28,6 @@ public class BlockCrossRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
-		return world.getBiomeAt(x, z).getFoliageColor();
-	}
-	
-	@Override
 	public boolean needFaces() {
 		return false;
 	}
@@ -42,7 +37,7 @@ public class BlockCrossRenderer extends BlockColorizableRenderer {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
-		Color color = this.needColorization ? this.getColorization(world, block, bx, by, bz) : Color.WHITE;
+		Color color = this.needColorization ? getBlockColor(world, bx, by, bz, BlockColorResolver.FOLIAGE_COLOR) : Color.WHITE;
 		
 		int rand = posRand(bx, by, bz);
 		x += (rand % 3) * 0.1f;

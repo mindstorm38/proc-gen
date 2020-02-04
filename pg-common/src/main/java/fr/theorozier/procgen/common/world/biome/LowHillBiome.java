@@ -12,7 +12,7 @@ public class LowHillBiome extends Biome {
 	
 	public LowHillBiome(int uid, String identifier) {
 		
-		super(uid, identifier, 0.27f, 16f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
+		super(uid, identifier, 0.27f, 20f, Biomes.GRASS_SURFACE, Biomes.UNDERWATER_DIRT_SURFACE);
 		
 		this.addFeature(Features.PLACEMENT, new PlacementFeatureConfig(
 				new ConfiguredPlacement<>(Placements.SURFACE_CHANCE, new ChanceConfig(0.2f)),

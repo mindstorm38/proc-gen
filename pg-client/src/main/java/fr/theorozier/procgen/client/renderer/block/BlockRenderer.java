@@ -3,7 +3,9 @@ package fr.theorozier.procgen.client.renderer.block;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.biome.Biome;
 import io.msengine.client.renderer.texture.TextureMap;
+import io.msengine.common.util.Color;
 
 public abstract class BlockRenderer {
 	
@@ -119,6 +121,39 @@ public abstract class BlockRenderer {
 	
 	public boolean needFaces() {
 		return true;
+	}
+	
+	protected static Color getBlockColor(WorldBase world, int x, int y, int z, BlockColorResolver resolver) {
+		
+		final int blendingRadius = 4;
+		
+		Biome biome;
+		Color color;
+		
+		float r = 0;
+		float g = 0;
+		float b = 0;
+		
+		int xMax = x + blendingRadius;
+		int zMax = z + blendingRadius;
+		
+		for (int bx = x - blendingRadius; bx <= xMax; ++bx) {
+			for (int bz = z - blendingRadius; bz <= zMax; ++bz) {
+				if ((biome = world.getBiomeAt(bx, bz)) != null) {
+					
+					color = resolver.getColor(biome);
+					r += color.getRed();
+					g += color.getGreen();
+					b += color.getBlue();
+					
+				}
+			}
+		}
+		
+		int total = (blendingRadius * 2 + 1) * (blendingRadius * 2 + 1);
+		
+		return new Color(r / total, g / total, b / total);
+		
 	}
 	
 }

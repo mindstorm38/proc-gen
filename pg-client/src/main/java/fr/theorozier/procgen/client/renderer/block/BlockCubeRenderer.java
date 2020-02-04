@@ -28,14 +28,9 @@ public class BlockCubeRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
-		return world.getBiomeAt(x, z).getFoliageColor();
-	}
-	
-	@Override
 	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		Color color = this.needColorization ? this.getColorization(world, block, bx, by, bz) : Color.WHITE;
+		Color color = this.needColorization ? getBlockColor(world, bx, by, bz, BlockColorResolver.FOLIAGE_COLOR) : Color.WHITE;
 		int occlData = block.isBlockOpaque() ? computeAmbientOcclusion(world, bx, by, bz, faces) : 0;
 		
 		if (faces.isTop()) {

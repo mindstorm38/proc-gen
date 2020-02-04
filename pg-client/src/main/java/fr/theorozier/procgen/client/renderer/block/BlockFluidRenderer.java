@@ -37,14 +37,9 @@ public class BlockFluidRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public Color getColorization(WorldBase world, BlockState block, int x, int y, int z) {
-		return world.getBiomeAt(x, z).getWaterColor();
-	}
-	
-	@Override
 	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
-		Color color = this.needColorization ? this.getColorization(world, block, bx, by, bz) : Color.WHITE;
+		Color color = this.needColorization ? getBlockColor(world, bx, by, bz, BlockColorResolver.WATER_COLOR) : Color.WHITE;
 		boolean under = this.hasSameBlockOnTop(world, bx, by, bz);
 		
 		float height = under ? 1 : TOP_HEIGHT;

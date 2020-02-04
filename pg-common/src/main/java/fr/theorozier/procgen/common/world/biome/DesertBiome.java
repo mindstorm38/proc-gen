@@ -4,8 +4,8 @@ import io.msengine.common.util.Color;
 
 public class DesertBiome extends Biome {
 	
-	public static final Color FOLIAGE_COLOR = new Color(164, 164, 52);
-	public static final Color GRASS_COLOR = new Color(164, 164, 52);
+	public static final Color FOLIAGE_COLOR = new Color(198, 212, 112);
+	public static final Color GRASS_COLOR = new Color(198, 212, 112);
 	
 	public DesertBiome(int uid, String identifier) {
 		

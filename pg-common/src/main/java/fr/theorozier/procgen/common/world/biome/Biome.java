@@ -53,8 +53,8 @@ public abstract class Biome {
 		this.underwaterSurface = underwaterSurface;
 		this.features = new ArrayList<>();
 		
-		this.foliageColor = new Color(98, 198, 75);
-		this.grassColor = new Color(98, 198, 75);
+		this.foliageColor = new Color(126, 201, 109);
+		this.grassColor = new Color(126, 201, 109);
 		this.waterColor = new Color(63, 118, 228);
 		
 	}
