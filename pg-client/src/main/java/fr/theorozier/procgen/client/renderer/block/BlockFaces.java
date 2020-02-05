@@ -78,12 +78,10 @@ public class BlockFaces {
 	public static class ImmutableBlockFaces extends BlockFaces {
 		
 		public ImmutableBlockFaces(byte data) {
-			super(data);
+			super.setData(data);
 		}
 		
-		public ImmutableBlockFaces() {
-			super();
-		}
+		public ImmutableBlockFaces() { }
 		
 		@Override
 		public void setFace(Direction dir, boolean b) {
