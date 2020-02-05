@@ -8,7 +8,6 @@ import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
-import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
@@ -160,7 +159,7 @@ public class CreateWorldScreen extends Screen {
 	
 	private long getWorldSeed() {
 		
-		String seedRaw = this.worldNameInput.getInputText();
+		String seedRaw = this.worldSeedInput.getInputText();
 		
 		if (seedRaw.isEmpty())
 			return this.seedRandom.nextLong();
