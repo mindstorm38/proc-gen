@@ -139,7 +139,7 @@ public abstract class BlockRenderer {
 		
 		for (int bx = x - blendingRadius; bx <= xMax; ++bx) {
 			for (int bz = z - blendingRadius; bz <= zMax; ++bz) {
-				if ((biome = world.getBiomeAt(bx, bz)) != null) {
+				if ((biome = world.getBiomeAt(bx, bz)) != null) { // Null should not happen
 					
 					color = resolver.getColor(biome);
 					r += color.getRed();

@@ -2,10 +2,20 @@ package fr.theorozier.procgen.client.renderer.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.position.Direction;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
 public class BlockFaces {
-
+	
+	public static final ImmutableBlockFaces FULL_FACES = new ImmutableBlockFaces((byte) 0xFF);
+	public static final ImmutableBlockFaces NO_FACES   = new ImmutableBlockFaces();
+	
 	private byte data = 0;
+	
+	public BlockFaces(byte data) {
+		this.setData(data);
+	}
+	
+	public BlockFaces() { }
 	
 	public void setFace(Direction dir, boolean b) {
 		if (b) this.data |= 1 << dir.ordinal();
@@ -63,6 +73,28 @@ public class BlockFaces {
 	@Override
 	public String toString() {
 		return Integer.toBinaryString(this.data);
+	}
+	
+	public static class ImmutableBlockFaces extends BlockFaces {
+		
+		public ImmutableBlockFaces(byte data) {
+			super(data);
+		}
+		
+		public ImmutableBlockFaces() {
+			super();
+		}
+		
+		@Override
+		public void setFace(Direction dir, boolean b) {
+			throw new UnsupportedOperationException("Can't set face data for immutable block faces.");
+		}
+		
+		@Override
+		public void setData(byte data) {
+			throw new UnsupportedOperationException("Can't set data for immutable block faces.");
+		}
+		
 	}
 	
 }

@@ -35,8 +35,7 @@ public class EntityCubePart extends EntityModelPart {
 		this.maxY = maxY;
 		this.maxZ = maxZ;
 		
-		this.faces = new BlockFaces();
-		this.faces.setData((byte) 0xFF);
+		this.faces = new BlockFaces((byte) 0xFF);
 		
 		this.tiles = new TextureMapTile[Direction.values().length];
 		this.tilesRotations = new int[Direction.values().length];
