@@ -25,7 +25,7 @@ public class EntityBlockRendererPart extends EntityModelPart {
 		if (renderer == null)
 			return;
 		
-		renderer.getRenderData(null, this.blockState, 0, 0, 0, 0f, 0f, 0f, BlockFaces.FULL_FACES, null, dataArray);
+		renderer.getRenderData(null, this.blockState, 0, 0, 0, 0f, 0f, 0f, BlockFaces.ImmutableBlockFaces.FULL_FACES, null, dataArray);
 		
 		this.buffer = shaderManager.createBasicDrawBuffer(true, true);
 		dataArray.uploadToDrawBuffer(this.buffer);

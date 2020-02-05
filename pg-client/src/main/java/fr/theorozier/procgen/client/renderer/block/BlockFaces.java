@@ -2,12 +2,8 @@ package fr.theorozier.procgen.client.renderer.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.position.Direction;
-import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
 public class BlockFaces {
-	
-	public static final ImmutableBlockFaces FULL_FACES = new ImmutableBlockFaces((byte) 0xFF);
-	public static final ImmutableBlockFaces NO_FACES   = new ImmutableBlockFaces();
 	
 	private byte data = 0;
 	
@@ -76,6 +72,9 @@ public class BlockFaces {
 	}
 	
 	public static class ImmutableBlockFaces extends BlockFaces {
+		
+		public static final ImmutableBlockFaces FULL_FACES = new ImmutableBlockFaces((byte) 0xFF);
+		public static final ImmutableBlockFaces NO_FACES   = new ImmutableBlockFaces();
 		
 		public ImmutableBlockFaces(byte data) {
 			super.setData(data);
