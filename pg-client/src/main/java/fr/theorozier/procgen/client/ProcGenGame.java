@@ -8,10 +8,7 @@ import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.entity.Entity;
-import fr.theorozier.procgen.common.entity.LiveEntity;
-import fr.theorozier.procgen.common.entity.MotionEntity;
-import fr.theorozier.procgen.common.entity.PigEntity;
+import fr.theorozier.procgen.common.entity.*;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
@@ -284,10 +281,16 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					
 					Camera3D cam = this.worldRenderer.getCamera();
 					
+					/*
 					PigEntity entity = new PigEntity(serverWorld, (long) (Math.random() * 10000000));
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setRotation(this.rotation, 0);
 					this.rotation += 0.1f;
+					*/
+					
+					FallingBlockEntity entity = new FallingBlockEntity(serverWorld, (long) (Math.random() * 10000000));
+					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
+					entity.setState(Blocks.CACTUS.getDefaultState());
 					
 					serverWorld.rawAddEntity(entity);
 					

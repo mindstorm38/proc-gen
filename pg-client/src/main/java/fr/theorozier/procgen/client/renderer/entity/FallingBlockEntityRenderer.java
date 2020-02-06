@@ -1,40 +1,60 @@
 package fr.theorozier.procgen.client.renderer.entity;
 
-import fr.theorozier.procgen.client.renderer.entity.part.EntityCubePart;
+import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.renderer.entity.part.EntityBlockRendererPart;
+import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
+import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
 import io.msengine.client.renderer.model.ModelHandler;
-import io.msengine.client.renderer.texture.SimpleTexture;
 import io.msengine.client.renderer.texture.Texture;
-import io.msengine.client.renderer.texture.TextureManager;
+import io.msengine.client.renderer.texture.TextureMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FallingBlockEntityRenderer extends MotionEntityRenderer<FallingBlockEntity> {
 	
-	private final SimpleTexture texture = new SimpleTexture("textures/blocks/bedrock.png");
+	private final Map<BlockState, EntityBlockRendererPart> blockStateRenderers = new HashMap<>();
+	private final WorldRenderDataArray dataArray = new WorldRenderDataArray();
+	private WorldShaderManager worldShaderManager;
+	private TextureMap terrainMap;
 	
-	private final EntityCubePart part;
+	public FallingBlockEntityRenderer() { }
 	
-	public FallingBlockEntityRenderer() {
-		
-		this.part = new EntityCubePart(0, 0, 0, 1, 1, 1);
-		this.addPart("block", this.part);
-		
+	@Override
+	public void initRenderer(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
+		super.initRenderer(shaderManager, dataArray);
+		this.worldShaderManager = shaderManager;
 	}
 	
 	@Override
 	public void initTexture() {
-		TextureManager.getInstance().loadTexture(this.texture);
+		this.terrainMap = ProcGenGame.getGameInstance().getWorldRenderer().getTerrainMap();
 	}
 	
 	@Override
 	public Texture getTexture(FallingBlockEntity entity) {
-		// return this.texture;
-		return null;
+		return this.terrainMap;
+	}
+	
+	public EntityBlockRendererPart getRendererPart(BlockState state) {
+		
+		return this.blockStateRenderers.computeIfAbsent(state, st -> {
+			
+			EntityBlockRendererPart part = new EntityBlockRendererPart(st);
+			part.initPart(this.worldShaderManager, this.dataArray);
+			return part;
+			
+		});
+		
 	}
 	
 	@Override
 	public void renderMotionEntity(float alpha, ModelHandler model, FallingBlockEntity entity) {
 		
-		this.part.render();
+		EntityBlockRendererPart part = this.getRendererPart(entity.getState());
+		part.render();
 		
 	}
 	

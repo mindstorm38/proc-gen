@@ -37,7 +37,7 @@ generation.
 - [x] Asynchronous (multi-threaded) chunk generation
 - [ ] Asynchronous world chunk saving on file system *(actively working on)*
 - [ ] Items
-- [ ] All-model falling blocks
+- [x] All-model falling blocks
 - [ ] TNT
 
 ## Contribute

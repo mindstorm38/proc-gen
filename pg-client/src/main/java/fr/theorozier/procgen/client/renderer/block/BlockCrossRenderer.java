@@ -2,7 +2,7 @@ package fr.theorozier.procgen.client.renderer.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.WorldAccessor;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
@@ -33,7 +33,7 @@ public class BlockCrossRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		

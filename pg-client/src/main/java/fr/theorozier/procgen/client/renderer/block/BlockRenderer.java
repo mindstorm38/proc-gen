@@ -2,6 +2,7 @@ package fr.theorozier.procgen.client.renderer.block;
 
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import io.msengine.client.renderer.texture.TextureMap;
@@ -47,7 +48,7 @@ public abstract class BlockRenderer {
 	 * @param faces Faces data used to optimize results (currently not used).
 	 * @return An integer used to store bits of informations per corners per faces.
 	 */
-	protected static int computeAmbientOcclusion(WorldBase world, int x, int y, int z, BlockFaces faces) {
+	protected static int computeAmbientOcclusion(WorldAccessor world, int x, int y, int z, BlockFaces faces) {
 		
 		// X/Y Plane
 		int r = isBlockOpaque(world.getBlockAt(x - 1, y + 1, z)) ? 0b0000_0000_0011_0000_0000_1100 : 0;
@@ -117,13 +118,13 @@ public abstract class BlockRenderer {
 		
 	}
 	
-	public abstract void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray);
+	public abstract void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray);
 	
 	public boolean needFaces() {
 		return true;
 	}
 	
-	protected static Color getBlockColor(WorldBase world, int x, int y, int z, BlockColorResolver resolver) {
+	protected static Color getBlockColor(WorldAccessor world, int x, int y, int z, BlockColorResolver resolver) {
 		
 		final int blendingRadius = 4;
 		

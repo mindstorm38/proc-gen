@@ -3,6 +3,7 @@ package fr.theorozier.procgen.client.renderer.block;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.BlockFluid;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
@@ -31,13 +32,13 @@ public class BlockFluidRenderer extends BlockColorizableRenderer {
 		return map.getTile(face == Direction.TOP ? this.topMapTileId : this.sideMapTileId);
 	}
 	
-	public boolean hasSameBlockOnTop(WorldBase world, int x, int y, int z) {
+	public boolean hasSameBlockOnTop(WorldAccessor world, int x, int y, int z) {
 		BlockState state = world.getBlockAt(x, y + 1, z);
 		return state != null && state.isBlock(this.fluidBlock);
 	}
 	
 	@Override
-	public void getRenderData(WorldBase world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
 		
 		Color color = this.needColorization ? getBlockColor(world, bx, by, bz, BlockColorResolver.WATER_COLOR) : Color.WHITE;
 		boolean under = this.hasSameBlockOnTop(world, bx, by, bz);

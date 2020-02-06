@@ -8,10 +8,7 @@ import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class BlockState {
@@ -22,12 +19,25 @@ public class BlockState {
 	private Table<BlockStateProperty<?>, ?, BlockState> statesByValues;
 	private short uid;
 	
+	private final String repr;
+	
 	public BlockState(Block owner, ImmutableMap<BlockStateProperty<?>, ?> properties) {
 		
 		this.owner = owner;
 		this.properties = properties;
 		this.boundingBoxes = new ArrayList<>();
 		this.uid = 0;
+		
+		StringBuilder builder = new StringBuilder(owner.getIdentifier());
+		
+		properties.forEach((prop, val) -> {
+			builder.append(',');
+			builder.append(prop.getName());
+			builder.append(':');
+			builder.append(prop.getValueNameSafe(val));
+		});
+		
+		this.repr = builder.toString();
 		
 	}
 	
@@ -143,6 +153,23 @@ public class BlockState {
 	
 	public boolean isBlockOpaque() {
 		return this.owner.isOpaque();
+	}
+	
+	public String repr() {
+		return this.repr;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		BlockState that = (BlockState) o;
+		return uid == that.uid;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.uid;
 	}
 	
 	@Override

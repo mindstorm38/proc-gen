@@ -6,9 +6,7 @@ import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
-import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
-import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.event.WorldMethodEventManager;
 import fr.theorozier.procgen.common.world.position.*;
 import io.msengine.common.util.event.MethodEventManager;
@@ -26,7 +24,7 @@ import java.util.function.Consumer;
  * @author Theo Rozier
  *
  */
-public abstract class WorldBase {
+public abstract class WorldBase implements WorldAccessor {
 
 	protected final Map<SectionPositioned, WorldSection> sections = new HashMap<>();
 	protected final Map<Long, Entity> entitiesById = new HashMap<>();
@@ -90,6 +88,15 @@ public abstract class WorldBase {
 	// SECTIONS //
 	
 	/**
+	 * Internal method to get a section a specific position.
+	 * @param pos The section position.
+	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
+	 */
+	protected WorldSection getSectionAt(SectionPositioned pos) {
+		return this.sections.get(pos);
+	}
+	
+	/**
 	 * Internal method to get a section at specific position.
 	 * @param x The X section coordinate.
 	 * @param z The Z section coordinate.
@@ -127,55 +134,32 @@ public abstract class WorldBase {
 	
 	// CHUNKS //
 	
-	/**
-	 * Method to get a chunk at specific position.
-	 * @param x The X chunk coordinate.
-	 * @param y The Y chunk coordinate.
-	 * @param z The Z chunk coordinate.
-	 * @return Chunk at this position, or <b>NULL</b> if no chunk there.
-	 */
+	@Override
 	public WorldChunk getChunkAt(int x, int y, int z) {
 		WorldSection section = this.getSectionAt(x, z);
 		return section == null ? null : section.getChunkAt(y);
 	}
 	
-	public WorldChunk getChunkAtBlock(int x, int y, int z) {
-		return this.getChunkAt(x >> 4, y >> 4, z >> 4);
-	}
-	
-	public WorldChunk getChunkAtBlock(BlockPositioned pos) {
-		return this.getChunkAtBlock(pos.getX(), pos.getY(), pos.getZ());
-	}
-	
 	// BIOMES //
 	
+	@Override
 	public Biome getBiomeAt(int x, int z) {
 		WorldSection section = this.getSectionAtBlock(x, z);
 		return section == null ? null : section.getBiomeAtBlock(x, z);
 	}
 	
-	public Biome getBiomeAt(SectionPositioned pos) {
-		return this.getBiomeAt(pos.getX(), pos.getZ());
-	}
-	
 	// BLOCKS //
 	
+	@Override
 	public BlockState getBlockAt(int x, int y, int z) {
 		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
 		return chunk == null ? null : chunk.getBlockAt(x & 15, y & 15, z & 15);
 	}
 	
-	public BlockState getBlockAt(BlockPositioned pos) {
-		return this.getBlockAt(pos.getX(), pos.getY(), pos.getZ());
-	}
-	
+	@Override
 	public void setBlockAt(int x, int y, int z, BlockState state) {
 		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
 		if (chunk != null) chunk.setBlockAt(x & 15, y & 15, z & 15, state);
-	}
-	
-	public void setBlockAt(BlockPositioned pos, BlockState state) {
-		this.setBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
 	}
 	
 	// ENTITIES //
