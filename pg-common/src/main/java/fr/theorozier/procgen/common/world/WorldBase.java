@@ -179,6 +179,16 @@ public abstract class WorldBase implements WorldAccessor {
 		
 	}
 	
+	protected final void removeEntity(Entity entity, boolean fromList) {
+		
+		this.entitiesById.remove(entity.getUid());
+		this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityRemoved(this, entity));
+		
+		if (fromList)
+			this.entities.remove(entity);
+		
+	}
+	
 	public final List<Entity> getEntitiesView() {
 		return this.entitiesView;
 	}

@@ -3,9 +3,11 @@ package fr.theorozier.procgen.client.renderer.world;
 import fr.theorozier.procgen.client.renderer.entity.EntityRenderer;
 import fr.theorozier.procgen.client.renderer.entity.FallingBlockEntityRenderer;
 import fr.theorozier.procgen.client.renderer.entity.PigEntityRenderer;
+import fr.theorozier.procgen.client.renderer.entity.PrimedTNTRenderer;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
 import fr.theorozier.procgen.common.entity.PigEntity;
+import fr.theorozier.procgen.common.entity.PrimedTNTEntity;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.shader.ShaderSamplerObject;
 import io.msengine.common.util.GameProfiler;
@@ -40,6 +42,7 @@ public class EntityRenderManager {
 		this.entitiesByClasses = new HashMap<>();
 		
 		this.addEntityRenderer(FallingBlockEntity.class, new FallingBlockEntityRenderer());
+		this.addEntityRenderer(PrimedTNTEntity.class, new PrimedTNTRenderer());
 		this.addEntityRenderer(PigEntity.class, new PigEntityRenderer());
 		
 	}
@@ -63,7 +66,7 @@ public class EntityRenderManager {
 		
 	}
 	
-	public <E extends Entity> void addEntityRenderer(Class<E> entityClass, EntityRenderer<E> renderer) {
+	public <E extends Entity> void addEntityRenderer(Class<E> entityClass, EntityRenderer<? super E> renderer) {
 		this.entityRenderers.put(entityClass, renderer);
 	}
 	
@@ -121,6 +124,11 @@ public class EntityRenderManager {
 	void removeEntity(Entity entity) {
 		
 		this.entitiesById.remove(entity.getUid());
+		
+		HashSet<Entity> classEntities = this.entitiesByClasses.get(entity.getClass());
+		if (classEntities != null) {
+			classEntities.remove(entity);
+		}
 		
 	}
 	

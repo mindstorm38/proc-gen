@@ -36,6 +36,8 @@ public class BlockRenderers {
 		
 		registerRenderer(Blocks.CACTUS, new BlockCactusRenderer());
 		
+		registerRenderer(Blocks.TNT, new BlockTNTRenderer());
+		
 		registerRenderer(Blocks.WATER, new BlockFluidRenderer("water_still", "water_flow", true, Blocks.WATER));
 		
 	}

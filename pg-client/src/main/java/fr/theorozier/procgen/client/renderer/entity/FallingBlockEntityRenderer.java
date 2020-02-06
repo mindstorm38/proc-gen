@@ -16,16 +16,13 @@ import java.util.Map;
 public class FallingBlockEntityRenderer extends MotionEntityRenderer<FallingBlockEntity> {
 	
 	private final Map<BlockState, EntityBlockRendererPart> blockStateRenderers = new HashMap<>();
-	private final WorldRenderDataArray dataArray = new WorldRenderDataArray();
-	private WorldShaderManager worldShaderManager;
-	private TextureMap terrainMap;
+	private TextureMap terrainMap = null;
 	
 	public FallingBlockEntityRenderer() { }
 	
 	@Override
 	public void initRenderer(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
 		super.initRenderer(shaderManager, dataArray);
-		this.worldShaderManager = shaderManager;
 	}
 	
 	@Override
@@ -43,7 +40,7 @@ public class FallingBlockEntityRenderer extends MotionEntityRenderer<FallingBloc
 		return this.blockStateRenderers.computeIfAbsent(state, st -> {
 			
 			EntityBlockRendererPart part = new EntityBlockRendererPart(st);
-			part.initPart(this.worldShaderManager, this.dataArray);
+			this.addPart(st.repr(), part);
 			return part;
 			
 		});

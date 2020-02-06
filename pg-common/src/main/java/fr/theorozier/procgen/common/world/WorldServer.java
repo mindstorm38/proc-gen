@@ -94,6 +94,16 @@ public class WorldServer extends WorldBase {
 		return this.chunkGenerator;
 	}
 	
+	@Override
+	public boolean isServer() {
+		return true;
+	}
+	
+	@Override
+	public WorldServer getAsServer() {
+		return this;
+	}
+	
 	/**
 	 * @return This world sea level.
 	 */
@@ -113,7 +123,24 @@ public class WorldServer extends WorldBase {
 		
 		this.blockTickList.tick();
 		
-		this.entities.forEach(Entity::update);
+		ListIterator<Entity> entitiesIt = this.entities.listIterator();
+		
+		while (entitiesIt.hasNext()) {
+			entitiesIt.next().update();
+		}
+		
+		while (entitiesIt.hasPrevious()) {
+			
+			Entity entity = entitiesIt.previous();
+			
+			if (entity.isDead()) {
+				
+				entitiesIt.remove();
+				this.removeEntity(entity, false);
+				
+			}
+			
+		}
 		
 	}
 	

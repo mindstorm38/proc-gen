@@ -88,7 +88,7 @@ public class WorldSinglePlayer extends WorldClient implements
 	
 	@Override
 	public void worldEntityRemoved(WorldBase world, Entity entity) {
-	
+		this.removeEntity(entity, true);
 	}
 	
 }

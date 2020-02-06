@@ -36,6 +36,8 @@ public final class Blocks {
 	
 	public static final BlockCactus CACTUS  = registerBlock(new BlockCactus(40, "cactus"));
 	
+	public static final BlockTNT TNT = registerBlock(new BlockTNT(50, "tnt"));
+	
 	public static final BlockFluid WATER = registerBlock(new BlockFluidWater(80, "water"));
 	
 	public static <T extends Block> T registerBlock(T block) {

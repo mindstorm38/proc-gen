@@ -5,9 +5,9 @@ import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 
-public class BlockSandstoneRenderer extends BlockCubeRenderer {
+public class BlockTNTRenderer extends BlockCubeRenderer {
 	
-	public BlockSandstoneRenderer() {
+	public BlockTNTRenderer() {
 		super(null);
 	}
 	
@@ -15,11 +15,11 @@ public class BlockSandstoneRenderer extends BlockCubeRenderer {
 	public TextureMapTile getFaceTile(BlockState block, TextureMap map, Direction face) {
 		
 		if (face == Direction.TOP) {
-			return map.getTile("sandstone_top");
+			return map.getTile("tnt_top");
 		} else if (face == Direction.BOTTOM) {
-			return map.getTile("sandstone_bottom");
+			return map.getTile("tnt_bottom");
 		} else {
-			return map.getTile("sandstone_side");
+			return map.getTile("tnt_side");
 		}
 		
 	}

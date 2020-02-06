@@ -7,6 +7,9 @@ layout(location=0) out vec4 frag_color;
 
 uniform sampler2D texture_sampler;
 uniform int texture_enabled;
+
+uniform vec4 global_color;
+
 uniform int fog_enabled;
 
 const vec4 fog_color = vec4(0.8, 0.8, 0.8, 1.0);
@@ -16,7 +19,7 @@ const vec4 one = vec4(1.0);
 
 void main() {
 
-	frag_color = mix(one, texture(texture_sampler, out_tex_coord), texture_enabled) * vec4(out_color, 1.0);
+	frag_color = mix(one, texture(texture_sampler, out_tex_coord), texture_enabled) * vec4(out_color, 1.0) * global_color;
 
 	if (frag_color.a < 0.5)
 		discard;

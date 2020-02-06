@@ -21,6 +21,7 @@ import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
 import io.msengine.client.util.camera.SmoothCamera3D;
+import io.msengine.common.util.Color;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
 import io.sutil.profiler.Profiler;
@@ -221,6 +222,7 @@ public class WorldRenderer implements ModelApplyListener,
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 		
+		this.shaderManager.resetGlobalColor();
 		this.shaderManager.use();
 		
 		PROFILER.startSection("render_skybox");

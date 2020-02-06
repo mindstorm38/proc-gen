@@ -6,6 +6,7 @@ import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
 import fr.theorozier.procgen.common.entity.Entity;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.Texture;
+import io.sutil.LazyLoadValue;
 
 import java.util.HashMap;
 
@@ -21,8 +22,15 @@ import java.util.HashMap;
 public abstract class EntityRenderer<E extends Entity> {
 
 	private boolean initied = false;
-	
 	private final HashMap<String, EntityModelPart> parts = new HashMap<>();
+	
+	private final LazyLoadValue<WorldRenderDataArray> optionalDataArray = new LazyLoadValue<WorldRenderDataArray>() {
+		public WorldRenderDataArray create() {
+			return new WorldRenderDataArray();
+		}
+	};
+	
+	protected WorldShaderManager shaderManager = null;
 	
 	public boolean isInitied() {
 		return this.initied;
@@ -42,6 +50,7 @@ public abstract class EntityRenderer<E extends Entity> {
 		
 		this.initTexture(); // FIXME : Do not allow to re-start renderer after stoping (for texture managing).
 		
+		this.shaderManager = shaderManager;
 		this.initied = true;
 	
 	}
@@ -53,25 +62,34 @@ public abstract class EntityRenderer<E extends Entity> {
 		
 		this.parts.values().forEach(EntityModelPart::stopPart);
 		
+		this.shaderManager = null;
 		this.initied = false;
 		
 	}
 	
 	public void addPart(String id, EntityModelPart part) {
 		
-		if (this.initied)
-			throw new IllegalStateException("Entity renderer already started, can't add part.");
+		//if (this.initied)
+		//	throw new IllegalStateException("Entity renderer already started, can't add part.");
 		
 		this.parts.put(id, part);
+		
+		if (this.initied) {
+			part.initPart(this.shaderManager, this.optionalDataArray.get());
+		}
 		
 	}
 	
 	public void removePart(String id) {
 		
-		if (this.initied)
-			throw new IllegalStateException("Entity renderer already started, can't remove part.");
+		//if (this.initied)
+		//	throw new IllegalStateException("Entity renderer already started, can't remove part.");
 		
-		this.parts.remove(id);
+		EntityModelPart part = this.parts.remove(id);
+		
+		if (this.initied && part != null) {
+			part.stopPart();
+		}
 		
 	}
 	

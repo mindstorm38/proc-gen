@@ -288,9 +288,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					this.rotation += 0.1f;
 					*/
 					
-					FallingBlockEntity entity = new FallingBlockEntity(serverWorld, (long) (Math.random() * 10000000));
+					FallingBlockEntity entity = new PrimedTNTEntity(serverWorld, (long) (Math.random() * 10000000));
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
-					entity.setState(Blocks.CACTUS.getDefaultState());
+					// entity.setState(Blocks.CACTUS.getDefaultState());
 					
 					serverWorld.rawAddEntity(entity);
 					
