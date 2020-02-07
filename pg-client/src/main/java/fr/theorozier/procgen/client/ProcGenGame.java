@@ -292,8 +292,6 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
 
-					// entity.setState(Blocks.CACTUS.getDefaultState());
-					
 					serverWorld.spawnEntity(entity);
 					
 				}
