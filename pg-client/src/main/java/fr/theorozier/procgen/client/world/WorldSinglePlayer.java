@@ -25,7 +25,7 @@ public class WorldSinglePlayer extends WorldClient implements
 		this.server = Objects.requireNonNull(server, "World server expected for a WorldSinglePlayer");
 		
 		server.forEachSection(sec -> this.sections.put(sec.getSectionPos(), sec));
-		server.getEntitiesView().forEach(this::addEntity);
+		this.entities.addAll(server.getEntitiesView());
 		
 		server.getEventManager().addEventListener(WorldLoadingListener.class, this);
 		server.getEventManager().addEventListener(WorldChunkListener.class, this);
@@ -48,11 +48,7 @@ public class WorldSinglePlayer extends WorldClient implements
 	
 	@Override
 	public void update() {
-		
-		// this.server.update(); FIXME : No longer needed because DimensionManager update them.
-		
 		super.update();
-		
 	}
 	
 	@Override
@@ -83,12 +79,25 @@ public class WorldSinglePlayer extends WorldClient implements
 	
 	@Override
 	public void worldEntityAdded(WorldBase world, Entity entity) {
-		this.addEntity(entity);
+		
+		if (this.entitiesById.containsKey(entity.getUid()))
+			return;
+		
+		if (this.entitiesById.put(entity.getUid(), entity) == null)
+			this.entities.add(entity);
+			
+		this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityAdded(this, entity));
+		
 	}
 	
 	@Override
 	public void worldEntityRemoved(WorldBase world, Entity entity) {
-		this.removeEntity(entity, true);
+		
+		if (this.entitiesById.remove(entity.getUid()) != null)
+			this.entities.remove(entity);
+		
+		this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityRemoved(this, entity));
+		
 	}
 	
 }

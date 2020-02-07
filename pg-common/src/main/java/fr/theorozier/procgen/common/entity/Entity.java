@@ -4,6 +4,7 @@ import fr.theorozier.procgen.common.entity.controller.EntityController;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.WorldServer;
+import io.sutil.math.MathHelper;
 
 import java.util.Random;
 
@@ -37,6 +38,11 @@ public abstract class Entity {
 	protected float yaw;
 	protected float pitch;
 	
+	protected boolean inChunk;
+	protected int chunkPosX;
+	protected int chunkPosY;
+	protected int chunkPosZ;
+	
 	protected long lifetime;
 	
 	protected boolean dead;
@@ -50,12 +56,17 @@ public abstract class Entity {
 		this.rand = new Random();
 		
 		this.boundingBox = new AxisAlignedBB();
-		this.setPositionInstant(0, 0, 0);
-		this.setRotation(0, 0);
-		
 		this.debugBoundingBox = new AxisAlignedBB();
 		
 		this.controller = null;
+		
+		this.setPositionInstant(0, 0, 0);
+		this.setRotation(0, 0);
+		
+		this.inChunk = false;
+		this.chunkPosX = 0;
+		this.chunkPosY = 0;
+		this.chunkPosZ = 0;
 		
 		this.lifetime = 0L;
 		
@@ -229,6 +240,32 @@ public abstract class Entity {
 		return pitch;
 	}
 	
+	public boolean isInChunk() {
+		return inChunk;
+	}
+	
+	public void setInChunk(boolean inChunk) {
+		this.inChunk = inChunk;
+	}
+	
+	public int getChunkPosX() {
+		return chunkPosX;
+	}
+	
+	public int getChunkPosY() {
+		return chunkPosY;
+	}
+	
+	public int getChunkPosZ() {
+		return chunkPosZ;
+	}
+	
+	public void setChunkPos(int x, int y, int z) {
+		this.chunkPosX = x;
+		this.chunkPosY = y;
+		this.chunkPosZ = z;
+	}
+	
 	/**
 	 * Immutable method to know if an entity is dead.
 	 * @return True if the entity is dead.
@@ -242,6 +279,57 @@ public abstract class Entity {
 	 */
 	public void setDead() {
 		this.dead = true;
+	}
+	
+	/**
+	 * @return Current effective block position X.
+	 */
+	public int getCurrentBlockPosX() {
+		return MathHelper.floorDoubleInt(this.posX);
+	}
+	
+	/**
+	 * @return Current effective block position Y.
+	 */
+	public int getCurrentBlockPosY() {
+		return MathHelper.floorDoubleInt(this.posY);
+	}
+	
+	/**
+	 * @return Current effective block position Z.
+	 */
+	public int getCurrentBlockPosZ() {
+		return MathHelper.floorDoubleInt(this.posZ);
+	}
+	
+	/**
+	 * @return Current effective chunk position X.
+	 */
+	public int getCurrentChunkPosX() {
+		return this.getCurrentBlockPosX() >> 4;
+	}
+	
+	/**
+	 * @return Current effective chunk position Y.
+	 */
+	public int getCurrentChunkPosY() {
+		
+		int cy = this.getCurrentBlockPosY() >> 4;
+		
+		if (cy < 0) {
+			cy = 0;
+		} else if (cy >= this.world.getVerticalChunkCount()) {
+			cy = this.world.getVerticalChunkCount() - 1;
+		}
+		
+		return cy;
+	}
+	
+	/**
+	 * @return Current effective chunk position Z.
+	 */
+	public int getCurrentChunkPosZ() {
+		return this.getCurrentBlockPosZ() >> 4;
 	}
 	
 	// DEFAULT IMPLEMENTATIONS //

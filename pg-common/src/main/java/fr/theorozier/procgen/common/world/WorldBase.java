@@ -6,7 +6,6 @@ import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
-import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldMethodEventManager;
 import fr.theorozier.procgen.common.world.position.*;
 import io.msengine.common.util.event.MethodEventManager;
@@ -43,21 +42,14 @@ public abstract class WorldBase implements WorldAccessor {
 		
 	}
 	
+	// PROPERTIES //
+	
 	public boolean isServer() {
 		return false;
 	}
 	
 	public WorldServer getAsServer() {
 		throw new UnsupportedOperationException("This world is not a server world.");
-	}
-	
-	/**
-	 * Run a single tick in this world.
-	 */
-	public void update() {
-		
-		++this.time;
-		
 	}
 	
 	/**
@@ -85,37 +77,29 @@ public abstract class WorldBase implements WorldAccessor {
 		return this.eventManager;
 	}
 	
-	// SECTIONS //
+	// UPDATE //
 	
 	/**
-	 * Internal method to get a section a specific position.
-	 * @param pos The section position.
-	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
+	 * Run a single tick in this world.
 	 */
-	protected WorldSection getSectionAt(SectionPositioned pos) {
+	public void update() {
+		
+		++this.time;
+		
+	}
+	
+	// SECTIONS //
+	
+	@Override
+	public WorldSection getSectionAt(SectionPositioned pos) {
 		return this.sections.get(pos);
 	}
 	
-	/**
-	 * Internal method to get a section at specific position.
-	 * @param x The X section coordinate.
-	 * @param z The Z section coordinate.
-	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
-	 */
-	protected WorldSection getSectionAt(int x, int z) {
+	@Override
+	public WorldSection getSectionAt(int x, int z) {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
 			return this.sections.get(pos.get().set(x, z));
 		}
-	}
-	
-	/**
-	 * Internal method to get a section at specific block position.
-	 * @param x The X block coordinate.
-	 * @param z The Y block coordinate.
-	 * @return Section where the block is positionned, or <b>NULL</b> if no section loaded there.
-	 */
-	protected WorldSection getSectionAtBlock(int x, int z) {
-		return this.getSectionAt(x >> 4, z >> 4);
 	}
 	
 	public boolean isSectionLoadedAt(int x, int z) {
@@ -164,6 +148,7 @@ public abstract class WorldBase implements WorldAccessor {
 	
 	// ENTITIES //
 	
+	/*
 	protected final boolean addEntity(Entity entity) {
 		
 		if (this.entitiesById.put(entity.getUid(), entity) == null) {
@@ -188,6 +173,7 @@ public abstract class WorldBase implements WorldAccessor {
 			this.entities.remove(entity);
 		
 	}
+	*/
 	
 	public final List<Entity> getEntitiesView() {
 		return this.entitiesView;

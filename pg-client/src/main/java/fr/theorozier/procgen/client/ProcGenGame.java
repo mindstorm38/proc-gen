@@ -294,7 +294,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 
 					// entity.setState(Blocks.CACTUS.getDefaultState());
 					
-					serverWorld.rawAddEntity(entity);
+					serverWorld.spawnEntity(entity);
 					
 				}
 				

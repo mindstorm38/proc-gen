@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
@@ -9,6 +10,7 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.buffer.VariableBuffer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -26,6 +28,8 @@ public class WorldChunk {
 	
 	private final short[] data;
 	
+	private final HashSet<Entity> entities;
+	
 	public WorldChunk(WorldBase world, WorldSection section, ImmutableBlockPosition position) {
 		
 		this.world = world;
@@ -34,6 +38,8 @@ public class WorldChunk {
 		this.centerBlockPosition = new ImmutableBlockPosition((position.getX() << 4) + 7, (position.getY() << 4) + 7, (position.getZ() << 4) + 7);
 		
 		this.data = new short[4096];
+		
+		this.entities = new HashSet<>();
 		
 	}
 	
@@ -77,6 +83,27 @@ public class WorldChunk {
 	
 	public void setBlockAt(int x, int y, int z, BlockState state) {
 		this.data[getBlockIndex(x, y, z)] = state.getBlock().isUnsavable() ? 0 : state.getUid();
+	}
+	
+	// ENTITIES //
+	
+	public void addEntity(Entity entity) {
+	
+		int ex = entity.getCurrentChunkPosX();
+		int ey = entity.getCurrentChunkPosY();
+		int ez = entity.getCurrentChunkPosZ();
+		
+		if (ex != this.position.getX() || ey != this.position.getY() || ez != this.position.getZ())
+			throw new IllegalStateException("Can't add this entity in this chunk, because it's placed in chunk at " + ex + "/" + ey + "/" + ez + " and this chunk is at " + this.position);
+		
+		entity.setInChunk(true);
+		entity.setChunkPos(ex, ey, ez);
+		this.entities.add(entity);
+		
+	}
+	
+	public void removeEntity(Entity entity) {
+		this.entities.remove(entity);
 	}
 	
 	// SAVING //

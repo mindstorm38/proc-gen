@@ -9,6 +9,7 @@ import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldSectionBlockRegistry;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
@@ -123,25 +124,69 @@ public class WorldServer extends WorldBase {
 		
 		this.blockTickList.tick();
 		
-		ListIterator<Entity> entitiesIt = this.entities.listIterator();
+		this.updateEntities();
 		
-		while (entitiesIt.hasNext()) {
-			entitiesIt.next().update();
-		}
-		
-		while (entitiesIt.hasPrevious()) {
+	}
+	
+	public void updateEntities() {
+	
+		for (int i = 0; i < this.entities.size(); ++i) {
 			
-			Entity entity = entitiesIt.previous();
+			Entity entity = this.entities.get(i);
+			
+			if (!entity.isDead()) {
+				this.updateEntity(entity);
+			}
 			
 			if (entity.isDead()) {
 				
-				entitiesIt.remove();
-				this.removeEntity(entity, false);
+				int ecx = entity.getChunkPosX();
+				int ecy = entity.getChunkPosY();
+				int ecz = entity.getChunkPosZ();
+				
+				if (entity.isInChunk() && this.isSectionLoadedAt(ecx, ecz)) {
+					this.getChunkAt(ecx, ecy, ecz).removeEntity(entity);
+				}
+				
+				this.entitiesById.remove(entity.getUid());
+				this.entities.remove(i--);
+				
+				this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityRemoved(this, entity));
 				
 			}
 			
 		}
+	
+	}
+	
+	public void updateEntity(Entity entity) {
 		
+		int ex = entity.getCurrentChunkPosX();
+		int ey = entity.getCurrentChunkPosY();
+		int ez = entity.getCurrentChunkPosZ();
+		
+		int ecx = entity.getChunkPosX();
+		int ecy = entity.getChunkPosY();
+		int ecz = entity.getChunkPosZ();
+		
+		if (!entity.isInChunk() || ex != ecx || ey != ecy || ez != ecz) {
+			
+			if (entity.isInChunk() && this.isSectionLoadedAt(ecx, ecz)) {
+				this.getChunkAt(ecx, ecy, ecz).removeEntity(entity);
+			}
+			
+			if (this.isSectionLoadedAt(ex, ez)) {
+				this.getChunkAt(ex, ey, ez).addEntity(entity);
+			} else {
+				entity.setInChunk(false);
+			}
+			
+		}
+		
+		if (entity.isInChunk()) {
+			entity.update();
+		}
+	
 	}
 	
 	/**
@@ -150,7 +195,7 @@ public class WorldServer extends WorldBase {
 	 * @return True if you can tick at this position.
 	 */
 	public boolean canTickAt(BlockPositioned pos) {
-		return this.getChunkAtBlock(pos) != null;
+		return this.isSectionLoadedAt(pos.getX(), pos.getZ());
 	}
 	
 	public WorldTickList<Block> getBlockTickList() {
@@ -171,9 +216,36 @@ public class WorldServer extends WorldBase {
 		
 	}
 	
+	// ENTITIES //
+	
+	public boolean spawnEntity(Entity entity) {
+		
+		if (this.entitiesById.containsKey(entity.getUid()))
+			throw new IllegalStateException("This entity is already loaded in the world.");
+		
+		int ex = entity.getCurrentChunkPosX();
+		int ey = entity.getCurrentChunkPosY();
+		int ez = entity.getCurrentChunkPosZ();
+		
+		if (this.isSectionLoadedAt(ex, ez)) {
+			
+			this.getChunkAt(ex, ey, ez).addEntity(entity);
+			this.entitiesById.put(entity.getUid(), entity);
+			this.entities.add(entity);
+			
+			this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityAdded(this, entity));
+			
+			return true;
+			
+		} else {
+			return false;
+		}
+		
+	}
+	
 	// SECTIONS //
 	
-	protected WorldServerSection getSectionAt(int x, int z) {
+	public WorldServerSection getSectionAt(int x, int z) {
 		if (this.isSectionLoadingAt(x, z)) {
 			return this.getPrimitiveSectionAt(x, z);
 		} else {
@@ -181,7 +253,7 @@ public class WorldServer extends WorldBase {
 		}
 	}
 	
-	protected WorldServerSection getSectionAtBlock(int x, int z) {
+	public WorldServerSection getSectionAtBlock(int x, int z) {
 		return (WorldServerSection) super.getSectionAtBlock(x, z);
 	}
 	
@@ -485,11 +557,6 @@ public class WorldServer extends WorldBase {
 	
 	public static String getSectionFileName(SectionPositioned pos) {
 		return pos.getX() + "." + pos.getZ() + ".pgs";
-	}
-	
-	// FIXME : TEMPORARY FOR ENTITY TESTING
-	public void rawAddEntity(Entity entity) {
-		super.addEntity(entity);
 	}
 	
 }
