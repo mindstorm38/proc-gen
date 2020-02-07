@@ -119,7 +119,15 @@ public class Block {
 	// Dynamic function for modifying the world
 	
 	public void tickBlock(WorldServer world, BlockPositioned pos, BlockState block, Random rand) {}
-	
+
+	public void placedBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+
+	public void destroyedBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+
+	public void interactBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+
+	public void neighbourBlockUpdated(WorldServer world, BlockPositioned pos, BlockState block, BlockPositioned neighbourPos, BlockState neighbour, Direction face) {}
+
 	@Override
 	public int hashCode() {
 		return this.getUid();
