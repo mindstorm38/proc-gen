@@ -254,6 +254,14 @@ public abstract class MotionEntity extends Entity {
 		
 	}
 	
+	public void addVelocity(double x, double y, double z) {
+		
+		this.velX += x;
+		this.velY += y;
+		this.velZ += z;
+		
+	}
+	
 	/**
 	 * Internal method to update natural velocity, like gravity.
 	 */

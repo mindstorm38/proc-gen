@@ -529,8 +529,6 @@ public class WorldServer extends WorldBase {
 				
 			}
 			
-			
-			
 			blockRegistry.foreachStates((state, uid) -> {
 				
 				headerBuf.writeShort(uid);

@@ -3,6 +3,7 @@ package fr.theorozier.procgen.common.world.chunk;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
+import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
@@ -12,6 +13,8 @@ import io.sutil.buffer.VariableBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  *
@@ -104,6 +107,16 @@ public class WorldChunk {
 	
 	public void removeEntity(Entity entity) {
 		this.entities.remove(entity);
+	}
+	
+	public void forEachEntitiesInBoundingBox(AxisAlignedBB boundingBox, Consumer<Entity> entityConsumer, boolean centerPointOnly) {
+	
+		for (Entity entity : this.entities) {
+			if ((centerPointOnly && boundingBox.intersects(entity.getPosX(), entity.getPosY(), entity.getPosZ())) || (!centerPointOnly && boundingBox.intersects(entity.getBoundingBox()))) {
+				entityConsumer.accept(entity);
+			}
+		}
+	
 	}
 	
 	// SAVING //

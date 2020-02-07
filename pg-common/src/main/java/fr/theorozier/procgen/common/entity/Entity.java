@@ -171,6 +171,10 @@ public abstract class Entity {
 		
 	}
 	
+	public AxisAlignedBB getBoundingBox() {
+		return this.boundingBox;
+	}
+	
 	public AxisAlignedBB getDebugBoundingBox() {
 		this.debugBoundingBox.setPosition(this.boundingBox);
 		return this.debugBoundingBox;

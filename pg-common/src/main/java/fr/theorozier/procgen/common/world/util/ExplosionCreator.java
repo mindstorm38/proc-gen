@@ -2,6 +2,8 @@ package fr.theorozier.procgen.common.world.util;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.MotionEntity;
+import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
@@ -41,6 +43,30 @@ public class ExplosionCreator {
 				}
 			}
 		}
+		
+		AxisAlignedBB explosionBox = new AxisAlignedBB(x - size, y - size, z - size, x + size, y + size, z + size);
+		
+		world.forEachEntitiesInBoundingBox(explosionBox, e -> {
+		
+			if (e instanceof MotionEntity) {
+				
+				MotionEntity entity = (MotionEntity) e;
+				
+				double dx = entity.getPosX() - x;
+				double dy = entity.getPosY() - y;
+				double dz = entity.getPosZ() - z;
+				double sqDist = dx * dx + dy * dy + dz * dz;
+				
+				if (sqDist <= rangeSq) {
+					
+					double distRatio = 1 - (sqDist / rangeSq);
+					entity.addVelocity(dx * distRatio, dy * distRatio, dz * distRatio);
+					
+				}
+				
+			}
+		
+		}, true);
 		
 	}
 	

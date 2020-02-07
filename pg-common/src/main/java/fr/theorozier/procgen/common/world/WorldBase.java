@@ -3,6 +3,7 @@ package fr.theorozier.procgen.common.world;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
+import fr.theorozier.procgen.common.util.FunctionUtils;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
@@ -14,6 +15,8 @@ import io.sutil.pool.FixedObjectPool;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  *
@@ -148,32 +151,25 @@ public abstract class WorldBase implements WorldAccessor {
 	
 	// ENTITIES //
 	
-	/*
-	protected final boolean addEntity(Entity entity) {
+	public void forEachEntitiesInBoundingBox(AxisAlignedBB boundingBox, Consumer<Entity> entityConsumer, boolean centerPointOnly) {
+	
+		int minCx = MathHelper.floorDoubleInt(boundingBox.getMinX()) >> 4;
+		int minCy = MathHelper.floorDoubleInt(boundingBox.getMinY()) >> 4;
+		int minCz = MathHelper.floorDoubleInt(boundingBox.getMinZ()) >> 4;
+	
+		int maxCx = MathHelper.floorDoubleInt(boundingBox.getMaxX()) >> 4;
+		int maxCy = MathHelper.floorDoubleInt(boundingBox.getMaxY()) >> 4;
+		int maxCz = MathHelper.floorDoubleInt(boundingBox.getMaxZ()) >> 4;
 		
-		if (this.entitiesById.put(entity.getUid(), entity) == null) {
-			
-			this.entities.add(entity);
-			this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityAdded(this, entity));
-			
-			return true;
-			
-		} else {
-			return false;
+		for (int cx = minCx; cx <= maxCx; ++cx) {
+			for (int cy = minCy; cy <= maxCy; ++cy) {
+				for (int cz = minCz; cz <= maxCz; ++cz) {
+					this.getChunkAt(cx, cy, cz).forEachEntitiesInBoundingBox(boundingBox, entityConsumer, centerPointOnly);
+				}
+			}
 		}
 		
 	}
-	
-	protected final void removeEntity(Entity entity, boolean fromList) {
-		
-		this.entitiesById.remove(entity.getUid());
-		this.eventManager.fireListeners(WorldEntityListener.class, l -> l.worldEntityRemoved(this, entity));
-		
-		if (fromList)
-			this.entities.remove(entity);
-		
-	}
-	*/
 	
 	public final List<Entity> getEntitiesView() {
 		return this.entitiesView;
