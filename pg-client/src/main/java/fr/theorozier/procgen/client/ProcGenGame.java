@@ -301,8 +301,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					
 					PlayerEntity entity = new PlayerEntity(serverWorld, entityUid);
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
-					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
-
+					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()) * 2, Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()) * 2);
+					entity.setRotation(-cam.getYaw() + (float) Math.PI, 0f);
+					
 					serverWorld.spawnEntity(entity);
 					
 				}

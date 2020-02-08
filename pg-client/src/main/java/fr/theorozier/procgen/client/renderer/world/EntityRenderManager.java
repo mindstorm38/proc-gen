@@ -97,6 +97,9 @@ public class EntityRenderManager {
 		
 		}
 		
+		model.reset();
+		model.apply();
+		
 	}
 	
 	void unload() {

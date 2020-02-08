@@ -231,17 +231,14 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		PROFILER.endStartSection("render_chunks");
 		// this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
-		this.renderChunks();
+		this.renderChunks(alpha);
 		PROFILER.endSection();
-		
-		// this.shaderManager.setGlobalOffset(0, 0, 0);
-		this.entityRenderManager.render(alpha);
 		
 		this.shaderManager.end();
 	
 	}
 	
-	private void renderChunks() {
+	private void renderChunks(float alpha) {
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
 		
@@ -253,6 +250,9 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		glDisable(GL_CULL_FACE);
 		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT_NOT_CULLED);
+		this.entityRenderManager.render(alpha);
+		
+		this.shaderManager.setTextureSampler(this.terrainMap);
 		
 		glEnable(GL_CULL_FACE);
 		glDepthMask(false);
