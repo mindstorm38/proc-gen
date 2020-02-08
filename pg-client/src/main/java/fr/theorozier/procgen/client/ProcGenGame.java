@@ -261,11 +261,15 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 								if ((dx * dx + dy * dy + dz * dz) > rangeSq)
 									continue;
 								
-								pos.set(cx + dx, cy + dy, cz + dz);
-								serverWorld.setBlockAt(pos, airState);
-								
-								serverWorld.getEventManager().fireListeners(WorldChunkListener.class,
-										l -> l.worldChunkBlockChanged(serverWorld, serverWorld.getChunkAtBlock(pos), pos, airState));
+								if (!serverWorld.isBlockAt(cx + dx, cy + dy, cz + dz, Blocks.BEDROCK.getDefaultState())) {
+									
+									pos.set(cx + dx, cy + dy, cz + dz);
+									serverWorld.setBlockAt(pos, airState);
+									
+									serverWorld.getEventManager().fireListeners(WorldChunkListener.class,
+											l -> l.worldChunkBlockChanged(serverWorld, serverWorld.getChunkAtBlock(pos), pos, airState));
+									
+								}
 								
 							}
 						}

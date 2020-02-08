@@ -5,13 +5,17 @@ import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
+import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
+import io.msengine.common.util.noise.SeedSimplexNoise;
 
 public class Beta3DChunkGenerator extends ChunkGenerator {
 	
 	private final OctaveSimplexNoise baseNoise;
+	private final SeedSimplexNoise bedrockNoise;
 	
 	private final int noiseHorizontalGranularity;
 	private final int noiseVerticalGranularity;
@@ -24,6 +28,7 @@ public class Beta3DChunkGenerator extends ChunkGenerator {
 		super(seed, new BetaBiomeProvider(seed));
 		
 		this.baseNoise = new OctaveSimplexNoise(seed, 12, 0.6f, 2.0f);
+		this.bedrockNoise = new SeedSimplexNoise(seed);
 		
 		this.noiseHorizontalGranularity = 4; // TODO Add these fields to arguments
 		this.noiseVerticalGranularity = 8;
@@ -112,24 +117,24 @@ public class Beta3DChunkGenerator extends ChunkGenerator {
 					noiseY = y / this.noiseVerticalGranularity;
 					relY = y % this.noiseVerticalGranularity;
 					ratioY = relY / (float) this.noiseVerticalGranularity;
-					
+						
 					// Bottom plate
-					n1 = noiseMap[noiseX    ][noiseZ][noiseY];
+					n1 = noiseMap[noiseX][noiseZ][noiseY];
 					n2 = noiseMap[noiseX + 1][noiseZ][noiseY];
 					n01 = MathUtils.lerp(n1, n2, ratioX);
 					
-					n1 = noiseMap[noiseX    ][noiseZ + 1][noiseY];
+					n1 = noiseMap[noiseX][noiseZ + 1][noiseY];
 					n2 = noiseMap[noiseX + 1][noiseZ + 1][noiseY];
 					n02 = MathUtils.lerp(n1, n2, ratioX);
 					
 					n001 = MathUtils.lerp(n01, n02, ratioZ);
 					
 					// Top plate
-					n1 = noiseMap[noiseX    ][noiseZ][noiseY + 1];
+					n1 = noiseMap[noiseX][noiseZ][noiseY + 1];
 					n2 = noiseMap[noiseX + 1][noiseZ][noiseY + 1];
 					n01 = MathUtils.lerp(n1, n2, ratioX);
 					
-					n1 = noiseMap[noiseX    ][noiseZ + 1][noiseY + 1];
+					n1 = noiseMap[noiseX][noiseZ + 1][noiseY + 1];
 					n2 = noiseMap[noiseX + 1][noiseZ + 1][noiseY + 1];
 					n02 = MathUtils.lerp(n1, n2, ratioX);
 					
@@ -183,6 +188,23 @@ public class Beta3DChunkGenerator extends ChunkGenerator {
 			}
 		}
 		*/
+		
+	}
+	
+	@Override
+	public void genBedrock(WorldServerSection section, SectionPositioned pos) {
+		
+		for (int x = 0; x < 16; ++x) {
+			for (int z = 0; z < 16; ++z) {
+				for (int y = 0; y < 4; ++y) {
+					
+					if (y == 0 || this.bedrockNoise.noise(pos.getX() + x, y, pos.getZ() + z) > 0) {
+						section.setBlockAt(x, y, z, Blocks.BEDROCK.getDefaultState());
+					}
+					
+				}
+			}
+		}
 		
 	}
 	

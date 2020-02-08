@@ -49,4 +49,9 @@ public class DummyWorld implements WorldAccessor {
 	
 	}
 	
+	@Override
+	public boolean isBlockAt(int x, int y, int z, BlockState state) {
+		return false;
+	}
+	
 }

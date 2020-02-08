@@ -85,7 +85,11 @@ public class WorldChunk {
 	}
 	
 	public void setBlockAt(int x, int y, int z, BlockState state) {
-		this.data[getBlockIndex(x, y, z)] = state.getBlock().isUnsavable() ? 0 : state.getUid();
+		this.data[getBlockIndex(x, y, z)] = state.getSaveUid();
+	}
+	
+	public boolean isBlockAt(int x, int y, int z, BlockState state) {
+		return this.data[getBlockIndex(x, y, z)] == state.getSaveUid();
 	}
 	
 	// ENTITIES //

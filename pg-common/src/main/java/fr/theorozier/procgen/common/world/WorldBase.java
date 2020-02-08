@@ -149,6 +149,12 @@ public abstract class WorldBase implements WorldAccessor {
 		if (chunk != null) chunk.setBlockAt(x & 15, y & 15, z & 15, state);
 	}
 	
+	@Override
+	public boolean isBlockAt(int x, int y, int z, BlockState state) {
+		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
+		return chunk != null && chunk.isBlockAt(x & 15, y & 15, z & 15, state);
+	}
+	
 	// ENTITIES //
 	
 	public void forEachEntitiesInBoundingBox(AxisAlignedBB boundingBox, Consumer<Entity> entityConsumer, boolean centerPointOnly) {

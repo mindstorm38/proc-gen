@@ -82,5 +82,11 @@ public interface WorldAccessor {
 	default void setBlockAt(BlockPositioned pos, BlockState state) {
 		this.setBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
 	}
+	
+	boolean isBlockAt(int x, int y, int z, BlockState state);
+	
+	default boolean isBlockAt(BlockPositioned pos, BlockState state) {
+		return this.isBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
+	}
 
 }

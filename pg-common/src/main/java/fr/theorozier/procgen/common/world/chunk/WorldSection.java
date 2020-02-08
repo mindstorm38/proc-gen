@@ -1,13 +1,11 @@
 package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.Consumer;
 

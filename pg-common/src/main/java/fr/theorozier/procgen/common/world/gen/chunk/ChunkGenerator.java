@@ -14,6 +14,7 @@ import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
+import javafx.scene.Scene;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -63,7 +64,11 @@ public abstract class ChunkGenerator {
 	
 	public abstract void genBase(WorldServerChunk chunk, BlockPositioned pos);
 	
+	public void genBedrock(WorldServerSection section, SectionPositioned pos) { }
+	
 	public void genSurface(WorldServerSection section, SectionPositioned pos) {
+		
+		this.genBedrock(section, pos);
 		
 		WorldServer world = section.getWorld();
 		int seaLimit = world.getSeaLevel() - 2;

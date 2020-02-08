@@ -57,6 +57,10 @@ public class BlockState {
 		this.uid = uid;
 	}
 	
+	public short getSaveUid() {
+		return this.owner.isUnsavable() ? 0 : this.uid;
+	}
+	
 	public int getPropertiesCount() {
 		return this.properties.size();
 	}
