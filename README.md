@@ -36,6 +36,7 @@ generation.
   - [ ] AI
 - [x] Player
   - [x] Model
+  - [x] Animations
   - [ ] Controlable
   - [ ] Inventory
 - [x] Asynchronous (multi-threaded) chunk generation

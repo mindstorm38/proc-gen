@@ -12,7 +12,7 @@ public class BlockFluidWater extends BlockFluid {
 	}
 	
 	@Override
-	public float getInnerViscosity() {
+	public float getInnerFriction() {
 		return 1f;
 	}
 	

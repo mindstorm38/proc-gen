@@ -46,7 +46,7 @@ public class ExplosionCreator {
 		
 		AxisAlignedBB explosionBox = new AxisAlignedBB(x - size, y - size, z - size, x + size, y + size, z + size);
 		
-		world.forEachEntitiesInBoundingBox(explosionBox, e -> {
+		world.forEachEntitiesIn(explosionBox, e -> {
 		
 			if (e instanceof MotionEntity) {
 				

@@ -3,11 +3,11 @@ package fr.theorozier.procgen.common.entity;
 import fr.theorozier.procgen.common.entity.animation.EntityFrame;
 import fr.theorozier.procgen.common.world.WorldBase;
 
-public class HumanEntity extends WalkingEntity {
+public class HumanoidEntity extends WalkingEntity {
 	
 	protected final EntityFrame armsFrame;
 	
-	public HumanEntity(WorldBase world, long uid) {
+	public HumanoidEntity(WorldBase world, long uid) {
 		
 		super(world, uid);
 		
@@ -23,7 +23,7 @@ public class HumanEntity extends WalkingEntity {
 		super.updateMotion();
 		
 		this.armsFrame.setLast();
-		this.armsFrame.addValue(0.6f);
+		this.armsFrame.addValue(0.1f);
 		
 	}
 	

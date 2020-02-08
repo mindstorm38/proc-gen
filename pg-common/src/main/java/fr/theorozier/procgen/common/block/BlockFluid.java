@@ -27,6 +27,6 @@ public abstract class BlockFluid extends Block {
 	public void getStateCollision(BlockState state, List<AxisAlignedBB> boundingBoxes) {}
 	
 	@Override
-	public abstract float getInnerViscosity();
+	public abstract float getInnerFriction();
 	
 }

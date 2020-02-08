@@ -7,6 +7,7 @@ import com.google.common.collect.Table;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
+import io.sutil.pool.FixedObjectPool;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -90,6 +91,29 @@ public class BlockState {
 				copy = new AxisAlignedBB();
 				
 			}
+			
+		}
+		
+	}
+	
+	public boolean isBoundingBoxColliding(int x, int y, int z, AxisAlignedBB other) {
+		
+		try (FixedObjectPool<AxisAlignedBB>.PoolObject tempHold = AxisAlignedBB.POOL.acquire()) {
+			
+			AxisAlignedBB temp = tempHold.get();
+			
+			for (AxisAlignedBB bb : this.boundingBoxes) {
+				
+				temp.setPosition(bb);
+				temp.move(x, y, z);
+				
+				if (temp.intersects(other)) {
+					return true;
+				}
+				
+			}
+			
+			return false;
 			
 		}
 		

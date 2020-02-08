@@ -103,8 +103,12 @@ public class Block {
 		addCubeBoundingBox(boundingBoxes);
 	}
 	
-	public float getInnerViscosity() {
-		return 0f;
+	public float getInnerFriction() {
+		return 1.00f;
+	}
+	
+	public float getSurfaceFriction(Direction face) {
+		return 0.90f;
 	}
 	
 	// Properties

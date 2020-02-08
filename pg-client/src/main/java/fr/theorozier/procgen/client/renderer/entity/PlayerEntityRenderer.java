@@ -2,6 +2,7 @@ package fr.theorozier.procgen.client.renderer.entity;
 
 import fr.theorozier.procgen.client.renderer.entity.part.EntityCubePart;
 import fr.theorozier.procgen.common.entity.PlayerEntity;
+import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.Texture;
@@ -77,6 +78,12 @@ public class PlayerEntityRenderer extends MotionEntityRenderer<PlayerEntity> {
 	public void renderMotionEntity(float alpha, ModelHandler model, PlayerEntity entity) {
 	
 		float sneakRot = 1f;
+		float walkingInterpolation = entity.getWalkingInterpolation().getValue();
+		
+		float walkFrame = (float) Math.sin(entity.getWalkFrame().getLerped(alpha)) * 0.5f;
+		float armsLateralFrame = (float) Math.sin(entity.getArmsFrame().getLerped(alpha)) * 0.03f;
+		
+		float armsEffectiveFrame = MathUtils.lerp(armsLateralFrame, -walkFrame, walkingInterpolation);
 		
 		model.push().translate(0, 0.75f, 0).apply();
 		this.body.render();
@@ -88,11 +95,11 @@ public class PlayerEntityRenderer extends MotionEntityRenderer<PlayerEntity> {
 		
 		model.push().translate(0, 1.375f, 0);
 		
-			model.push().translate(-0.375f, 0, 0).apply();
+			model.push().translate(-0.375f, 0, 0).rotateX(armsEffectiveFrame).rotateZ(armsLateralFrame).apply();
 			this.armRight.render();
 			model.pop();
 			
-			model.push().translate(0.375f, 0, 0).apply();
+			model.push().translate(0.375f, 0, 0).rotateX(-armsEffectiveFrame).rotateZ(-armsLateralFrame).apply();
 			this.armLeft.render();
 			model.pop();
 			
@@ -100,11 +107,11 @@ public class PlayerEntityRenderer extends MotionEntityRenderer<PlayerEntity> {
 		
 		model.push().translate(0, 0.625f, 0);
 		
-			model.push().translate(-0.125f, 0, 0).apply();
+			model.push().translate(-0.125f, 0, 0).rotateX(walkFrame).apply();
 			this.legRight.render();
 			model.pop();
 		
-			model.push().translate(0.125f, 0, 0).apply();
+			model.push().translate(0.125f, 0, 0).rotateX(-walkFrame).apply();
 			this.legLeft.render();
 			model.pop();
 			

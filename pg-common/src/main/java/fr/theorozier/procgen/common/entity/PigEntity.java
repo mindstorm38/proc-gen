@@ -26,4 +26,8 @@ public class PigEntity extends WalkingEntity {
 		
 	}
 	
+	@Override
+	protected float getWalkFrameSpeed(float sqDist) {
+		return sqDist * 30f;
+	}
 }

@@ -1,7 +1,11 @@
 package fr.theorozier.procgen.common.phys;
 
+import io.sutil.pool.FixedObjectPool;
+
 public class AxisAlignedBB {
 
+	public static final FixedObjectPool<AxisAlignedBB> POOL = new FixedObjectPool<>(AxisAlignedBB::new, 16);
+	
 	private double minX, minY, minZ;
 	private double maxX, maxY, maxZ;
 	
@@ -114,6 +118,19 @@ public class AxisAlignedBB {
 		
 		if (z > 0) this.maxZ += z;
 		else this.minZ += z;
+		
+	}
+	
+	public void grow(double x, double y, double z) {
+		
+		this.minX -= x;
+		this.maxX += x;
+		
+		this.minY -= y;
+		this.maxY += y;
+		
+		this.minZ -= z;
+		this.maxZ += z;
 		
 	}
 	

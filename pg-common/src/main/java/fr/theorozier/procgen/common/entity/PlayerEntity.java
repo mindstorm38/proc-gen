@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.entity;
 
 import fr.theorozier.procgen.common.world.WorldBase;
 
-public class PlayerEntity extends HumanEntity {
+public class PlayerEntity extends HumanoidEntity {
 	
 	public PlayerEntity(WorldBase world, long uid) {
 		
@@ -26,4 +26,8 @@ public class PlayerEntity extends HumanEntity {
 		
 	}
 	
+	@Override
+	protected float getWalkFrameSpeed(float sqDist) {
+		return Math.min((float) Math.sqrt(sqDist) * 2f, 1f);
+	}
 }

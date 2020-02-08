@@ -14,6 +14,7 @@ import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -155,9 +156,53 @@ public abstract class WorldBase implements WorldAccessor {
 		return chunk != null && chunk.isBlockAt(x & 15, y & 15, z & 15, state);
 	}
 	
+	public void forEachBlocksIn(AxisAlignedBB boundingBox, BiConsumer<BlockState, BlockPositioned> blockConsumer) {
+		
+		int xMin = MathHelper.floorDoubleInt(boundingBox.getMinX()) - 1;
+		int yMin = MathHelper.floorDoubleInt(boundingBox.getMinY()) - 1;
+		int zMin = MathHelper.floorDoubleInt(boundingBox.getMinZ()) - 1;
+		
+		int xMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxX()) + 1;
+		int yMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxY()) + 1;
+		int zMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxZ()) + 1;
+		
+		BlockState state;
+		
+		try (FixedObjectPool<BlockPosition>.PoolObject pos = BlockPosition.POOL.acquire()) {
+			
+			for (int y = yMin; y <= yMax; ++y)
+				for (int x = xMin; x <= xMax; ++x)
+					for (int z = zMin; z <= zMax; ++z)
+						if ((state = this.getBlockAt(x, y, z)) != null && state.isBoundingBoxColliding(x, y, z, boundingBox))
+							blockConsumer.accept(state, pos.get().set(x, y, z));
+			
+		}
+		
+	}
+	
+	public void forEachBoundingBoxesIn(AxisAlignedBB boundingBox, Consumer<AxisAlignedBB> bbConsumer) {
+		
+		int xMin = MathHelper.floorDoubleInt(boundingBox.getMinX()) - 1;
+		int yMin = MathHelper.floorDoubleInt(boundingBox.getMinY()) - 1;
+		int zMin = MathHelper.floorDoubleInt(boundingBox.getMinZ()) - 1;
+		
+		int xMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxX()) + 1;
+		int yMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxY()) + 1;
+		int zMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxZ()) + 1;
+		
+		BlockState state;
+		
+		for (int y = yMin; y <= yMax; ++y)
+			for (int x = xMin; x <= xMax; ++x)
+				for (int z = zMin; z <= zMax; ++z)
+					if ((state = this.getBlockAt(x, y, z)) != null)
+						state.forEachCollidingBoundingBox(x, y, z, boundingBox, bbConsumer);
+		
+	}
+	
 	// ENTITIES //
 	
-	public void forEachEntitiesInBoundingBox(AxisAlignedBB boundingBox, Consumer<Entity> entityConsumer, boolean centerPointOnly) {
+	public void forEachEntitiesIn(AxisAlignedBB boundingBox, Consumer<Entity> entityConsumer, boolean centerPointOnly) {
 	
 		int minCx = MathHelper.floorDoubleInt(boundingBox.getMinX()) >> 4;
 		int minCy = MathHelper.floorDoubleInt(boundingBox.getMinY()) >> 4;
@@ -182,27 +227,6 @@ public abstract class WorldBase implements WorldAccessor {
 	}
 	
 	// UTILITES //
-	
-	public void forEachBoundingBoxesIn(AxisAlignedBB boundingBox, Consumer<AxisAlignedBB> bbConsumer) {
-	
-		int xMin = MathHelper.floorDoubleInt(boundingBox.getMinX()) - 1;
-		int xMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxX()) + 1;
-		
-		int yMin = MathHelper.floorDoubleInt(boundingBox.getMinY()) - 1;
-		int yMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxY()) + 1;
-		
-		int zMin = MathHelper.floorDoubleInt(boundingBox.getMinZ()) - 1;
-		int zMax = MathHelper.ceilingDoubleInt(boundingBox.getMaxZ()) + 1;
-		
-		BlockState state;
-		
-		for (int y = yMin; y <= yMax; ++y)
-			for (int x = xMin; x <= xMax; ++x)
-				for (int z = zMin; z <= zMax; ++z)
-					if ((state = this.getBlockAt(x, y, z)) != null)
-						state.forEachCollidingBoundingBox(x, y, z, boundingBox, bbConsumer);
-		
-	}
 	
 	public void forEachChunkPosNear(float x, float y, float z, int range, boolean wholeY, Consumer<BlockPosition> consumer) {
 		

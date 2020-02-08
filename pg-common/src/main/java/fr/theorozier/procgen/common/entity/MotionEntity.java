@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.entity;
 
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.position.Direction;
 import io.sutil.math.MathHelper;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public abstract class MotionEntity extends Entity {
 	protected double fallDistance;
 	
 	private final AxisAlignedBB tempMotionBoundingBox;
+	private float tempFriction;
 	
 	public MotionEntity(WorldBase world, long uid) {
 		
@@ -168,6 +170,39 @@ public abstract class MotionEntity extends Entity {
 				if (dz == 0)
 					this.velZ = 0;
 			
+			}
+			
+			if (this.velX != 0 || this.velZ != 0 || this.velY != 0) {
+				
+				this.tempFriction = 0.96f; // Natural friction
+				
+				this.world.forEachBlocksIn(this.boundingBox, (state, pos) -> {
+					this.tempFriction *= state.getBlock().getInnerFriction();
+				});
+				
+				if (this.onGround) {
+					
+					this.tempMotionBoundingBox.setPositionUnsafe(this.boundingBox.getMinX(), this.boundingBox.getMinY() - 0.0625f, this.boundingBox.getMinZ(), this.boundingBox.getMaxX(), this.boundingBox.getMinY(), this.boundingBox.getMaxZ());
+					
+					this.world.forEachBlocksIn(this.tempMotionBoundingBox, (state, pos) -> {
+						this.tempFriction *= state.getBlock().getSurfaceFriction(Direction.TOP);
+					});
+					
+				}
+				
+				this.velX *= this.tempFriction;
+				this.velY *= this.tempFriction;
+				this.velZ *= this.tempFriction;
+				
+				if (this.velX != 0 && -0.01f < this.velX && this.velX < 0.01f)
+					this.velX = 0;
+				
+				if (this.velY != 0 && -0.01f < this.velY && this.velY < 0.01f)
+					this.velY = 0;
+				
+				if (this.velZ != 0 && -0.01f < this.velZ && this.velZ < 0.01f)
+					this.velZ = 0;
+				
 			}
 			
 			this.resetPositionToBoundingBox();
