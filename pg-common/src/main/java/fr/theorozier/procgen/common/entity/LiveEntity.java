@@ -60,6 +60,8 @@ public abstract class LiveEntity extends MotionEntity {
 	@Override
 	public void onFallen(double distance) {
 		
+		super.onFallen(distance);
+		
 		float damage = (float) (distance - this.fallResistance);
 		
 		if (damage > 0) {

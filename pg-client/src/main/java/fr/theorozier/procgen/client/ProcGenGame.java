@@ -284,15 +284,22 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					WorldServer serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
 					
 					Camera3D cam = this.worldRenderer.getCamera();
+					long entityUid = (long) (Math.random() * 10000000);
 					
 					/*
-					PigEntity entity = new PigEntity(serverWorld, (long) (Math.random() * 10000000));
+					PigEntity entity = new PigEntity(serverWorld, entityUid);
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setRotation(this.rotation, 0);
 					this.rotation += 0.1f;
 					*/
 					
-					FallingBlockEntity entity = new PrimedTNTEntity(serverWorld, (long) (Math.random() * 10000000));
+					/*
+					FallingBlockEntity entity = new PrimedTNTEntity(serverWorld, entityUid);
+					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
+					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
+					*/
+					
+					PlayerEntity entity = new PlayerEntity(serverWorld, entityUid);
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
 

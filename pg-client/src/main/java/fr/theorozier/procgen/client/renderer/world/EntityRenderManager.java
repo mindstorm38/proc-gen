@@ -1,13 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world;
 
-import fr.theorozier.procgen.client.renderer.entity.EntityRenderer;
-import fr.theorozier.procgen.client.renderer.entity.FallingBlockEntityRenderer;
-import fr.theorozier.procgen.client.renderer.entity.PigEntityRenderer;
-import fr.theorozier.procgen.client.renderer.entity.PrimedTNTRenderer;
-import fr.theorozier.procgen.common.entity.Entity;
-import fr.theorozier.procgen.common.entity.FallingBlockEntity;
-import fr.theorozier.procgen.common.entity.PigEntity;
-import fr.theorozier.procgen.common.entity.PrimedTNTEntity;
+import fr.theorozier.procgen.client.renderer.entity.*;
+import fr.theorozier.procgen.common.entity.*;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.shader.ShaderSamplerObject;
 import io.msengine.common.util.GameProfiler;
@@ -44,6 +38,7 @@ public class EntityRenderManager {
 		this.addEntityRenderer(FallingBlockEntity.class, new FallingBlockEntityRenderer());
 		this.addEntityRenderer(PrimedTNTEntity.class, new PrimedTNTRenderer());
 		this.addEntityRenderer(PigEntity.class, new PigEntityRenderer());
+		this.addEntityRenderer(PlayerEntity.class, new PlayerEntityRenderer());
 		
 	}
 	

@@ -10,8 +10,6 @@ import io.msengine.client.renderer.texture.TexturePredefinedMap;
 
 public class PigEntityRenderer extends MotionEntityRenderer<PigEntity> {
 	
-	private static final float MIN_LEG_ROTATION = (float) Math.toRadians(10.0);
-	
 	private final TexturePredefinedMap baseTexture;
 	
 	private final EntityCubePart body;

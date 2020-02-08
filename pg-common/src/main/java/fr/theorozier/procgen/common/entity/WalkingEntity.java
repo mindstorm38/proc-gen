@@ -49,6 +49,7 @@ public abstract class WalkingEntity extends LiveEntity {
 	
 	@Override
 	protected void onIdle() {
+		super.onIdle();
 		this.walkFrame.backToZero(0.3f);
 	}
 	

@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateContainer;
+import fr.theorozier.procgen.common.item.ItemStack;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.WorldServer;
@@ -122,9 +123,9 @@ public class Block {
 
 	public void placedBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
 
-	public void destroyedBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+	public void destroyedBlock(WorldServer world, BlockPositioned pos, BlockState block, ItemStack usedItem) {}
 
-	public void interactBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+	public void interactBlock(WorldServer world, BlockPositioned pos, BlockState block, Direction face, ItemStack usedItem) {}
 
 	public void neighbourBlockUpdated(WorldServer world, BlockPositioned pos, BlockState block, BlockPositioned neighbourPos, BlockState neighbour, Direction face) {}
 
