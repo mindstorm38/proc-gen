@@ -24,7 +24,6 @@ public class ExplosionCreator {
 		int cy = MathHelper.floorDoubleInt(y);
 		int cz = MathHelper.floorDoubleInt(z);
 		
-		BlockPosition pos = new BlockPosition();
 		BlockState airState = Blocks.AIR.getDefaultState();
 		
 		for (int dx = -baseRange; dx <= baseRange; ++dx) {
@@ -34,11 +33,7 @@ public class ExplosionCreator {
 					if ((dx * dx + dy * dy + dz * dz) > (rangeSq - (2 * random.nextFloat())))
 						continue;
 					
-					pos.set(cx + dx, cy + dy, cz + dz);
-					world.setBlockAt(pos, airState);
-					
-					world.getEventManager().fireListeners(WorldChunkListener.class,
-							l -> l.worldChunkBlockChanged(world, world.getChunkAtBlock(pos), pos, airState));
+					world.setBlockAt(cx + dx, cy + dy, cz + dz, airState);
 					
 				}
 			}

@@ -8,7 +8,8 @@ import java.util.Objects;
 
 public class FallingBlockEntity extends MotionEntity {
 	
-	private BlockState state = Blocks.STONE.getDefaultState();
+	protected BlockState state = Blocks.STONE.getDefaultState();
+	protected boolean placeOnIdle = true;
 	
 	public FallingBlockEntity(WorldBase world, long uid) {
 		super(world, uid);
@@ -34,6 +35,43 @@ public class FallingBlockEntity extends MotionEntity {
 		this.posY = this.boundingBox.getMinY();
 		this.posZ = this.boundingBox.getMinZ();
 		
+	}
+	
+	// MOTION EVENTS //
+	
+	@Override
+	protected void onIdle() {
+		
+		super.onIdle();
+		
+		if (this.isInServer && this.placeOnIdle) {
+			
+			int placeX = (int) Math.round(this.posX);
+			int placeY = (int) Math.round(this.posY);
+			int placeZ = (int) Math.round(this.posZ);
+			
+			BlockState state = this.serverWorld.getBlockAt(placeX, placeY, placeZ);
+			
+			if (state == null) {
+				this.serverWorld.setBlockAt(placeX, placeY, placeZ, this.state);
+			} else {
+				// Drop block item
+			}
+			
+			this.setDead();
+			
+		}
+		
+	}
+	
+	// PROPERTIES GET & SET //
+	
+	public boolean doPlaceOnIdle() {
+		return this.placeOnIdle;
+	}
+	
+	public void setPlaceOnIdle(boolean placeOnIdle) {
+		this.placeOnIdle = placeOnIdle;
 	}
 	
 }

@@ -15,6 +15,7 @@ public class PrimedTNTEntity extends FallingBlockEntity {
 		super(world, uid);
 		super.setState(Blocks.TNT.getDefaultState());
 		
+		this.placeOnIdle = false;
 		this.flashingFrame = new EntityFrame();
 		this.remainTick = 60;
 		

@@ -3,10 +3,10 @@ package fr.theorozier.procgen.common.world;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
-import fr.theorozier.procgen.common.util.FunctionUtils;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
+import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldMethodEventManager;
 import fr.theorozier.procgen.common.world.position.*;
 import io.msengine.common.util.event.MethodEventManager;
@@ -16,8 +16,6 @@ import io.sutil.pool.FixedObjectPool;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  *
@@ -147,7 +145,12 @@ public abstract class WorldBase implements WorldAccessor {
 	@Override
 	public void setBlockAt(int x, int y, int z, BlockState state) {
 		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
-		if (chunk != null) chunk.setBlockAt(x & 15, y & 15, z & 15, state);
+		if (chunk != null) {
+			chunk.setBlockAt(x & 15, y & 15, z & 15, state);
+			try (FixedObjectPool<BlockPosition>.PoolObject pos  = BlockPosition.POOL.acquire()) {
+				this.eventManager.fireListeners(WorldChunkListener.class, l -> l.worldChunkBlockChanged(this, chunk, pos.get().set(x, y, z), state));
+			}
+		}
 	}
 	
 	@Override

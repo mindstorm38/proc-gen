@@ -261,14 +261,10 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 								if ((dx * dx + dy * dy + dz * dz) > rangeSq)
 									continue;
 								
-								if (!serverWorld.isBlockAt(cx + dx, cy + dy, cz + dz, Blocks.BEDROCK.getDefaultState())) {
-									
-									pos.set(cx + dx, cy + dy, cz + dz);
+								pos.set(cx + dx, cy + dy, cz + dz);
+								
+								if (!serverWorld.isBlockAt(pos, Blocks.BEDROCK.getDefaultState())) {
 									serverWorld.setBlockAt(pos, airState);
-									
-									serverWorld.getEventManager().fireListeners(WorldChunkListener.class,
-											l -> l.worldChunkBlockChanged(serverWorld, serverWorld.getChunkAtBlock(pos), pos, airState));
-									
 								}
 								
 							}
@@ -293,16 +289,15 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					this.rotation += 0.1f;
 					*/
 					
-					/*
-					FallingBlockEntity entity = new PrimedTNTEntity(serverWorld, entityUid);
+					FallingBlockEntity entity = new FallingBlockEntity(serverWorld, entityUid);
+					entity.setState(Blocks.CACTUS.getDefaultState());
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
-					*/
 					
-					PlayerEntity entity = new PlayerEntity(serverWorld, entityUid);
+					/*PlayerEntity entity = new PlayerEntity(serverWorld, entityUid);
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()) * 2, Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()) * 2);
-					entity.setRotation(-cam.getYaw() + (float) Math.PI, 0f);
+					entity.setRotation(-cam.getYaw() + (float) Math.PI, 0f);*/
 					
 					serverWorld.spawnEntity(entity);
 					
