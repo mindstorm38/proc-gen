@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateContainer;
+import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.item.ItemStack;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.util.ErrorUtils;
@@ -103,6 +104,8 @@ public class Block {
 		addCubeBoundingBox(boundingBoxes);
 	}
 	
+	// Properties
+	
 	public float getInnerFriction() {
 		return 1.00f;
 	}
@@ -111,14 +114,16 @@ public class Block {
 		return 0.90f;
 	}
 	
-	// Properties
-	
 	public float getResistance(BlockState state) {
 		return resistance;
 	}
 	
 	public void setResistance(float resistance) {
 		this.resistance = resistance;
+	}
+	
+	public boolean canOverride(WorldServer world, BlockPositioned pos, BlockState state) {
+		return false;
 	}
 	
 	// Dynamic function for modifying the world
@@ -129,7 +134,9 @@ public class Block {
 
 	public void destroyedBlock(WorldServer world, BlockPositioned pos, BlockState block, ItemStack usedItem) {}
 
-	public void interactBlock(WorldServer world, BlockPositioned pos, BlockState block, Direction face, ItemStack usedItem) {}
+	public boolean interactBlock(WorldServer world, BlockPositioned pos, BlockState block, Direction face, LiveEntity entity, ItemStack usedItem) {
+		return false;
+	}
 
 	public void neighbourBlockUpdated(WorldServer world, BlockPositioned pos, BlockState block, BlockPositioned neighbourPos, BlockState neighbour, Direction face) {}
 

@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.common.item;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
@@ -51,10 +52,14 @@ public class Item {
 	
 	// Interacts //
 	
-	public void useItemOnBlock(WorldServer world, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
-		block.getBlock().interactBlock(world, pos, block, face, stack);
+	public void useOnBlock(WorldServer world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
+		if (!block.getBlock().interactBlock(world, pos, block, face, entity, stack)) {
+			this.useOnBlockNoInteract(world, entity, stack, pos, block, face);
+		}
 	}
 	
-	public void useItem(WorldServer world, ItemStack stack) {}
+	public void useOnBlockNoInteract(WorldServer world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) { }
+	
+	public void useOffBlock(WorldServer world, LiveEntity entity, ItemStack stack) {}
 	
 }

@@ -3,6 +3,8 @@ package fr.theorozier.procgen.common.entity;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldBase;
+import fr.theorozier.procgen.common.world.position.BlockPosition;
+import io.sutil.pool.FixedObjectPool;
 
 import java.util.Objects;
 
@@ -46,16 +48,19 @@ public class FallingBlockEntity extends MotionEntity {
 		
 		if (this.isInServer && this.placeOnIdle) {
 			
-			int placeX = (int) Math.round(this.posX);
-			int placeY = (int) Math.round(this.posY);
-			int placeZ = (int) Math.round(this.posZ);
-			
-			BlockState state = this.serverWorld.getBlockAt(placeX, placeY, placeZ);
-			
-			if (state == null) {
-				this.serverWorld.setBlockAt(placeX, placeY, placeZ, this.state);
-			} else {
-				// Drop block item
+			try (FixedObjectPool<BlockPosition>.PoolObject poolPos = BlockPosition.POOL.acquire()) {
+				
+				BlockPosition pos = poolPos.get();
+				pos.set((int) Math.round(this.posX), (int) Math.round(this.posY), (int) Math.round(this.posZ));
+				
+				BlockState state = this.serverWorld.getBlockAt(pos);
+				
+				if (state == null || state.getBlock().canOverride(this.serverWorld, pos, state)) {
+					this.serverWorld.setBlockAt(pos, this.state);
+				} else {
+					// Drop block item
+				}
+				
 			}
 			
 			this.setDead();

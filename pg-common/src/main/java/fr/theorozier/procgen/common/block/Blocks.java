@@ -71,7 +71,7 @@ public final class Blocks {
 	}
 	
 	public static BlockState getBlockState(short uid) {
-		return uidStateRegister.get(uid);
+		return uid == 0 ? null : uidStateRegister.get(uid);
 	}
 	
 	private Blocks() {}
