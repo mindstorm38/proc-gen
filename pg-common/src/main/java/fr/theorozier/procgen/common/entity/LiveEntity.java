@@ -11,6 +11,7 @@ public abstract class LiveEntity extends MotionEntity {
 	protected float lastHeadYaw;
 	protected float lastHeadPitch;
 	
+	protected float eyesHeight;
 	protected int health;
 	protected float fallResistance;
 	
@@ -18,6 +19,7 @@ public abstract class LiveEntity extends MotionEntity {
 		
 		super(world, uid);
 		
+		this.eyesHeight = 1f;
 		this.health = 1;
 		this.fallResistance = 3f;
 		
