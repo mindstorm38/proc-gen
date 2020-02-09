@@ -25,15 +25,25 @@ public class ExplosionCreator {
 		int cz = MathHelper.floorDoubleInt(z);
 		
 		BlockState airState = Blocks.AIR.getDefaultState();
+		BlockPosition pos = new BlockPosition();
 		
 		for (int dx = -baseRange; dx <= baseRange; ++dx) {
 			for (int dz = -baseRange; dz <= baseRange; ++dz) {
 				for (int dy = -baseRange; dy <= baseRange; ++dy) {
 					
-					if ((dx * dx + dy * dy + dz * dz) > (rangeSq - (2 * random.nextFloat())))
+					if ((dx * dx + dy * dy + dz * dz) > (rangeSq - (10 * random.nextFloat())))
 						continue;
 					
-					world.setBlockAt(cx + dx, cy + dy, cz + dz, airState);
+					pos.set(cx + dx, cy + dy, cz + dz);
+					
+					if (world.isBlockAt(pos, Blocks.TNT.getDefaultState())) {
+						
+						Blocks.TNT.fuze(world, pos, Blocks.TNT.getDefaultState())
+								.setRemainTick(10 + random.nextInt(6));
+						
+					} else {
+						world.setBlockAt(cx + dx, cy + dy, cz + dz, airState);
+					}
 					
 				}
 			}

@@ -17,7 +17,7 @@ public class PrimedTNTEntity extends FallingBlockEntity {
 		
 		this.placeOnIdle = false;
 		this.flashingFrame = new EntityFrame();
-		this.remainTick = 60;
+		this.remainTick = 80;
 		
 	}
 	
@@ -31,7 +31,7 @@ public class PrimedTNTEntity extends FallingBlockEntity {
 		this.flashingFrame.setLast();
 		this.flashingFrame.addValue(0.6f);
 		
-		if (--this.remainTick == 0)
+		if (--this.remainTick <= 0)
 			this.explode();
 		
 	}
@@ -42,7 +42,7 @@ public class PrimedTNTEntity extends FallingBlockEntity {
 		
 		if (this.isInServer) {
 			
-			ExplosionCreator.createExplosion(this.serverWorld, (float) this.posX, (float) this.posY, (float) this.posZ, 6);
+			ExplosionCreator.createExplosion(this.serverWorld, (float) this.posX, (float) this.posY, (float) this.posZ, 4);
 			this.setDead();
 			
 		}
@@ -53,6 +53,14 @@ public class PrimedTNTEntity extends FallingBlockEntity {
 	
 	public EntityFrame getFlashingFrame() {
 		return flashingFrame;
+	}
+	
+	public int getRemainTick() {
+		return this.remainTick;
+	}
+	
+	public void setRemainTick(int remainTick) {
+		this.remainTick = remainTick;
 	}
 	
 }
