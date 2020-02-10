@@ -1,6 +1,5 @@
 package fr.theorozier.procgen.common.world.gen.chunk;
 
-import com.google.common.base.Enums;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.biome.Biome;
@@ -14,7 +13,6 @@ import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.msengine.common.util.noise.OctaveSimplexNoise;
-import javafx.scene.Scene;
 
 import java.util.EnumSet;
 import java.util.Random;
