@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.world;
 
+import com.github.luben.zstd.ZstdOutputStream;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
@@ -372,7 +373,6 @@ public class WorldServer extends WorldBase {
 								)
 							);
 
-							/*
 							this.dimensionManager.submitOtherTask(new PriorityRunnable() {
 								
 								public int getPriority() { return 0; }
@@ -382,7 +382,6 @@ public class WorldServer extends WorldBase {
 								}
 								
 							});
-							*/
 							
 						}
 						
@@ -505,7 +504,7 @@ public class WorldServer extends WorldBase {
 		
 		try {
 			
-			OutputStream stream = new GZIPOutputStream(new FileOutputStream(sectionFile));
+			ZstdOutputStream stream = new ZstdOutputStream(new FileOutputStream(sectionFile));
 			
 			WorldSectionBlockRegistry blockRegistry = new WorldSectionBlockRegistry();
 			
@@ -554,7 +553,7 @@ public class WorldServer extends WorldBase {
 	}
 	
 	public static String getSectionFileName(SectionPositioned pos) {
-		return pos.getX() + "." + pos.getZ() + ".pgs";
+		return pos.getX() + "." + pos.getZ() + ".pgs.zstd";
 	}
 	
 }
