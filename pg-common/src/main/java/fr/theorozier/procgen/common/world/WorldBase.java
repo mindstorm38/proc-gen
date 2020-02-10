@@ -214,11 +214,15 @@ public abstract class WorldBase implements WorldAccessor {
 		int maxCx = MathHelper.floorDoubleInt(boundingBox.getMaxX()) >> 4;
 		int maxCy = MathHelper.floorDoubleInt(boundingBox.getMaxY()) >> 4;
 		int maxCz = MathHelper.floorDoubleInt(boundingBox.getMaxZ()) >> 4;
+
+		WorldChunk chunk;
 		
 		for (int cx = minCx; cx <= maxCx; ++cx) {
 			for (int cy = minCy; cy <= maxCy; ++cy) {
 				for (int cz = minCz; cz <= maxCz; ++cz) {
-					this.getChunkAt(cx, cy, cz).forEachEntitiesInBoundingBox(boundingBox, entityConsumer, centerPointOnly);
+					if ((chunk = this.getChunkAt(cx, cy, cz)) != null) {
+						chunk.forEachEntitiesInBoundingBox(boundingBox, entityConsumer, centerPointOnly);
+					}
 				}
 			}
 		}

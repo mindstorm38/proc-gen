@@ -272,26 +272,25 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					}
 					
 				}
-				
-			} else if (KEY_SPAWN_FALLING_BLOCK.isValid(key, scancode, mods)) {
-				
+
+			} else if (KEY_SPAWN_FALLING_BLOCK.isValid(key, scancode, 0)) {
+
 				if (this.clientWorld instanceof WorldSinglePlayer) {
 					
 					WorldServer serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
 					
 					Camera3D cam = this.worldRenderer.getCamera();
-					long entityUid = Entity.getNewUid();
-					
+
 					/*
-					PigEntity entity = new PigEntity(serverWorld, entityUid);
+					PigEntity entity = new PigEntity(serverWorld, Entity.getNewUid());
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setRotation(this.rotation, 0);
 					this.rotation += 0.1f;
 					*/
-					
-					if ((mods | GLFW.GLFW_MOD_ALT) == GLFW.GLFW_MOD_ALT) {
+
+					if ((mods & GLFW.GLFW_MOD_ALT) == GLFW.GLFW_MOD_ALT) {
 						
-						PrimedTNTEntity entity = new PrimedTNTEntity(serverWorld, entityUid);
+						PrimedTNTEntity entity = new PrimedTNTEntity(serverWorld, Entity.getNewUid());
 						entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 						entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
 						
@@ -299,16 +298,16 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 						
 					} else {
 						
-						FallingBlockEntity entity = new FallingBlockEntity(serverWorld, entityUid);
+						FallingBlockEntity entity = new FallingBlockEntity(serverWorld, Entity.getNewUid());
 						entity.setState(Blocks.TNT.getDefaultState());
 						entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 						entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()), Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()));
 						
 						serverWorld.spawnEntity(entity);
-						
+
 					}
 					
-					/*PlayerEntity entity = new PlayerEntity(serverWorld, entityUid);
+					/*PlayerEntity entity = new PlayerEntity(serverWorld, Entity.getNewUid());
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()) * 2, Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()) * 2);
 					entity.setRotation(-cam.getYaw() + (float) Math.PI, 0f);*/
