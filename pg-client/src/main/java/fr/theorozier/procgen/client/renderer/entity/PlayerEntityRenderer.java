@@ -84,7 +84,7 @@ public class PlayerEntityRenderer extends MotionEntityRenderer<PlayerEntity> {
 		float armsLateralFrame = (float) Math.sin(entity.getArmsFrame().getLerped(alpha)) * 0.03f;
 		
 		float armsEffectiveFrame = MathUtils.lerp(armsLateralFrame, -walkFrame, walkingInterpolation);
-		
+
 		model.push().translate(0, 0.75f, 0).apply();
 		this.body.render();
 		model.pop();

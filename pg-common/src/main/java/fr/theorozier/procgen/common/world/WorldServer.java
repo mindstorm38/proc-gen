@@ -371,7 +371,7 @@ public class WorldServer extends WorldBase {
 									l.worldChunkLoaded(this, chunk)
 								)
 							);
-							
+
 							/*
 							this.dimensionManager.submitOtherTask(new PriorityRunnable() {
 								
