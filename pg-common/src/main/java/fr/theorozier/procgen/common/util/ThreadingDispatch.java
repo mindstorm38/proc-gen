@@ -92,8 +92,12 @@ public class ThreadingDispatch {
 		return this.ratio;
 	}
 	
+	public int getEffectiveCount(int minimmum) {
+		return Math.max(this.effectiveCount, minimmum);
+	}
+	
 	public int getEffectiveCount() {
-		return this.effectiveCount;
+		return this.getEffectiveCount(1);
 	}
 
 }
