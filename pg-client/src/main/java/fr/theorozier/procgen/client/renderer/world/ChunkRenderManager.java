@@ -5,8 +5,8 @@ import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkDirectLayerData;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerData;
 import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerDataProvider;
-import fr.theorozier.procgen.client.renderer.world.layer.ChunkSortedLayerData;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
@@ -24,6 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ChunkRenderManager {
+	
+	private static final ThreadingDispatch CHUNK_RENDERER_DISPATCH = ThreadingDispatch.register("CHUNK_RENDER", 3);
 	
 	// These distances are squared, for optimisation.
 	public static final int RENDER_DISTANCE_CHUNKS = 12;
@@ -46,9 +48,9 @@ public class ChunkRenderManager {
 	
 	private final ChunkLayerDataProvider[] layerHandlers;
 	
-	private final ExecutorService chunkComputer;
-	private final HashMap<ChunkUpdateDescriptor, Future<ChunkUpdateDescriptor>> chunkUpdates;
-	private final List<Future<ChunkUpdateDescriptor>> chunkUpdatesDescriptors;
+	private ExecutorService chunkComputer = null;
+	private final HashMap<ChunkUpdateDescriptor, Future<ChunkUpdateDescriptor>> chunkUpdates = new HashMap<>();
+	private final List<Future<ChunkUpdateDescriptor>> chunkUpdatesDescriptors = new ArrayList<>();
 	
 	private float viewX, viewY, viewZ;
 	private int renderOffsetX, renderOffsetZ;
@@ -70,10 +72,6 @@ public class ChunkRenderManager {
 		this.setLayerHandler(BlockRenderLayer.CUTOUT_NOT_CULLED, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkDirectLayerData::new);
 		
-		this.chunkComputer = Executors.newFixedThreadPool(2);
-		this.chunkUpdates = new HashMap<>();
-		this.chunkUpdatesDescriptors = new ArrayList<>();
-		
 		this.renderOffsetX = 0;
 		this.renderOffsetZ = 0;
 		
@@ -81,6 +79,12 @@ public class ChunkRenderManager {
 	
 	public WorldRenderer getWorldRenderer() {
 		return this.renderer;
+	}
+	
+	void init() {
+		
+		this.chunkComputer = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
+	
 	}
 	
 	private void setLayerHandler(BlockRenderLayer layer, ChunkLayerDataProvider handler) {
@@ -103,6 +107,9 @@ public class ChunkRenderManager {
 		
 	}
 	
+	/**
+	 * To run every tick.
+	 */
 	void update() {
 		
 		this.profiler.startSection("chunk_render_update");
@@ -283,6 +290,9 @@ public class ChunkRenderManager {
 	// Update tasks
 	
 	public void scheduleUpdateTask(ChunkRenderer cr, BlockRenderLayer layer, Runnable action) {
+		
+		if (this.chunkComputer == null)
+			throw new IllegalStateException("Can't schedule update tasks while associated thread pool is not initialized.");
 		
 		ChunkUpdateDescriptor descriptor = new ChunkUpdateDescriptor(cr.getChunkPosition(), layer);
 		

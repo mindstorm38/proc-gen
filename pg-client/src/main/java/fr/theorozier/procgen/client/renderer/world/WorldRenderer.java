@@ -119,6 +119,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.updateRenderSize(this.window);
 		
+		this.chunkRenderManager.init();
 		this.entityRenderManager.init();
 		
 		this.init = true;

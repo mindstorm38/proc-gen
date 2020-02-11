@@ -9,11 +9,12 @@ import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.*;
+import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
+import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
 import io.msengine.client.option.OptionKey;
@@ -23,6 +24,7 @@ import io.msengine.client.renderer.window.CursorMode;
 import io.msengine.client.renderer.window.listener.WindowKeyEventListener;
 import io.msengine.client.util.camera.Camera3D;
 import io.msengine.common.util.GameProfiler;
+import io.sutil.ReflectUtils;
 import io.sutil.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -30,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.*;
+import static io.msengine.common.util.GameLogger.LOGGER;
 
 public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements WindowKeyEventListener {
 	
@@ -64,6 +67,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	private final WorldLoadingPosition testLoadingPosition = new WorldLoadingPosition();
 	
 	private final WorldRenderer worldRenderer;
+	private final WorldLoadingManager worldLoadingManager;
 	
 	private boolean escaped = false;
 	
@@ -74,6 +78,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.worldList = new WorldList(new File(this.getAppdata(), "worlds"));
 		
 		this.worldRenderer = new WorldRenderer();
+		this.worldLoadingManager = new WorldLoadingManager();
 		
 		this.options.addOption(KEY_FORWARD);
 		this.options.addOption(KEY_BACKWARD);
@@ -99,25 +104,40 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		return this.worldRenderer;
 	}
 	
+	public WorldLoadingManager getWorldLoadingManager() {
+		return this.worldLoadingManager;
+	}
+	
 	@Override
 	protected void init() {
 		
 		super.init();
 		
-		TextureMap.setDebugAtlases(true);
-		Blocks.computeStatesUids();
+		// Profiler
 		this.profiler.setEnabled(true);
 		GameProfiler.WARNING_TIME_LIMIT = 100000000L;
 		
+		// Threads dispatching
+		ThreadingDispatch.dispatch();
+		ThreadingDispatch.debug();
+		
+		// Overall initialisations
+		TextureMap.setDebugAtlases(true);
+		Blocks.computeStatesUids();
+		
+		// Keys bindings
 		this.window.addKeyEventListener(this);
 		this.window.setFullscreen(Options.FULLSCREEN.getValue());
 		
+		// World rendering
 		this.worldRenderer.init();
 		this.setEscaped(true);
 		
+		// Temporary camera targetting (TODO remove)
 		this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
 		this.worldRenderer.getCamera().instantTarget();
 		
+		// GUI scene registering
 		this.guiManager.registerSceneClass("debug", DebugScene.class);
 		this.guiManager.registerSceneClass("title", TitleScreen.class);
 		this.guiManager.registerSceneClass("options", OptionsScreen.class);
@@ -126,6 +146,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.registerSceneClass("mp_main", MultiplayerScreen.class);
 		this.guiManager.loadScene("title");
 		
+		// OpenGL clear color (TODO could be moved in world renderer for futur world framebuffer)
 		glClearColor(0, 0, 0, 1);
 		
 	}
