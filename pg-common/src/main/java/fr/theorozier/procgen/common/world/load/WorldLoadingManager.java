@@ -12,6 +12,8 @@ import static io.msengine.common.util.GameLogger.LOGGER;
  *
  * Basic handler for world dimensions saving and loading from files or from scratch.
  *
+ * @author Theo Rozier
+ *
  */
 public class WorldLoadingManager {
 	
@@ -60,10 +62,9 @@ public class WorldLoadingManager {
 
 		if (this.dimensionManager == null && this.loadingThreadPool != null && (System.currentTimeMillis() - this.idleStart) > MAX_IDLE_TIME) {
 
-			LOGGER.info("Shutting down world loading thread pool... (" + this.loadingThreadPool.getCorePoolSize() + " threads)");
+			LOGGER.info("Shutting down world loading thread pool (" + this.loadingThreadPool.getCorePoolSize() + " threads) ...");
 			this.loadingThreadPool.shutdown(); // FIXME: Potential leaks if tasks never finished
 			this.loadingThreadPool = null;
-
 
 		}
 

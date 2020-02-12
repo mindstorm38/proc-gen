@@ -11,6 +11,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+ *
+ * Entity render manager singleton, instantiated in {@link WorldRenderer}.
+ *
+ * @author Theo Rozier
+ *
+ */
 public class EntityRenderManager {
 
 	private final WorldRenderer renderer;
@@ -42,6 +49,9 @@ public class EntityRenderManager {
 		
 	}
 	
+	/**
+	 * Initialize this entity render manager.
+	 */
 	void init() {
 		
 		WorldShaderManager shaderManager = this.shaderManager;
@@ -53,6 +63,9 @@ public class EntityRenderManager {
 		
 	}
 	
+	/**
+	 * Stop the entity renderer.
+	 */
 	void stop() {
 		
 		for (EntityRenderer<?> renderer : this.entityRenderers.values())
@@ -61,8 +74,19 @@ public class EntityRenderManager {
 		
 	}
 	
+	/**
+	 * Register a new entity renderer.
+	 * @param entityClass The entity class.
+	 * @param renderer The entity renderer.
+	 * @param <E> Entity type.
+	 */
 	public <E extends Entity> void addEntityRenderer(Class<E> entityClass, EntityRenderer<? super E> renderer) {
+		
+		if (this.renderer.initialized())
+			throw new IllegalStateException("Can't add entity renderer after world initialization.");
+		
 		this.entityRenderers.put(entityClass, renderer);
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -70,6 +94,10 @@ public class EntityRenderManager {
 		return (EntityRenderer<E>) this.entityRenderers.get(entityClass);
 	}
 	
+	/**
+	 * Render entities.
+	 * @param alpha Render lerp ratio.
+	 */
 	void render(float alpha) {
 	
 		ModelHandler model = this.model;
@@ -102,10 +130,11 @@ public class EntityRenderManager {
 		
 	}
 	
+	/**
+	 * Unload the entity renderer, clear all entities.
+	 */
 	void unload() {
-		
 		this.entitiesById.clear();
-		
 	}
 	
 	void addEntity(Entity entity) {

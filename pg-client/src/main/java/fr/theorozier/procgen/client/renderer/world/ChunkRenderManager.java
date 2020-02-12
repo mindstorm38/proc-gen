@@ -23,6 +23,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ *
+ * Chunk render manager singleton, instantiated in {@link WorldRenderer}.
+ *
+ * @author Theo Rozier
+ *
+ */
 public class ChunkRenderManager {
 	
 	private static final ThreadingDispatch CHUNK_RENDERER_DISPATCH = ThreadingDispatch.register("CHUNK_RENDER", 3);

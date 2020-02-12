@@ -21,7 +21,6 @@ import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
 import io.msengine.client.util.camera.SmoothCamera3D;
-import io.msengine.common.util.Color;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
 import io.sutil.profiler.Profiler;
@@ -29,6 +28,13 @@ import org.joml.Matrix4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
+/**
+ *
+ * The world renderer singleton (access via {@link ProcGenGame} singleton).
+ *
+ * @author Theo Rozier
+ *
+ */
 public class WorldRenderer implements ModelApplyListener,
 		WindowFramebufferSizeEventListener,
 		WindowMousePositionEventListener,
@@ -91,14 +97,25 @@ public class WorldRenderer implements ModelApplyListener,
 		return this.camera;
 	}
 	
+	/**
+	 * @return The chunk render manager singleton.
+	 */
 	public ChunkRenderManager getChunkRenderManager() {
 		return chunkRenderManager;
 	}
 	
+	/**
+	 * @return The entity render manager singleton.
+	 */
 	public EntityRenderManager getEntityRenderManager() {
 		return entityRenderManager;
 	}
 	
+	/**
+	 * Initialize the world renderer.<br>
+	 * Add event listeners for window, initialize shader manager and all world rendering utilities.
+	 * @throws IllegalStateException If the world is already initialized.
+	 */
 	public void init() {
 	
 		if (this.init)
@@ -126,6 +143,17 @@ public class WorldRenderer implements ModelApplyListener,
 		
 	}
 	
+	/**
+	 * @return True if the world renderer was initialized, even if called {@link #stop()}.
+	 */
+	public boolean initialized() {
+		return this.init;
+	}
+	
+	/**
+	 * Stop all things initialized in {@link #init()}, can't re-init after stoped.
+	 * @throws IllegalStateException If the world renderer is not already initialized.
+	 */
 	public void stop() {
 		
 		if (!this.init)
@@ -138,10 +166,12 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.window.removeMousePositionEventListener(this);
 		
-		this.init = false;
-		
 	}
 	
+	/**
+	 * Render the world.
+	 * @param alpha Render lerp ratio.
+	 */
 	public void render(float alpha) {
 		
 		if (!this.ready)
@@ -275,6 +305,9 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	}
 	
+	/**
+	 * Update the world renderer logic.
+	 */
 	public void update() {
 		
 		PROFILER.startSection("terrain_map");
@@ -323,6 +356,9 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	}
 	
+	/**
+	 * @return Current rendering world, or Null if .
+	 */
 	public WorldClient getRenderingWorld() {
 		return this.renderingWorld;
 	}
