@@ -24,7 +24,6 @@ import io.msengine.client.renderer.window.CursorMode;
 import io.msengine.client.renderer.window.listener.WindowKeyEventListener;
 import io.msengine.client.util.camera.Camera3D;
 import io.msengine.common.util.GameProfiler;
-import io.sutil.ReflectUtils;
 import io.sutil.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -32,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.*;
-import static io.msengine.common.util.GameLogger.LOGGER;
 
 public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements WindowKeyEventListener {
 	

@@ -27,7 +27,6 @@ import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.zip.GZIPOutputStream;
 
 public class WorldServer extends WorldBase {
 	
@@ -53,6 +52,8 @@ public class WorldServer extends WorldBase {
 	private final Map<SectionPositioned, Boolean> savedSections = new HashMap<>();
 	
 	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
+
+	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
 	
 	public WorldServer(WorldDimensionManager dimensionManager, File worldDir, long seed, ChunkGeneratorProvider provider) {
 		
