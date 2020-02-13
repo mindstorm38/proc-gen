@@ -1,13 +1,10 @@
 package fr.theorozier.procgen.common.world;
 
-import com.github.luben.zstd.ZstdOutputStream;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
-import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
-import fr.theorozier.procgen.common.world.chunk.WorldSectionBlockRegistry;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
@@ -19,23 +16,28 @@ import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
-import io.sutil.buffer.VariableBuffer;
 import io.sutil.pool.FixedObjectPool;
 
 import java.io.*;
-import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+/**
+ *
+ * A server-side world class, to manage all world's logic.
+ * World servers requires to be instantiated from {@link WorldDimensionManager}, so WorldServer are also called 'Dimension'.
+ *
+ * @author Theo Rozier
+ *
+ */
 public class WorldServer extends WorldBase {
 	
 	public static final int NEAR_CHUNK_LOADING = 4;
 	
 	private final WorldDimensionManager dimensionManager;
+	private final String identifier;
 	private final File worldDir;
-	private final File sectionsDir;
-	private final File sectionsBackupDir;
 	
 	private final long seed;
 	private final Random random;
@@ -55,15 +57,11 @@ public class WorldServer extends WorldBase {
 
 	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
 	
-	public WorldServer(WorldDimensionManager dimensionManager, File worldDir, long seed, ChunkGeneratorProvider provider) {
+	public WorldServer(WorldDimensionManager dimensionManager, String identifier, File worldDir, long seed, ChunkGeneratorProvider provider) {
 		
 		this.dimensionManager = Objects.requireNonNull(dimensionManager);
+		this.identifier = Objects.requireNonNull(identifier);
 		this.worldDir = Objects.requireNonNull(worldDir);
-		this.sectionsDir = new File(worldDir, "sections");
-		this.sectionsBackupDir = new File(worldDir, "sections_bk");
-		
-		SaveUtils.mkdirOrThrowException(this.sectionsDir, "Chunks directory already exists but it's not a directory.");
-		SaveUtils.mkdirOrThrowException(this.sectionsBackupDir, "Chunks backup directory already exists but it's not a directory.");
 		
 		this.seed = seed;
 		this.random = new Random(seed);
@@ -72,19 +70,42 @@ public class WorldServer extends WorldBase {
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
-		
+
 	}
 	
 	// PROPERTIES //
-	
+
+	/**
+	 * @return The underlying dimension manager.
+	 */
 	public WorldDimensionManager getDimensionManager() {
 		return this.dimensionManager;
 	}
-	
+
+	/**
+	 * @return The world (dimension) identifier, given by {@link WorldDimensionManager}.
+	 */
+	public String getIdentifier() {
+		return this.identifier;
+	}
+
+	/**
+	 * @return The world (dimension) directory where all world specific data are saved, like regions files.
+	 */
+	public File getWorldDir() {
+		return this.worldDir;
+	}
+
+	/**
+	 * @return The world generation seed used by chunk generator.
+	 */
 	public long getSeed() {
 		return this.seed;
 	}
-	
+
+	/**
+	 * @return The world global random, used in entities for example.
+	 */
 	public Random getRandom() {
 		return this.random;
 	}
@@ -129,7 +150,10 @@ public class WorldServer extends WorldBase {
 		this.updateEntities();
 		
 	}
-	
+
+	/**
+	 * Update all entities in the world.
+	 */
 	public void updateEntities() {
 	
 		for (int i = 0; i < this.entities.size(); ++i) {
@@ -160,7 +184,11 @@ public class WorldServer extends WorldBase {
 		}
 	
 	}
-	
+
+	/**
+	 * Update a specific entity, it also check for chunk positions and relocate the entity in another chunk if needed.
+	 * @param entity The entity to update.
+	 */
 	public void updateEntity(Entity entity) {
 		
 		int ex = entity.getCurrentChunkPosX();
@@ -374,6 +402,7 @@ public class WorldServer extends WorldBase {
 								)
 							);
 
+							/*
 							this.dimensionManager.submitOtherTask(new PriorityRunnable() {
 								
 								public int getPriority() { return 0; }
@@ -383,6 +412,7 @@ public class WorldServer extends WorldBase {
 								}
 								
 							});
+							*/
 							
 						}
 						
@@ -488,14 +518,16 @@ public class WorldServer extends WorldBase {
 	}
 	
 	// SECTIONS SAVING //
-	
+
 	public boolean isSectionSaved(SectionPositioned pos) {
 		
-		return this.savedSections.computeIfAbsent(pos, p ->
-				new File(this.sectionsDir, getSectionFileName(p.immutableSectionPos())).isFile());
+		/*return this.savedSections.computeIfAbsent(pos, p ->
+				new File(this.sectionsDir, getSectionFileName(p.immutableSectionPos())).isFile());*/
+		return false;
 		
 	}
-	
+
+	/*
 	public void saveSection(WorldServerSection section) {
 		
 		File sectionFile = new File(this.sectionsDir, getSectionFileName(section.getSectionPos()));
@@ -556,5 +588,7 @@ public class WorldServer extends WorldBase {
 	public static String getSectionFileName(SectionPositioned pos) {
 		return pos.getX() + "." + pos.getZ() + ".pgs.zstd";
 	}
+
+	 */
 	
 }

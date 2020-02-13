@@ -78,9 +78,9 @@ public class WorldDimensionManager {
 			throw new IllegalArgumentException("The dimension '" + identifier + "' already exists this manager !");
 		
 		File worldDir = new File(this.dimensionsDirectory, identifier);
-		worldDir.mkdirs();
+		SaveUtils.mkdirOrThrowException(worldDir, "The world directory can't be created because a file with same name already exists.");
 		
-		WorldServer newDim = new WorldServer(this, worldDir, seed, provider);
+		WorldServer newDim = new WorldServer(this, identifier, worldDir, seed, provider);
 		
 		this.dimensionsWorlds.put(identifier, newDim);
 		
@@ -110,7 +110,7 @@ public class WorldDimensionManager {
 	 * @return True if the world's chunk generator is of class <code>generatorClass</code>, also return true if there is no dimensions with this identifier.
 	 */
 	public boolean isDimensionUsingChunkGenerator(String identifier, Class<? extends ChunkGenerator> generatorClass) {
-		
+
 		WorldServer world = this.dimensionsWorlds.get(identifier);
 		
 		if (world != null) {
@@ -118,17 +118,17 @@ public class WorldDimensionManager {
 		} else {
 			return true;
 		}
-		
+
 	}
 	
 	public WorldServer getDimension(String identifier) {
 		return this.dimensionsWorlds.get(identifier);
 	}
-	
+
 	public WorldServer getMainDimension() {
 		return this.dimensions.length == 0 ? null : this.dimensions[0];
 	}
-	
+
 	public void update() {
 		
 		PROFILER.startSection("world_dims");

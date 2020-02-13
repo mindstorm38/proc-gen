@@ -45,11 +45,18 @@ public abstract class WorldBase implements WorldAccessor {
 	}
 	
 	// PROPERTIES //
-	
+
+	/**
+	 * @return True if this world is a server one, must be overriden in subclass if return true is needed.
+	 */
 	public boolean isServer() {
 		return false;
 	}
-	
+
+	/**
+	 * @return This world base casted to world server.
+	 * @throws UnsupportedOperationException If the world is not a server world.
+	 */
 	public WorldServer getAsServer() {
 		throw new UnsupportedOperationException("This world is not a server world.");
 	}

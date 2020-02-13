@@ -45,6 +45,7 @@ public class SaveUtils {
 	 * Try to make a directory, if this entry already exists as a file, an exception with a specific message is thrown.
 	 * @param file The file entry to make directory.
 	 * @param errorMessage The exception message.
+	 * @throws IllegalStateException If the entry if already a file, the errorMessage is used.
 	 */
 	public static void mkdirOrThrowException(File file, String errorMessage) {
 		
