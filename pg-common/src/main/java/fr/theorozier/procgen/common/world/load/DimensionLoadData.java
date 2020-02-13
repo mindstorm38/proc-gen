@@ -7,7 +7,7 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.pool.FixedObjectPool;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class DimensionLoadData {
     private final File regionsDir;
 
     private final Map<SectionPositioned, Boolean> sectionsSaveStates = new HashMap<>();
-    private final Map<SectionPositioned, DimensionRegionStorage> regions = new HashMap<>();
+    private final Map<SectionPositioned, DimensionRegionFile> regions = new HashMap<>();
 
     public DimensionLoadData(WorldServer world) {
 
@@ -42,11 +42,11 @@ public class DimensionLoadData {
         return this.regionsDir;
     }
 
-    public DimensionRegionStorage getSectionRegion(SectionPositioned pos) {
+    public DimensionRegionFile getSectionRegion(SectionPositioned pos) {
 
         try (FixedObjectPool<SectionPosition>.PoolObject poolPos = SectionPosition.POOL.acquire()) {
 
-            SectionPositioned regionPos = poolPos.get().set(pos.getX() >> 4, pos.getZ() >> 4);
+            SectionPositioned regionPos = poolPos.get().set(pos.getX() >> 5, pos.getZ() >> 5);
 
             return this.regions.computeIfAbsent(regionPos, p -> {
 
@@ -55,17 +55,17 @@ public class DimensionLoadData {
                 try {
 
                     SaveUtils.mkdirOrThrowException(file, "Can't create region file '" + file + "' because a file with the same name already exits.");
-                    RandomAccessFile rafile = new RandomAccessFile(file, "rws");
+                    RandomAccessFile rafile = new RandomAccessFile(file, "rw");
 
-                    return new DimensionRegionStorage(regionPos, rafile);
+                    return new DimensionRegionFile(regionPos, rafile);
 
-                } catch (FileNotFoundException | IllegalStateException e) {
+                } catch (IllegalStateException | IOException e) {
 
                     LOGGER.log(Level.WARNING, "Failed to create a region file '" + file + "'.", e);
                     return null;
 
                 }
-
+    
             });
 
         }
@@ -73,11 +73,7 @@ public class DimensionLoadData {
     }
 
     public boolean isSectionSaved(SectionPositioned pos) {
-
-        return this.sectionsSaveStates.computeIfAbsent(pos, p -> {
-            return false;
-        });
-
+        return this.getSectionRegion(pos).isSectionSaved(pos.getX() & 31, pos.getZ() & 31);
     }
 
 }
