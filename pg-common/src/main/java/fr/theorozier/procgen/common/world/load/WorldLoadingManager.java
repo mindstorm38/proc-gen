@@ -3,8 +3,14 @@ package fr.theorozier.procgen.common.world.load;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
 import fr.theorozier.procgen.common.world.WorldDimensionManager;
+import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
 
@@ -18,9 +24,10 @@ public class WorldLoadingManager {
 	private static final ThreadingDispatch WORLD_CHUNK_LOADING_DISPATCH = ThreadingDispatch.register("WORLD_CHUNK_LOADING", 3);
 	private static final long MAX_IDLE_TIME = 60000;
 
+	private final Map<String, DimensionLoadData> dimensionsLoadData = new HashMap<>();
 	private WorldDimensionManager dimensionManager = null;
 	private PriorityThreadPoolExecutor loadingThreadPool = null;
-	private long idleStart = 0;
+	private long poolIdleStartTime = 0;
 
 	public WorldLoadingManager() { }
 
@@ -32,7 +39,9 @@ public class WorldLoadingManager {
 	public void setCurrentDimensionManager(WorldDimensionManager manager) {
 
 		if (this.dimensionManager != null) {
-			// Nothing to do for now, because thread pool shutdown is delayed.
+
+			this.dimensionsLoadData.clear();
+
 		}
 
 		this.dimensionManager = manager;
@@ -41,14 +50,17 @@ public class WorldLoadingManager {
 
 			if (this.loadingThreadPool == null) {
 
-				LOGGER.info("Started world loading thread pool (" + WORLD_CHUNK_LOADING_DISPATCH.getEffectiveCount() + " threads) ...");
-				this.loadingThreadPool = new PriorityThreadPoolExecutor(WORLD_CHUNK_LOADING_DISPATCH.getEffectiveCount(), PriorityThreadPoolExecutor.ASC_COMPARATOR);
+				int poolSize = WORLD_CHUNK_LOADING_DISPATCH.getEffectiveCount();
+
+				LOGGER.info("Started world loading thread pool (" + poolSize + " threads) ...");
+				this.loadingThreadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 
 			}
 
 
+
 		} else if (this.loadingThreadPool != null) {
-			this.idleStart = System.currentTimeMillis();
+			this.poolIdleStartTime = System.currentTimeMillis();
 		}
 
 	}
@@ -58,31 +70,68 @@ public class WorldLoadingManager {
 	 */
 	public void update() {
 
-		if (this.dimensionManager == null && this.loadingThreadPool != null && (System.currentTimeMillis() - this.idleStart) > MAX_IDLE_TIME) {
+		if (this.dimensionManager == null && this.loadingThreadPool != null && (System.currentTimeMillis() - this.poolIdleStartTime) > MAX_IDLE_TIME) {
 
 			LOGGER.info("Shutting down world loading thread pool... (" + this.loadingThreadPool.getCorePoolSize() + " threads)");
 			this.loadingThreadPool.shutdown(); // FIXME: Potential leaks if tasks never finished
 			this.loadingThreadPool = null;
 
-
 		}
 
 	}
 
-	public boolean isSectionSaved(SectionPositioned pos) {
+	private DimensionLoadData getDimensionData(WorldServer dim) {
+
+		if (this.dimensionManager == null)
+			throw new IllegalStateException("Can't get dimension data if no dimension manager is running");
+
+		DimensionLoadData data = this.dimensionsLoadData.get(dim.getIdentifier());
+
+		if (data == null) {
+
+			try {
+
+				data = new DimensionLoadData(dim);
+				this.dimensionsLoadData.put(dim.getIdentifier(), data);
+
+			} catch (IllegalStateException e) {
+
+				LOGGER.log(Level.WARNING, "Failed to created dimension data !", e);
+				return null;
+
+			}
+
+		}
+
+		return data;
+
+	}
+
+	public boolean isSectionSaved(WorldServer dim, SectionPositioned pos) {
+		DimensionLoadData data = this.getDimensionData(dim);
+		return data != null && data.isSectionSaved(pos);
+	}
+	
+	public boolean isSectionSaving(WorldServer dim, SectionPositioned pos) {
 		return false;
 	}
 	
-	public boolean isSectionSaving(SectionPositioned pos) {
-		return false;
-	}
-	
-	public void loadSectionTo(WorldServerSection section) {
+	public void loadSectionTo(WorldServer dim, WorldServerSection section) {
 	
 	}
 	
-	public boolean isSectionLoading(SectionPositioned pos) {
+	public boolean isSectionLoading(WorldServer dim, SectionPositioned pos) {
 		return false;
+	}
+
+
+
+	public static String getSectionFileName(SectionPositioned pos) {
+		return pos.getX() + "." + pos.getZ() + ".pgs.zstd";
+	}
+
+	public static String getRegionFileName(SectionPositioned pos) {
+		return pos.getX() + "." + pos.getZ() + ".pgr.zstd";
 	}
 
 }

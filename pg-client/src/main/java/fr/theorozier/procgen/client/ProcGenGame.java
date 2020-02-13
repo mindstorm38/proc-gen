@@ -130,7 +130,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		// World rendering
 		this.worldRenderer.init();
 		this.setEscaped(true);
-		
+
 		// Temporary camera targetting (TODO remove)
 		this.worldRenderer.getCamera().setTarget(0f, 100f, 0f, 0f, 0f);
 		this.worldRenderer.getCamera().instantTarget();
@@ -153,6 +153,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	protected void stop() {
 		
 		this.worldRenderer.stop();
+		this.worldLoadingManager.setCurrentDimensionManager(null);
 		
 		try {
 			this.options.save(true);
