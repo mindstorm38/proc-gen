@@ -41,17 +41,17 @@ public class ThreadingDispatch {
 		if (totalRatio == 0)
 			return;
 		
-		int coresCount = getAvailableCores();
+		int availableThreads = getAvailableCores() - 1; // Remove the main thread.
 		int affectedCores = 0;
 		
 		for (ThreadingDispatch d : dispatches) {
 			
-			d.effectiveCount = MathHelper.floorFloatInt(d.ratio / (float) totalRatio * coresCount);
+			d.effectiveCount = MathHelper.floorFloatInt(d.ratio / (float) totalRatio * availableThreads);
 			affectedCores += d.effectiveCount;
 			
 		}
 		
-		while (affectedCores < coresCount) {
+		while (affectedCores < availableThreads) {
 			for (ThreadingDispatch d : dispatches) {
 				d.effectiveCount++;
 				affectedCores++;
