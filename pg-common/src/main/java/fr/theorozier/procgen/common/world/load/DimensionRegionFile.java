@@ -13,6 +13,14 @@ import java.util.List;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
 
+/**
+ *
+ * Represent a region file, and all its format.
+ * This class manager region file sectors of 4Ko.
+ *
+ * @author Theo Rozier
+ *
+ */
 public class DimensionRegionFile {
 	
 	// Metadata and header bytes constants.
@@ -89,21 +97,75 @@ public class DimensionRegionFile {
 	}
 	
 	// WRITES //
-	
-	public OutputStream getSectionBufferStream(int x, int z, int formatVersion) throws IOException {
-		
+
+	/**
+	 * Get a section output stream to write in the specified format version.<br>
+	 * Formats constants :<br>
+	 * <ul>
+	 *     <li><b>SECTION_VERSION_ZSTD</b> : Section Zstd compressed V1</li>
+	 *     <li><b>SECTION_VERSION_LAST</b> : Equals to last stable version : <b>SECTION_VERSION_ZSTD</b></li>
+	 * </ul>
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @param formatVersion The format version used to encode the section to sectors data.
+	 * @return The section output stream, implementing {@link SectionOutputStream} used to write the section to this region sectors.
+	 * @throws IOException If the format version is invalid, or creation of output streams fails.
+	 */
+	@SuppressWarnings("unchecked")
+	public <R extends OutputStream & SectionOutputStream> R getSectionOutputStream(int x, int z, int formatVersion) throws IOException {
+
 		if (formatVersion == SECTION_VERSION_ZSTD) {
-			return new ZstdOutputStream(new SectionBuffer(x, z, formatVersion));
+			return (R) new SectionZstdOutputStream(x, z);
 		}
-		
+
 		throw new IllegalArgumentException("Invalid format version '" + formatVersion + "'.");
 		
 	}
-	
-	public OutputStream getSectionBufferStream(int x, int z) throws IOException {
-		return this.getSectionBufferStream(x, z, SECTION_VERSION_LAST);
+
+	/**
+	 * Get a section output stream to write in the last stable format version.
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @return The section output stream, implementing {@link SectionOutputStream} used to write the section to this region sectors.
+	 * @throws IOException If the format version is invalid, or creation of output streams fails.
+	 * @see #getSectionOutputStream(int, int, int)
+	 */
+	public OutputStream getSectionOutputStream(int x, int z) throws IOException {
+		return this.getSectionOutputStream(x, z, SECTION_VERSION_LAST);
 	}
-	
+
+	/**
+	 * Internal class to implement {@link SectionOutputStream}.
+	 */
+	private class SectionZstdOutputStream extends ZstdOutputStream implements SectionOutputStream {
+
+		public SectionZstdOutputStream(int x, int y) throws IOException {
+			super(new SectionBuffer(x, y, SECTION_VERSION_ZSTD));
+		}
+
+		@Override
+		public void writeSectionData() throws IOException {
+			((SectionBuffer) this.out).writeSectionData();
+		}
+
+		@Override
+		public void writeSectionDataAndClose() throws IOException {
+			this.writeSectionData();
+			this.close();
+		}
+
+	}
+
+    public interface SectionOutputStream {
+
+        void writeSectionData() throws IOException;
+        void writeSectionDataAndClose() throws IOException;
+
+    }
+
+	/**
+	 * Low level byte array stream used to write section data in the region sectors.
+	 */
 	private class SectionBuffer extends ByteArrayOutputStream {
 		
 		private final int x, y, version;
@@ -114,15 +176,25 @@ public class DimensionRegionFile {
 			this.y = y;
 			this.version = version;
 		}
-		
-		@Override
-		public void close() throws IOException {
-			super.close();
+
+		public void writeSectionData() throws IOException {
 			DimensionRegionFile.this.writeSectionData(this.x, this.y, this.buf, this.count, this.version);
 		}
 		
 	}
-	
+
+	/**
+	 * Raw write method for a specified section.
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @param data Byte array to write.
+	 * @param length Byte array length to effectively write.
+	 * @param version The format to write in the section header, not used more than that in this method, passed data must be already encoded as wanted.
+	 *                   This version will be used when reading to return the appropriate input stream for decoding.
+	 * @throws IOException If write errors occurs on the random access file.
+	 * @see #getSectionOutputStream(int, int, int)
+	 * @see #getSectionOutputStream(int, int)
+	 */
 	public synchronized void writeSectionData(int x, int z, byte[] data, int length, int version) throws IOException {
 		
 		if (length < 1)
@@ -135,7 +207,11 @@ public class DimensionRegionFile {
 		int sectorsCountNeeded = (SECTION_HEADER_BYTES + length - 1) >> 12 + 1;
 		
 		if (sectorsCountNeeded > MAX_SECTORS_COUNT) {
-			
+
+			// Remember that unlike sectors count, offsets don't need to be checked because if all sections
+			// has the maximum number of sectors (MAX_SECTORS_COUNT), then offset would still be able to encode
+			// the last section section offset.
+
 			LOGGER.severe("Can't save section data at " + x + "/" + z + ", take too much sectors (" + sectorsCountNeeded + " > " + MAX_SECTORS_COUNT + ").");
 			return;
 			
@@ -200,7 +276,15 @@ public class DimensionRegionFile {
 		this.writeSectionDataAtSector(sectorsOffset, data, length, version);
 		
 	}
-	
+
+	/**
+	 * Internal raw method to write section at specified sector.
+	 * @param sectorsOffset Sector offset, sector 0 begin right after the region metadata.
+	 * @param data Byte array to write.
+	 * @param length Byte array length to take from data.
+	 * @param version Version format to write.
+	 * @throws IOException If write errors occurs.
+	 */
 	private void writeSectionDataAtSector(int sectorsOffset, byte[] data, int length, int version) throws IOException {
 		
 		this.raFile.seek((sectorsOffset + REGION_METADATA_SECTORS) << 12);
@@ -211,17 +295,47 @@ public class DimensionRegionFile {
 	}
 	
 	// LOAD UTILS //
-	
+
+	/**
+	 * To know if a section has at least 1 sectors in the region file.
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @return The section is already saved.
+	 */
 	public boolean isSectionSaved(int x, int z) {
 		return getSectOffset(this.getSectionOffset(x, z)) != 0;
 	}
 	
 	// FORMAT UTILS //
-	
+
+	/**
+	 * Get the section offset data. Following the format :<br>
+	 * <pre><code>
+	 *   byte off | 3 | 2 | 1 | 0 |
+	 *            +---+---+-+-+---+
+	 * bits taken |    24   | 12  |
+	 *     	      +---------+-----+
+	 *              /           \
+	 *     Section start      Number of sectors
+	 *     sector offset      used by section
+	 * </code></pre>
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @return Section offset data.
+	 */
 	public int getSectionOffset(int x, int z) {
 		return this.sectionOffsets[getRegionIndex(x, z)];
 	}
-	
+
+	/**
+	 * Set section offset data (built using {@link #buildSectionOffset(int, int)}).
+	 * It addition to {@link #sectionOffsets} update, it will also write to the random access file.
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @param offset The section offset data.
+	 * @throws IOException If write errors occurs to r.a. file.
+	 * @see #getSectionOffset(int, int)
+	 */
 	public void setSectionOffset(int x, int z, int offset) throws IOException {
 		int index = getRegionIndex(x, z);
 		this.sectionOffsets[index] = offset;
