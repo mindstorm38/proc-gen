@@ -1,13 +1,11 @@
 package fr.theorozier.procgen.common.world.load;
 
+import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class DimensionRegionFile {
 	// Section saving version formats.
 	private static final byte SECTION_VERSION_ZSTD   = 1;
 	private static final byte SECTION_VERSION_LAST   = SECTION_VERSION_ZSTD; // Last stable save format.
-	
+
 	// Empty sector constant for fast native writing.
 	private static final byte[] EMPTY_SECTOR         = new byte[4096];
 	
@@ -54,8 +52,9 @@ public class DimensionRegionFile {
 		if (raFile.length() < REGION_METADATA_BYTES) {
 			
 			// Missing space for common region header.
-			raFile.seek(raFile.length());
-			raFile.write(EMPTY_SECTOR, 0, (int) raFile.length() - REGION_METADATA_BYTES);
+			raFile.seek(0);
+			for (int i = 0; i < REGION_METADATA_SECTORS; ++i)
+				raFile.write(EMPTY_SECTOR);
 			
 		} else if ((raFile.length() & 0xFFF) != 0) {
 			
@@ -107,18 +106,19 @@ public class DimensionRegionFile {
 	 * </ul>
 	 * @param x The relative X section coordinate in this region.
 	 * @param z The relative Z section coordinate in this region.
-	 * @param formatVersion The format version used to encode the section to sectors data.
+	 * @param formatVersion The format version used to encode the section to sectors data. If version is wrong, then raw (uncompressed) data stream is returned.
 	 * @return The section output stream, implementing {@link SectionOutputStream} used to write the section to this region sectors.
-	 * @throws IOException If the format version is invalid, or creation of output streams fails.
+	 * @throws IOException If creation of output streams fails.
 	 */
 	@SuppressWarnings("unchecked")
 	public <R extends OutputStream & SectionOutputStream> R getSectionOutputStream(int x, int z, int formatVersion) throws IOException {
 
-		if (formatVersion == SECTION_VERSION_ZSTD) {
-			return (R) new SectionZstdOutputStream(x, z);
+		switch (formatVersion) {
+			case SECTION_VERSION_ZSTD:
+				return (R) new SectionZstdOutputStream(x, z);
+			default:
+				return (R) new SectionBuffer(x, z, formatVersion);
 		}
-
-		throw new IllegalArgumentException("Invalid format version '" + formatVersion + "'.");
 		
 	}
 
@@ -156,17 +156,10 @@ public class DimensionRegionFile {
 
 	}
 
-    public interface SectionOutputStream {
-
-        void writeSectionData() throws IOException;
-        void writeSectionDataAndClose() throws IOException;
-
-    }
-
 	/**
 	 * Low level byte array stream used to write section data in the region sectors.
 	 */
-	private class SectionBuffer extends ByteArrayOutputStream {
+	private class SectionBuffer extends ByteArrayOutputStream implements SectionOutputStream {
 		
 		private final int x, y, version;
 		
@@ -177,10 +170,27 @@ public class DimensionRegionFile {
 			this.version = version;
 		}
 
+		@Override
 		public void writeSectionData() throws IOException {
 			DimensionRegionFile.this.writeSectionData(this.x, this.y, this.buf, this.count, this.version);
 		}
-		
+
+		@Override
+		public void writeSectionDataAndClose() throws IOException {
+			this.writeSectionData();
+			this.close();
+		}
+
+	}
+
+	/**
+	 * Common interface providing write section data methods.
+	 */
+	public interface SectionOutputStream {
+
+		void writeSectionData() throws IOException;
+		void writeSectionDataAndClose() throws IOException;
+
 	}
 
 	/**
@@ -223,10 +233,9 @@ public class DimensionRegionFile {
 			for (int i = 0; i < sectorsCount; ++i)
 				this.freeSectors.set(sectorsOffset + i, true);
 		
-			// Computing a new free position for new sector.
-			sectorsOffset = 0;
+			// Computing a new free position for new sectors.
 			sectorsCount = 0;
-			
+
 			for (int i = 0; i < this.freeSectors.size(); ++i) {
 				
 				if (this.freeSectors.get(i)) {
@@ -238,10 +247,7 @@ public class DimensionRegionFile {
 						break;
 					
 				} else if (sectorsCount != 0) {
-					
 					sectorsCount = 0;
-					sectorsOffset = 0;
-					
 				}
 				
 			}
@@ -293,6 +299,53 @@ public class DimensionRegionFile {
 		this.raFile.write(data, 0, length);
 		
 	}
+
+	// READ //
+
+	private InputStream getSectionInputStream(int x, int z) throws IOException {
+
+		int offset = this.getSectionOffset(x, z);
+		int sectorsCount = getSectCount(offset);
+
+		// If the section has no sectors, then return null.
+		if (sectorsCount == 0)
+			return null;
+
+		int sectorsOffset = getSectOffset(offset);
+		int sectorsByteOffset = (sectorsOffset + REGION_METADATA_SECTORS) << 12;
+
+		// If the sectors byte offset is too large to the file length.
+		if (sectorsByteOffset >= this.raFile.length())
+			return null;
+
+		// Go to the sector position in the file.
+		this.raFile.seek((sectorsOffset + REGION_METADATA_SECTORS) << 12);
+
+		// Get section length in bytes
+		int dataLength = this.raFile.readInt();
+
+		// If data length is too much for the file length, return null.
+		if ((sectorsByteOffset + dataLength) > this.raFile.length())
+			return null;
+
+		// Get section data format version.
+		int dataVersion = this.raFile.read();
+
+		// Read the data of specified length.
+		byte[] data = new byte[dataLength];
+		this.raFile.read(data);
+
+		ByteArrayInputStream commonInStream = new ByteArrayInputStream(data);
+
+		// Return appropriate
+		switch (dataVersion) {
+			case SECTION_VERSION_ZSTD:
+				return new ZstdInputStream(commonInStream);
+			default:
+				return commonInStream;
+		}
+
+	}
 	
 	// LOAD UTILS //
 
@@ -303,7 +356,7 @@ public class DimensionRegionFile {
 	 * @return The section is already saved.
 	 */
 	public boolean isSectionSaved(int x, int z) {
-		return getSectOffset(this.getSectionOffset(x, z)) != 0;
+		return getSectCount(this.getSectionOffset(x, z)) != 0;
 	}
 	
 	// FORMAT UTILS //
