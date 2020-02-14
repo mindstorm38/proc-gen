@@ -27,6 +27,7 @@ public class DimensionRegionFile {
 	private static final int SECTION_HEADER_BYTES    = 5;
 	
 	// Section saving version formats.
+	private static final byte SECTION_VERSION_RAW    = 0;
 	private static final byte SECTION_VERSION_ZSTD   = 1;
 	private static final byte SECTION_VERSION_LAST   = SECTION_VERSION_ZSTD; // Last stable save format.
 
@@ -34,7 +35,7 @@ public class DimensionRegionFile {
 	private static final byte[] EMPTY_SECTOR         = new byte[4096];
 	
 	// Maximum section sectors count.
-	private static final int MAX_SECTORS_COUNT       = 4095;
+	private static final int MAX_SECTORS_COUNT       = 2047;
 	
 	// CLASS //
 	
@@ -101,12 +102,14 @@ public class DimensionRegionFile {
 	 * Get a section output stream to write in the specified format version.<br>
 	 * Formats constants :<br>
 	 * <ul>
+	 *     <li><b>SECTION_VERSION_RAW</b> : Section not compressed.</li>
 	 *     <li><b>SECTION_VERSION_ZSTD</b> : Section Zstd compressed V1</li>
 	 *     <li><b>SECTION_VERSION_LAST</b> : Equals to last stable version : <b>SECTION_VERSION_ZSTD</b></li>
 	 * </ul>
 	 * @param x The relative X section coordinate in this region.
 	 * @param z The relative Z section coordinate in this region.
-	 * @param formatVersion The format version used to encode the section to sectors data. If version is wrong, then raw (uncompressed) data stream is returned.
+	 * @param formatVersion The format version used to encode the section to sectors data.
+	 *                         If version is wrong, then raw (uncompressed) data stream is returned and <b>SECTION_VERSION_RAW</b> is used.
 	 * @return The section output stream, implementing {@link SectionOutputStream} used to write the section to this region sectors.
 	 * @throws IOException If creation of output streams fails.
 	 */
@@ -117,7 +120,7 @@ public class DimensionRegionFile {
 			case SECTION_VERSION_ZSTD:
 				return (R) new SectionZstdOutputStream(x, z);
 			default:
-				return (R) new SectionBuffer(x, z, formatVersion);
+				return (R) new SectionBuffer(x, z, SECTION_VERSION_RAW);
 		}
 		
 	}
@@ -302,6 +305,13 @@ public class DimensionRegionFile {
 
 	// READ //
 
+	/**
+	 * Retreive a section {@link InputStream}, used to read the data of a section from sectors.
+	 * @param x The relative X section coordinate in this region.
+	 * @param z The relative Z section coordinate in this region.
+	 * @return The section {@link InputStream}, or <b>Null</b>
+	 * @throws IOException If read errors occurs.
+	 */
 	private InputStream getSectionInputStream(int x, int z) throws IOException {
 
 		int offset = this.getSectionOffset(x, z);
@@ -341,7 +351,7 @@ public class DimensionRegionFile {
 		switch (dataVersion) {
 			case SECTION_VERSION_ZSTD:
 				return new ZstdInputStream(commonInStream);
-			default:
+			default: // If version is wrong, use uncompressed InputStream.
 				return commonInStream;
 		}
 
@@ -366,7 +376,7 @@ public class DimensionRegionFile {
 	 * <pre><code>
 	 *   byte off | 3 | 2 | 1 | 0 |
 	 *            +---+---+-+-+---+
-	 * bits taken |    24   | 12  |
+	 * bits taken |    21   | 11  |
 	 *     	      +---------+-----+
 	 *              /           \
 	 *     Section start      Number of sectors
@@ -401,15 +411,15 @@ public class DimensionRegionFile {
 	}
 	
 	public static int getSectOffset(int offset) {
-		return offset >> 12;
+		return offset >> 11;
 	}
 	
 	public static int getSectCount(int offset) {
-		return offset & 1023;
+		return offset & 2047;
 	}
 	
 	public static int buildSectionOffset(int sectOffset, int sectCount) {
-		return (sectOffset << 12) | sectCount;
+		return (sectOffset << 11) | sectCount;
 	}
 	
 }
