@@ -25,7 +25,7 @@ public class WorldLoadingManager {
 	private static final ThreadingDispatch WORLD_CHUNK_LOADING_DISPATCH = ThreadingDispatch.register("WORLD_CHUNK_LOADING", 3);
 	private static final long MAX_IDLE_TIME = 60000;
 
-	private final Map<String, DimensionLoadData> dimensionsLoadData = new HashMap<>();
+	private final Map<String, DimensionData> dimensionsLoadData = new HashMap<>();
 	private WorldDimensionManager dimensionManager = null;
 	private PriorityThreadPoolExecutor loadingThreadPool = null;
 	private long poolIdleStartTime = 0;
@@ -80,18 +80,18 @@ public class WorldLoadingManager {
 
 	}
 
-	private DimensionLoadData getDimensionData(WorldServer dim) {
+	private DimensionData getDimensionData(WorldServer dim) {
 
 		if (this.dimensionManager == null)
 			throw new IllegalStateException("Can't get dimension data if no dimension manager is running");
 
-		DimensionLoadData data = this.dimensionsLoadData.get(dim.getIdentifier());
+		DimensionData data = this.dimensionsLoadData.get(dim.getIdentifier());
 
 		if (data == null) {
 
 			try {
 
-				data = new DimensionLoadData(dim);
+				data = new DimensionData(dim);
 				this.dimensionsLoadData.put(dim.getIdentifier(), data);
 
 			} catch (IllegalStateException e) {
@@ -108,7 +108,7 @@ public class WorldLoadingManager {
 	}
 
 	public boolean isSectionSaved(WorldServer dim, SectionPositioned pos) {
-		DimensionLoadData data = this.getDimensionData(dim);
+		DimensionData data = this.getDimensionData(dim);
 		return data != null && data.isSectionSaved(pos);
 	}
 	
@@ -124,14 +124,8 @@ public class WorldLoadingManager {
 		return false;
 	}
 
-
-
-	public static String getSectionFileName(SectionPositioned pos) {
-		return pos.getX() + "." + pos.getZ() + ".pgs.zstd";
-	}
-
 	public static String getRegionFileName(SectionPositioned pos) {
-		return pos.getX() + "." + pos.getZ() + ".pgr.zstd";
+		return pos.getX() + "." + pos.getZ() + ".pgr";
 	}
 
 }

@@ -2,8 +2,6 @@ package fr.theorozier.procgen.common.world.load;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
-import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -39,15 +37,13 @@ public class DimensionRegionFile {
 	
 	// CLASS //
 	
-	private final ImmutableSectionPosition position; // TODO Check if usefull
 	private final RandomAccessFile raFile;
 	
 	private final int[] sectionOffsets = new int[1024];
 	private final List<Boolean> freeSectors;
 	
-	public DimensionRegionFile(SectionPositioned pos, RandomAccessFile raFile) throws IOException {
+	public DimensionRegionFile(RandomAccessFile raFile) throws IOException {
 		
-		this.position = pos.immutableSectionPos();
 		this.raFile = raFile;
 		
 		if (raFile.length() < REGION_METADATA_BYTES) {
@@ -367,6 +363,13 @@ public class DimensionRegionFile {
 	 */
 	public boolean isSectionSaved(int x, int z) {
 		return getSectCount(this.getSectionOffset(x, z)) != 0;
+	}
+	
+	/**
+	 * Close the random access file.
+	 */
+	public void close() throws IOException {
+		this.raFile.close();
 	}
 	
 	// FORMAT UTILS //
