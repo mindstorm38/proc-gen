@@ -188,13 +188,25 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		this.profiler.endStartSection("gui_update");
 		this.guiManager.update();
-		this.profiler.endSection();
 		
-		if (this.servedWorld != null)
+		this.profiler.endStartSection("world_loading_update");
+		this.worldLoadingManager.update();
+		
+		if (this.servedWorld != null) {
+			
+			this.profiler.endStartSection("dimensions_update");
 			this.servedWorld.update();
+			
+		}
 		
-		if (this.clientWorld != null)
+		if (this.clientWorld != null) {
+			
+			this.profiler.endStartSection("client_world_update");
 			this.clientWorld.update();
+			
+		}
+		
+		this.profiler.endSection();
 		
 	}
 	
@@ -218,13 +230,18 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		this.servedWorld = worldDimensionManager;
 		
-		if (this.servedWorld != null) {
+		if (worldDimensionManager != null) {
 		
-			this.clientWorld = new WorldSinglePlayer(this.servedWorld.getMainDimension());
+			this.clientWorld = new WorldSinglePlayer(worldDimensionManager.getMainDimension());
+			
 			this.worldRenderer.renderWorld(this.clientWorld);
+			this.worldLoadingManager.setCurrentDimensionManager(worldDimensionManager);
 			
 		} else {
+			
 			this.worldRenderer.renderWorld(null);
+			this.worldLoadingManager.setCurrentDimensionManager(null);
+			
 		}
 		
 	}

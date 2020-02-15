@@ -131,13 +131,9 @@ public class WorldDimensionManager {
 
 	public void update() {
 		
-		PROFILER.startSection("world_dims");
-		
 		for (WorldServer dim : this.dimensions) {
 			dim.update();
 		}
-		
-		PROFILER.endSection();
 		
 	}
 	
