@@ -11,6 +11,7 @@ import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProviders;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
+import fr.theorozier.procgen.common.world.load.DimensionMetadata;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;
@@ -121,10 +122,11 @@ public class CreateWorldScreen extends Screen {
 					try {
 						
 						WorldServer servedWorld = new WorldServer(worldDir);
-						WorldDimension world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), ChunkGeneratorProviders.BETA_3D_CHUNK_PROVIDER);
+						DimensionMetadata dimensionMetadata = new DimensionMetadata(this.getWorldSeed(), ChunkGeneratorProviders.BETA_3D_CHUNK_PROVIDER);
+						WorldDimension dimension = servedWorld.createNewDimension("testdim", dimensionMetadata);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
-						world.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
+						dimension.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
 						
 						this.manager.loadScene(DebugScene.class);
 						
