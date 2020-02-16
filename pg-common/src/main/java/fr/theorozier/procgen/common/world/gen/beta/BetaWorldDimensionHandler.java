@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.gen.beta;
 
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.gen.WorldDimensionHandler;
-import fr.theorozier.procgen.common.world.gen.WorldChunkGeneratorProviders;
+import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProviders;
 import fr.theorozier.procgen.common.world.gen.WorldIncompatException;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 
@@ -13,7 +13,7 @@ public class BetaWorldDimensionHandler implements WorldDimensionHandler {
 	@Override
 	public void worldCreated(WorldServer dimensionManager, WorldGenerationOption generationOption) {
 		
-		dimensionManager.createNewDimension(OVERWORLD_DIMENSION, generationOption.getSeed(), WorldChunkGeneratorProviders.BETA_CHUNK_PROVIDER);
+		dimensionManager.createNewDimension(OVERWORLD_DIMENSION, generationOption.getSeed(), ChunkGeneratorProviders.BETA_CHUNK_PROVIDER);
 		// Add here nether in the future //
 		
 	}

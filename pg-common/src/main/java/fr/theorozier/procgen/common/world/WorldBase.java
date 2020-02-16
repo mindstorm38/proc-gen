@@ -32,16 +32,12 @@ public abstract class WorldBase implements WorldAccessor {
 	protected final List<Entity> entities = new ArrayList<>();
 	protected final List<Entity> entitiesView = Collections.unmodifiableList(this.entities);
 	
-	protected long time;
+	protected long time = 0L;
 	
 	protected final MethodEventManager eventManager;
 	
 	public WorldBase() {
-		
-		this.time = 0L;
-		
 		this.eventManager = new WorldMethodEventManager();
-		
 	}
 	
 	// PROPERTIES //
@@ -92,9 +88,14 @@ public abstract class WorldBase implements WorldAccessor {
 	 * Run a single tick in this world.
 	 */
 	public void update() {
-		
+		this.updateTime();
+	}
+	
+	/**
+	 * Internal method to increase overall world time each tick.
+	 */
+	protected void updateTime() {
 		++this.time;
-		
 	}
 	
 	// SECTIONS //

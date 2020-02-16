@@ -55,8 +55,7 @@ public class WorldServer {
 	}
 	
 	/**
-	 * Get the world directory, where
-	 * @return
+	 * @return World directory containing all dimensions and players.
 	 */
 	public File getWorldDirectory() {
 		return this.worldDirectory;
@@ -82,11 +81,10 @@ public class WorldServer {
 	/**
 	 * Create a new dimension if not already existing.
 	 * @param identifier The world dimension identifier.
-	 * @param seed The dimension seed for generation.
-	 * @param provider The chunk provider to use for this world.
+	 * @param metadata The dimension metadata, contains seed and chunk generator provider.
 	 * @return The new dimension's world instance.
 	 */
-	public WorldDimension createNewDimension(String identifier, long seed, ChunkGeneratorProvider provider) {
+	public WorldDimension createNewDimension(String identifier, DimensionMetadata metadata) {
 		
 		if (this.dimensionsWorlds.containsKey(identifier))
 			throw new IllegalArgumentException("The dimension '" + identifier + "' already exists this manager !");
@@ -94,7 +92,7 @@ public class WorldServer {
 		File worldDir = new File(this.dimensionsDirectory, identifier);
 		SaveUtils.mkdirOrThrowException(worldDir, "The world directory can't be created because a file with same name already exists.");
 		
-		WorldDimension newDim = new WorldDimension(this, identifier, worldDir, seed, provider);
+		WorldDimension newDim = new WorldDimension(this, identifier, worldDir, metadata);
 		
 		this.dimensionsWorlds.put(identifier, newDim);
 		
@@ -114,7 +112,7 @@ public class WorldServer {
 	
 	public ChunkGeneratorProvider getDimensionChunkGeneratorProvider(String identifier) {
 		WorldDimension world = this.dimensionsWorlds.get(identifier);
-		return world == null ? null : world.getChunkGeneratorProvider();
+		return world == null ? null : world.getMetadata().getChunkGeneratorProvider();
 	}
 	
 	/**

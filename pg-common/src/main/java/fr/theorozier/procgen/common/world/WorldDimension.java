@@ -40,9 +40,10 @@ public class WorldDimension extends WorldBase {
 	private final String identifier;
 	private final File directory;
 	
+	private final DimensionMetadata metadata;
+	
 	private final long seed;
 	private final Random random;
-	private final ChunkGeneratorProvider chunkGeneratorProvider;
 	private final ChunkGenerator chunkGenerator;
 	
 	private final WorldTickList<Block> blockTickList;
@@ -58,16 +59,19 @@ public class WorldDimension extends WorldBase {
 
 	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
 	
-	public WorldDimension(WorldServer dimensionManager, String identifier, File directory, long seed, ChunkGeneratorProvider provider) {
+	public WorldDimension(WorldServer dimensionManager, String identifier, File directory, DimensionMetadata metadata) {
 		
 		this.dimensionManager = Objects.requireNonNull(dimensionManager);
 		this.identifier = Objects.requireNonNull(identifier);
 		this.directory = Objects.requireNonNull(directory);
 		
-		this.seed = seed;
-		this.random = new Random(seed);
-		this.chunkGeneratorProvider = Objects.requireNonNull(provider);
-		this.chunkGenerator = Objects.requireNonNull(provider.create(this), "ChunkGenerator provider returned Null.");
+		this.metadata = Objects.requireNonNull(metadata);
+		
+		this.time = this.metadata.getTime();
+		
+		this.seed = this.metadata.getSeed();
+		this.random = new Random(this.seed);
+		this.chunkGenerator = Objects.requireNonNull(this.metadata.getChunkGeneratorProvider().create(this), "ChunkGenerator provider returned Null.");
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
@@ -96,7 +100,21 @@ public class WorldDimension extends WorldBase {
 	public File getDirectory() {
 		return this.directory;
 	}
-
+	
+	/**
+	 * Get this dimension metadata, but update dynamic values before :<br>
+	 * <ul>
+	 *     <li>Time (ticks elapsed since world creation, used for day cycle)</li>
+	 * </ul>
+	 * Update these dynamic values in the metadata will not update them in the dimension
+	 * since they are only used for metadata serialization or on world instantiation.
+	 * @return The unique dimension metadata.
+	 */
+	public DimensionMetadata getMetadata() {
+		this.metadata.setTime(this.time);
+		return this.metadata;
+	}
+	
 	/**
 	 * @return The world generation seed used by chunk generator.
 	 */
@@ -109,10 +127,6 @@ public class WorldDimension extends WorldBase {
 	 */
 	public Random getRandom() {
 		return this.random;
-	}
-	
-	public ChunkGeneratorProvider getChunkGeneratorProvider() {
-		return this.chunkGeneratorProvider;
 	}
 	
 	public ChunkGenerator getChunkGenerator() {

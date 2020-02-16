@@ -9,7 +9,7 @@ import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.WorldDimension;
-import fr.theorozier.procgen.common.world.gen.WorldChunkGeneratorProviders;
+import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProviders;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
@@ -121,7 +121,7 @@ public class CreateWorldScreen extends Screen {
 					try {
 						
 						WorldServer servedWorld = new WorldServer(worldDir);
-						WorldDimension world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldChunkGeneratorProviders.BETA_3D_CHUNK_PROVIDER);
+						WorldDimension world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), ChunkGeneratorProviders.BETA_3D_CHUNK_PROVIDER);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
 						world.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
