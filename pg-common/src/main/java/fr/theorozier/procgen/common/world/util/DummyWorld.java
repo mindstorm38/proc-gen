@@ -14,9 +14,7 @@ public class DummyWorld implements WorldAccessor {
 	private final Biome biome;
 	
 	public DummyWorld(Biome biome) {
-		
 		this.biome = Objects.requireNonNull(biome, "Global biome can't be null.");
-		
 	}
 	
 	@Override
@@ -45,9 +43,7 @@ public class DummyWorld implements WorldAccessor {
 	}
 	
 	@Override
-	public void setBlockAt(int x, int y, int z, BlockState state) {
-	
-	}
+	public void setBlockAt(int x, int y, int z, BlockState state) { }
 	
 	@Override
 	public boolean isBlockAt(int x, int y, int z, BlockState state) {
