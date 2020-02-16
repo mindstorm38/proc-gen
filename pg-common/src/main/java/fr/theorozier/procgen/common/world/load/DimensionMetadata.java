@@ -1,16 +1,21 @@
 package fr.theorozier.procgen.common.world.load;
 
-import java.util.*;
+import com.google.gson.JsonObject;
+
+import java.util.Objects;
 
 public class DimensionMetadata {
 
 	private final long seed;
 	private final String chunkGeneratorProvider;
 	
-	public DimensionMetadata(long seed, String chunkGeneratorProvider) {
+	private final JsonObject data;
+	
+	public DimensionMetadata(long seed, String chunkGeneratorProvider, JsonObject data) {
 		
 		this.seed = seed;
 		this.chunkGeneratorProvider = Objects.requireNonNull(chunkGeneratorProvider);
+		this.data = data;
 		
 	}
 	
@@ -21,5 +26,9 @@ public class DimensionMetadata {
 	public String getChunkGeneratorProvider() {
 		return this.chunkGeneratorProvider;
 	}
-
+	
+	public JsonObject getData() {
+		return this.data;
+	}
+	
 }

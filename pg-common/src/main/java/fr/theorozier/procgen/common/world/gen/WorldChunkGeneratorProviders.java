@@ -1,14 +1,15 @@
 package fr.theorozier.procgen.common.world.gen;
 
-import fr.theorozier.procgen.common.world.*;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.beta.Beta3DChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.chunk.*;
-import fr.theorozier.procgen.common.world.gen.provider.*;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.provider.FastChunkGeneratorProvider;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.*;
+import java.util.function.Function;
 
 public final class WorldChunkGeneratorProviders {
 	

@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.common.world.gen.provider;
 
-import fr.theorozier.procgen.common.world.*;
-import fr.theorozier.procgen.common.world.gen.chunk.*;
+import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.Function;
 
 public class FastChunkGeneratorProvider extends ChunkGeneratorProvider {
 	
