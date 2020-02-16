@@ -4,7 +4,7 @@ import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.load.*;
 import io.msengine.common.util.GameProfiler;

@@ -10,7 +10,7 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.chunk.ChunkGeneratorProvider;
+import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.load.*;
@@ -67,7 +67,7 @@ public class WorldDimension extends WorldBase {
 		this.seed = seed;
 		this.random = new Random(seed);
 		this.chunkGeneratorProvider = Objects.requireNonNull(provider);
-		this.chunkGenerator = provider.create(this);
+		this.chunkGenerator = Objects.requireNonNull(provider.create(this), "ChunkGenerator provider returned Null.");
 		
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
