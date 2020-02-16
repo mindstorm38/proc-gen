@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.common.world;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
@@ -8,9 +10,13 @@ import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.load.*;
 import io.msengine.common.util.GameProfiler;
+import io.sutil.FileUtils;
 import io.sutil.profiler.Profiler;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -24,7 +30,14 @@ import java.util.concurrent.Future;
  */
 public class WorldServer {
 	
+	private static final String DIMENSION_METADATA_FILE = "meta.json";
+	
 	private static final Profiler PROFILER = GameProfiler.getInstance();
+	
+	private static final Gson GSON = new GsonBuilder()
+			.registerTypeAdapter(DimensionMetadata.class, new DimensionMetadata.Serializer())
+			.setPrettyPrinting()
+			.create();
 	
 	private final File worldDirectory;
 	private final File playersDirectory;
@@ -93,6 +106,7 @@ public class WorldServer {
 		SaveUtils.mkdirOrThrowException(worldDir, "The world directory can't be created because a file with same name already exists.");
 		
 		WorldDimension newDim = new WorldDimension(this, identifier, worldDir, metadata);
+		saveDimensionMetadata(newDim);
 		
 		this.dimensionsWorlds.put(identifier, newDim);
 		
@@ -145,6 +159,21 @@ public class WorldServer {
 		
 		for (WorldDimension dim : this.dimensions) {
 			dim.update();
+		}
+		
+	}
+	
+	public static void saveDimensionMetadata(WorldDimension dimension) {
+		
+		File metadataFile = new File(dimension.getDirectory(), DIMENSION_METADATA_FILE);
+		
+		if (metadataFile.isDirectory())
+			FileUtils.deleteDirectory(metadataFile);
+		
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(metadataFile))) {
+			GSON.toJson(dimension.getMetadata(), DimensionMetadata.class, writer);
+		} catch (IOException e) {
+			throw new IllegalStateException("Failed to save dimension metadata to '" + metadataFile + "'.", e);
 		}
 		
 	}

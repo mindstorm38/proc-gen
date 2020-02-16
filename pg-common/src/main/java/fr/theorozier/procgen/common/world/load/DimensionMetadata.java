@@ -20,6 +20,7 @@ public class DimensionMetadata {
 	private static final String METADATA_SEED   = "seed";
 	private static final String METADATA_CGP    = "chunk_generator_provider";
 	private static final String METADATA_CGO    = "chunk_generator_options";
+	private static final String METADATA_TIME   = "time";
 	
 	private final long seed;
 	private final ChunkGeneratorProvider chunkGeneratorProvider;
@@ -66,11 +67,14 @@ public class DimensionMetadata {
 			
 			JsonObject json = new JsonObject();
 			
+			// Common static infos
 			json.addProperty(METADATA_FORMAT, 1);
 			json.addProperty(METADATA_SEED, src.seed);
 			json.addProperty(METADATA_CGP, src.chunkGeneratorProvider.getIdentifier());
-			
 			json.add(METADATA_CGO, src.chunkGeneratorOptions);
+			
+			// Common dynamics infos
+			json.addProperty(METADATA_TIME, src.time);
 			
 			return json;
 			
@@ -84,6 +88,7 @@ public class DimensionMetadata {
 			
 			JsonObject json = root.getAsJsonObject();
 			
+			// Common static infos
 			int format = JsonUtils.getInt(json, METADATA_FORMAT, 1);
 			long seed = JsonUtils.getLongRequired(json, METADATA_SEED, "Dimension metadata long 'seed' is required.");
 			String chunkGeneratorProviderIdentifier = JsonUtils.getStringRequired(json, METADATA_CGP, "Dimension metadata string 'chunk_generator_provider' is required.");
@@ -106,7 +111,12 @@ public class DimensionMetadata {
 				chunkGeneratorOptions = new JsonObject();
 			}
 			
-			return new DimensionMetadata(seed, chunkGeneratorProvider, chunkGeneratorOptions);
+			DimensionMetadata metadata = new DimensionMetadata(seed, chunkGeneratorProvider, chunkGeneratorOptions);
+			
+			// Common dynamics infos
+			metadata.setTime(JsonUtils.getLong(json, METADATA_TIME, 0L));
+			
+			return metadata;
 			
 		}
 		
