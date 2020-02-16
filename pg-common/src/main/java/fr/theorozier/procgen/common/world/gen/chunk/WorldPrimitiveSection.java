@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.ThreadUtils;
@@ -10,7 +10,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	
 	private WorldSectionStatus status;
 	
-	public WorldPrimitiveSection(WorldServer world, SectionPositioned position) {
+	public WorldPrimitiveSection(WorldDimension world, SectionPositioned position) {
 		
 		super(world, position);
 		
@@ -35,7 +35,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		return this.status == WorldSectionStatus.FINISHED;
 	}
 	
-	public PriorityRunnable getNextStatusLoadingTask(WorldServer world, int distanceToLoaders) {
+	public PriorityRunnable getNextStatusLoadingTask(WorldDimension world, int distanceToLoaders) {
 	
 		WorldSectionStatus next = this.status.getNext();
 		

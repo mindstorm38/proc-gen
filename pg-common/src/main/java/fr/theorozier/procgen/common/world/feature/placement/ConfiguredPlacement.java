@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.feature.placement;
 
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.feature.placement.config.PlacementConfig;
@@ -21,7 +21,7 @@ public class ConfiguredPlacement<C extends PlacementConfig> {
 		
 	}
 	
-	public <FC extends FeatureConfig> boolean place(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, ConfiguredFeature<FC> featureConfig) {
+	public <FC extends FeatureConfig> boolean place(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, ConfiguredFeature<FC> featureConfig) {
 		return placement.place(world, generator, rand, at, this.config, featureConfig);
 	}
 	

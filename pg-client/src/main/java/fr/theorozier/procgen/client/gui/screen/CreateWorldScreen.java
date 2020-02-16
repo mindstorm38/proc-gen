@@ -7,8 +7,8 @@ import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiTextInput;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
-import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.WorldGenerators;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
 import io.msengine.client.gui.GuiParent;
@@ -120,8 +120,8 @@ public class CreateWorldScreen extends Screen {
 					
 					try {
 						
-						WorldDimensionManager servedWorld = new WorldDimensionManager(worldDir);
-						WorldServer world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_3D_CHUNK_PROVIDER);
+						WorldServer servedWorld = new WorldServer(worldDir);
+						WorldDimension world = servedWorld.createNewDimension("testdim", this.getWorldSeed(), WorldGenerators.BETA_3D_CHUNK_PROVIDER);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
 						world.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());

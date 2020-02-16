@@ -10,9 +10,9 @@ import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.*;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
-import fr.theorozier.procgen.common.world.WorldDimensionManager;
-import fr.theorozier.procgen.common.world.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldLoadingPosition;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
 import io.msengine.client.game.DefaultRenderGame;
@@ -59,7 +59,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	// Class //
 	
 	private final WorldList worldList;
-	private WorldDimensionManager servedWorld;
+	private WorldServer servedWorld;
 	private WorldClient clientWorld;
 	
 	private final WorldLoadingPosition testLoadingPosition = new WorldLoadingPosition();
@@ -216,9 +216,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		return this.worldList;
 	}
 	
-	public void setServedWorld(WorldDimensionManager worldDimensionManager) {
+	public void setServedWorld(WorldServer worldServer) {
 		
-		if (this.servedWorld == worldDimensionManager)
+		if (this.servedWorld == worldServer)
 			return;
 		
 		if (this.clientWorld != null) {
@@ -228,14 +228,20 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 			
 		}
 		
-		this.servedWorld = worldDimensionManager;
+		if (this.servedWorld != null) {
+			this.servedWorld.unload();
+		}
 		
-		if (worldDimensionManager != null) {
+		this.servedWorld = worldServer;
 		
-			this.clientWorld = new WorldSinglePlayer(worldDimensionManager.getMainDimension());
+		if (worldServer != null) {
+			
+			worldServer.load(this.worldLoadingManager);
+			
+			this.clientWorld = new WorldSinglePlayer(worldServer.getMainDimension());
 			
 			this.worldRenderer.renderWorld(this.clientWorld);
-			this.worldLoadingManager.setCurrentDimensionManager(worldDimensionManager);
+			this.worldLoadingManager.setCurrentDimensionManager(worldServer);
 			
 		} else {
 			
@@ -277,7 +283,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 				
 				if (this.clientWorld instanceof WorldSinglePlayer) {
 					
-					WorldServer serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
+					WorldDimension serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
 					
 					Camera3D cam = this.worldRenderer.getCamera();
 					
@@ -314,7 +320,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 
 				if (this.clientWorld instanceof WorldSinglePlayer) {
 					
-					WorldServer serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
+					WorldDimension serverWorld = ((WorldSinglePlayer) this.clientWorld).getServerWorld();
 					
 					Camera3D cam = this.worldRenderer.getCamera();
 

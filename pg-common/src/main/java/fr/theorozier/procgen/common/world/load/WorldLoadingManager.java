@@ -2,8 +2,8 @@ package fr.theorozier.procgen.common.world.load;
 
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
-import fr.theorozier.procgen.common.world.WorldDimensionManager;
 import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
@@ -26,7 +26,7 @@ public class WorldLoadingManager {
 	private static final long MAX_IDLE_TIME = 60000;
 
 	private final Map<String, DimensionData> dimensionsLoadData = new HashMap<>();
-	private WorldDimensionManager dimensionManager = null;
+	private WorldServer dimensionManager = null;
 	private PriorityThreadPoolExecutor loadingThreadPool = null;
 	private long poolIdleStartTime = 0;
 
@@ -37,7 +37,7 @@ public class WorldLoadingManager {
 	 * Should be called from main update loop.
 	 * @param manager The dimension manager, or Null to only stop current dimension manager.
 	 */
-	public void setCurrentDimensionManager(WorldDimensionManager manager) {
+	public void setCurrentDimensionManager(WorldServer manager) {
 
 		if (this.dimensionManager != null) {
 
@@ -80,7 +80,7 @@ public class WorldLoadingManager {
 
 	}
 
-	private DimensionData getDimensionData(WorldServer dim) {
+	private DimensionData getDimensionData(WorldDimension dim) {
 
 		if (this.dimensionManager == null)
 			throw new IllegalStateException("Can't get dimension data if no dimension manager is running");
@@ -107,20 +107,20 @@ public class WorldLoadingManager {
 
 	}
 
-	public boolean isSectionSaved(WorldServer dim, SectionPositioned pos) {
+	public boolean isSectionSaved(WorldDimension dim, SectionPositioned pos) {
 		DimensionData data = this.getDimensionData(dim);
 		return data != null && data.isSectionSaved(pos);
 	}
 	
-	public boolean isSectionSaving(WorldServer dim, SectionPositioned pos) {
+	public boolean isSectionSaving(WorldDimension dim, SectionPositioned pos) {
 		return false;
 	}
 	
-	public void loadSectionTo(WorldServer dim, WorldServerSection section) {
+	public void loadSectionTo(WorldDimension dim, WorldServerSection section) {
 	
 	}
 	
-	public boolean isSectionLoading(WorldServer dim, SectionPositioned pos) {
+	public boolean isSectionLoading(WorldDimension dim, SectionPositioned pos) {
 		return false;
 	}
 

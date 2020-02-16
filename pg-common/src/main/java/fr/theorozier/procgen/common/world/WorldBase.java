@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 /**
  *
  * Base world class storing data needed for client and server.<br>
- * In reality this a world dimension, stored and managed by a {@link WorldDimensionManager}.
+ * In reality this a world dimension, stored and managed by a {@link WorldServer}.
  *
  * @author Theo Rozier
  *
@@ -57,7 +57,7 @@ public abstract class WorldBase implements WorldAccessor {
 	 * @return This world base casted to world server.
 	 * @throws UnsupportedOperationException If the world is not a server world.
 	 */
-	public WorldServer getAsServer() {
+	public WorldDimension getAsServer() {
 		throw new UnsupportedOperationException("This world is not a server world.");
 	}
 	

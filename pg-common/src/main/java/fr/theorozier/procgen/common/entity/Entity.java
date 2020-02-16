@@ -3,7 +3,7 @@ package fr.theorozier.procgen.common.entity;
 import fr.theorozier.procgen.common.entity.controller.EntityController;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import io.sutil.math.MathHelper;
 
 import java.util.Random;
@@ -27,7 +27,7 @@ public abstract class Entity {
 	}
 	
 	protected final WorldBase world;
-	protected final WorldServer serverWorld;
+	protected final WorldDimension serverWorld;
 	protected final boolean isInServer;
 	protected final long uid;
 	protected final Random rand;
@@ -86,7 +86,7 @@ public abstract class Entity {
 		return this.world;
 	}
 	
-	public WorldServer getServerWorld() {
+	public WorldDimension getServerWorld() {
 		return this.serverWorld;
 	}
 	

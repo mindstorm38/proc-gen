@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
@@ -68,7 +68,7 @@ public abstract class ChunkGenerator {
 		
 		this.genBedrock(section, pos);
 		
-		WorldServer world = section.getWorld();
+		WorldDimension world = section.getWorld();
 		int seaLimit = world.getSeaLevel() - 2;
 		
 		short height, baseHeight;

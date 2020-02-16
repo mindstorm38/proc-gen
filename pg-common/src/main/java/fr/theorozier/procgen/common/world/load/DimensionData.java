@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.world.load;
 
 import fr.theorozier.procgen.common.util.SaveUtils;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.pool.FixedObjectPool;
@@ -22,16 +22,16 @@ import static io.msengine.common.util.GameLogger.LOGGER;
  */
 public class DimensionData {
 
-    private final WorldServer world;
+    private final WorldDimension world;
     private final File worldDir;
     private final File regionsDir;
 
     private final Map<SectionPositioned, DimensionRegionFile> regions = new HashMap<>();
 
-    public DimensionData(WorldServer world) {
+    public DimensionData(WorldDimension world) {
 
         this.world = world;
-        this.worldDir = world.getWorldDir();
+        this.worldDir = world.getDirectory();
         this.regionsDir = new File(this.worldDir, "regions");
         
         SaveUtils.mkdirOrThrowException(this.regionsDir, "The sections already exists but it's a file.");

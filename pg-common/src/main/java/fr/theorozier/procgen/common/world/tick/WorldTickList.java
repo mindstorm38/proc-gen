@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.tick;
 
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
 import java.util.*;
@@ -11,7 +11,7 @@ public class WorldTickList<T> {
 	
 	private static final int MAX_TICK_COUNT = 65536;
 	
-	private final WorldServer world;
+	private final WorldDimension world;
 	
 	private final HashSet<WorldTickEntry<T>> tickEntriesHashed = new HashSet<>();
 	private final TreeSet<WorldTickEntry<T>> tickEntriesTree = new TreeSet<>(WorldTickEntry.buildComparator());
@@ -20,7 +20,7 @@ public class WorldTickList<T> {
 	private final Predicate<T> filter;
 	private final Consumer<WorldTickEntry<T>> ticker;
 	
-	public WorldTickList(WorldServer world, Predicate<T> filter, Consumer<WorldTickEntry<T>> ticker) {
+	public WorldTickList(WorldDimension world, Predicate<T> filter, Consumer<WorldTickEntry<T>> ticker) {
 	
 		this.world = world;
 		this.filter = filter;

@@ -4,8 +4,7 @@ import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.MotionEntity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
-import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.event.WorldChunkListener;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import io.sutil.math.MathHelper;
 
@@ -13,7 +12,7 @@ import java.util.Random;
 
 public class ExplosionCreator {
 
-	public static void createExplosion(WorldServer world, float x, float y, float z, float size) {
+	public static void createExplosion(WorldDimension world, float x, float y, float z, float size) {
 	
 		Random random = world.getRandom();
 		

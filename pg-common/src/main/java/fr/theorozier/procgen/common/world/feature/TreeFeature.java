@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.feature;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
@@ -21,7 +21,7 @@ public class TreeFeature extends Feature<FeatureConfig> {
 	}
 	
 	@Override
-	public boolean place(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, FeatureConfig config) {
+	public boolean place(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, FeatureConfig config) {
 		
 		BlockPosition temp = new BlockPosition();
 		
@@ -98,7 +98,7 @@ public class TreeFeature extends Feature<FeatureConfig> {
 		
 	}
 	
-	private static void placeLeaves(WorldServer world, BlockPositioned pos) {
+	private static void placeLeaves(WorldDimension world, BlockPositioned pos) {
 		if (world.getBlockAt(pos) == null) world.setBlockAt(pos, Blocks.LEAVES.getDefaultState());
 	}
 	

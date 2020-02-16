@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.feature.placement;
 
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.feature.placement.config.PlacementConfig;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
@@ -14,7 +14,7 @@ public abstract class SurfacePlacement<C extends PlacementConfig> extends Placem
 
 	private static final SectionPosition cachedSectionPos = new SectionPosition();
 	
-	protected static ImmutableBlockPosition randomSurfacePosition(WorldServer world, Random rand, BlockPositioned origin) {
+	protected static ImmutableBlockPosition randomSurfacePosition(WorldDimension world, Random rand, BlockPositioned origin) {
 		
 		int xRand = rand.nextInt(16);
 		int zRand = rand.nextInt(16);

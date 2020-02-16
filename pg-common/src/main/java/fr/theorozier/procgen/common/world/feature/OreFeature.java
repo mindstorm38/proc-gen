@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.feature;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.feature.config.OreFeatureConfig;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
@@ -19,7 +19,7 @@ public class OreFeature extends Feature<OreFeatureConfig> {
 	}
 	
 	@Override
-	public boolean place(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, OreFeatureConfig config) {
+	public boolean place(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, OreFeatureConfig config) {
 		
 		AtomicInteger oreCount = new AtomicInteger(config.getInfCount() + (int) (rand.nextFloat() * (config.getSupCount() - config.getInfCount())));
 		
@@ -28,7 +28,7 @@ public class OreFeature extends Feature<OreFeatureConfig> {
 		
 	}
 	
-	private static void place(WorldServer world, Random rand, BlockPositioned at, OreFeatureConfig config, AtomicInteger oreCount) {
+	private static void place(WorldDimension world, Random rand, BlockPositioned at, OreFeatureConfig config, AtomicInteger oreCount) {
 	
 		if (oreCount.get() == 0)
 			return;

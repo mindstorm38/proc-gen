@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.feature.placement;
 
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.feature.placement.config.CountExtraConfig;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class SurfaceCountExtraPlacement extends SurfacePlacement<CountExtraConfig> {
 	
 	@Override
-	protected Stream<BlockPositioned> position(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, CountExtraConfig config) {
+	protected Stream<BlockPositioned> position(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, CountExtraConfig config) {
 	
 		int count = config.getCount() + (rand.nextFloat() < config.getExtraChance() ? config.getExtraCount() : 0);
 		

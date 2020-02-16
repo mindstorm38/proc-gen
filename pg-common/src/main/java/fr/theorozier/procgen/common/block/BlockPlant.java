@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class BlockPlant extends Block {
 	public void getStateCollision(BlockState state, List<AxisAlignedBB> boundingBoxes) {}
 	
 	@Override
-	public void tickBlock(WorldServer world, BlockPositioned pos, BlockState block, Random rand) {
+	public void tickBlock(WorldDimension world, BlockPositioned pos, BlockState block, Random rand) {
 	
 		/*
 		if (rand.nextFloat() < 0.05f) {

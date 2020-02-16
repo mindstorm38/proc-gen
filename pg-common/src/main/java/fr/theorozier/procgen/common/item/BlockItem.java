@@ -3,7 +3,7 @@ package fr.theorozier.procgen.common.item;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.LiveEntity;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
@@ -23,7 +23,7 @@ public class BlockItem extends Item {
 	}
 	
 	@Override
-	public void useOnBlockNoInteract(WorldServer world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
+	public void useOnBlockNoInteract(WorldDimension world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
 		
 		try (FixedObjectPool<BlockPosition>.PoolObject poolPos = BlockPosition.POOL.acquire()) {
 			
@@ -52,7 +52,7 @@ public class BlockItem extends Item {
 		
 	}
 	
-	public BlockState getStateToPlace(WorldServer world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
+	public BlockState getStateToPlace(WorldDimension world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
 		return this.block;
 	}
 	

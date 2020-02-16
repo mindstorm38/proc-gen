@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.gen.beta;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
@@ -51,7 +51,7 @@ public class Beta3DChunkGenerator extends ChunkGenerator {
 		int chunkY = pos.getY() << 4;
 		int chunkZ = pos.getZ() << 4;
 		
-		WorldServer world = chunk.getWorld();
+		WorldDimension world = chunk.getWorld();
 		int maxHeight = world.getHeightLimit();
 		int seaLevel = world.getSeaLevel();
 		

@@ -6,7 +6,7 @@ import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.item.ItemStack;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.util.ErrorUtils;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.sutil.StringUtils;
@@ -122,23 +122,23 @@ public class Block {
 		this.resistance = resistance;
 	}
 	
-	public boolean canOverride(WorldServer world, BlockPositioned pos, BlockState state) {
+	public boolean canOverride(WorldDimension world, BlockPositioned pos, BlockState state) {
 		return false;
 	}
 	
 	// Dynamic function for modifying the world
 	
-	public void tickBlock(WorldServer world, BlockPositioned pos, BlockState block, Random rand) {}
+	public void tickBlock(WorldDimension world, BlockPositioned pos, BlockState block, Random rand) {}
 
-	public void placedBlock(WorldServer world, BlockPositioned pos, BlockState block) {}
+	public void placedBlock(WorldDimension world, BlockPositioned pos, BlockState block) {}
 
-	public void destroyedBlock(WorldServer world, BlockPositioned pos, BlockState block, ItemStack usedItem) {}
+	public void destroyedBlock(WorldDimension world, BlockPositioned pos, BlockState block, ItemStack usedItem) {}
 
-	public boolean interactBlock(WorldServer world, BlockPositioned pos, BlockState block, Direction face, LiveEntity entity, ItemStack usedItem) {
+	public boolean interactBlock(WorldDimension world, BlockPositioned pos, BlockState block, Direction face, LiveEntity entity, ItemStack usedItem) {
 		return false;
 	}
 
-	public void neighbourBlockUpdated(WorldServer world, BlockPositioned pos, BlockState block, BlockPositioned neighbourPos, BlockState neighbour, Direction face) {}
+	public void neighbourBlockUpdated(WorldDimension world, BlockPositioned pos, BlockState block, BlockPositioned neighbourPos, BlockState neighbour, Direction face) {}
 
 	@Override
 	public int hashCode() {

@@ -3,7 +3,7 @@ package fr.theorozier.procgen.client.world;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
@@ -18,9 +18,9 @@ public class WorldSinglePlayer extends WorldClient implements
 		WorldChunkListener,
 		WorldEntityListener {
 	
-	private final WorldServer server;
+	private final WorldDimension server;
 	
-	public WorldSinglePlayer(WorldServer server) {
+	public WorldSinglePlayer(WorldDimension server) {
 		
 		this.server = Objects.requireNonNull(server, "World server expected for a WorldSinglePlayer");
 		
@@ -42,7 +42,7 @@ public class WorldSinglePlayer extends WorldClient implements
 		
 	}
 	
-	public WorldServer getServerWorld() {
+	public WorldDimension getServerWorld() {
 		return this.server;
 	}
 	

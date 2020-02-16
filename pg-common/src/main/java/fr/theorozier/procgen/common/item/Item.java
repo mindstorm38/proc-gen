@@ -3,7 +3,7 @@ package fr.theorozier.procgen.common.item;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.util.ErrorUtils;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.sutil.StringUtils;
@@ -52,14 +52,14 @@ public class Item {
 	
 	// Interacts //
 	
-	public void useOnBlock(WorldServer world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
+	public void useOnBlock(WorldDimension world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) {
 		if (!block.getBlock().interactBlock(world, pos, block, face, entity, stack)) {
 			this.useOnBlockNoInteract(world, entity, stack, pos, block, face);
 		}
 	}
 	
-	public void useOnBlockNoInteract(WorldServer world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) { }
+	public void useOnBlockNoInteract(WorldDimension world, LiveEntity entity, ItemStack stack, BlockPositioned pos, BlockState block, Direction face) { }
 	
-	public void useOffBlock(WorldServer world, LiveEntity entity, ItemStack stack) {}
+	public void useOffBlock(WorldDimension world, LiveEntity entity, ItemStack stack) {}
 	
 }

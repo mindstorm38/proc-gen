@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.feature.placement;
 
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.feature.placement.config.PlacementConfig;
@@ -13,9 +13,9 @@ import java.util.stream.Stream;
 
 public abstract class Placement<C extends PlacementConfig> {
 	
-	protected abstract Stream<BlockPositioned> position(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, C config);
+	protected abstract Stream<BlockPositioned> position(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, C config);
 
-	protected <FC extends FeatureConfig> boolean place(WorldServer world, ChunkGenerator generator, Random rand, BlockPositioned at, C config, ConfiguredFeature<FC> featureConfig) {
+	protected <FC extends FeatureConfig> boolean place(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, C config, ConfiguredFeature<FC> featureConfig) {
 		
 		AtomicBoolean placed = new AtomicBoolean(false);
 		

@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.chunk;
 
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
@@ -13,7 +13,7 @@ public class WorldServerSection extends WorldSection {
 	
 	protected final Map<Heightmap.Type, Heightmap> heightmaps;
 	
-	public WorldServerSection(WorldServer world, SectionPositioned position) {
+	public WorldServerSection(WorldDimension world, SectionPositioned position) {
 		
 		super(world, position);
 		
@@ -32,8 +32,8 @@ public class WorldServerSection extends WorldSection {
 		
 	}
 	
-	public WorldServer getWorld() {
-		return (WorldServer) super.getWorld();
+	public WorldDimension getWorld() {
+		return (WorldDimension) super.getWorld();
 	}
 	
 	// CHUNKS //

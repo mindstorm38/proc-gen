@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.block;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
-import fr.theorozier.procgen.common.world.WorldServer;
+import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public abstract class BlockFluid extends Block {
 	public abstract float getInnerFriction();
 	
 	@Override
-	public boolean canOverride(WorldServer world, BlockPositioned pos, BlockState state) {
+	public boolean canOverride(WorldDimension world, BlockPositioned pos, BlockState state) {
 		return true;
 	}
 	
