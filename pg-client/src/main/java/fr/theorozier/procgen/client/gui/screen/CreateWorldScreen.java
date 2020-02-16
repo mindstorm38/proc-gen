@@ -124,8 +124,6 @@ public class CreateWorldScreen extends Screen {
 						WorldDimension dimension = servedWorld.createNewDimension("overworld", dimensionMetadata);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
-						dimension.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
-						
 						this.manager.loadScene(DebugScene.class);
 						
 					} catch (Exception e) {

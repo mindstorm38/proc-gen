@@ -10,7 +10,6 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProvider;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.load.*;
@@ -102,16 +101,24 @@ public class WorldDimension extends WorldBase {
 	}
 	
 	/**
-	 * Get this dimension metadata, but update dynamic values before :<br>
+	 * Used to update dynamics metadata values :<br>
 	 * <ul>
 	 *     <li>Time (ticks elapsed since world creation, used for day cycle)</li>
 	 * </ul>
 	 * Update these dynamic values in the metadata will not update them in the dimension
 	 * since they are only used for metadata serialization or on world instantiation.
+	 */
+	public void updateMetadataDynamics() {
+		this.metadata.setTime(this.time);
+	}
+	
+	/**
+	 * Get this dimension metadata, but update dynamic values using {@link #updateMetadataDynamics()}.
 	 * @return The unique dimension metadata.
+	 * @see #updateMetadataDynamics()
 	 */
 	public DimensionMetadata getMetadata() {
-		this.metadata.setTime(this.time);
+		this.updateMetadataDynamics();
 		return this.metadata;
 	}
 	

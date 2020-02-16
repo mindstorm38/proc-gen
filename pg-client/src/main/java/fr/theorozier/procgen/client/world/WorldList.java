@@ -177,6 +177,23 @@ public class WorldList {
 	}
 	
 	/**
+	 * Get from a world in the list its directory.
+	 * @param worldIdentifier The world identifier.
+	 * @return The world directory.
+	 * @throws IllegalArgumentException If the world identifier is not loaded by this list.
+	 */
+	public File getWorldDirectory(String worldIdentifier) {
+		
+		Entry entry = this.worldEntries.get(worldIdentifier);
+		
+		if (entry == null)
+			throw new IllegalArgumentException("Invalid world identifier ...");
+		
+		return entry.getDirectory();
+		
+	}
+	
+	/**
 	 * Decode a world description file to a world list entry.
 	 * @param file The world description file.
 	 * @param entry The world list entry.

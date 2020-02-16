@@ -1,15 +1,18 @@
 package fr.theorozier.procgen.client.gui.screen;
 
 import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.gui.Screen;
 import fr.theorozier.procgen.client.gui.object.GuiButton;
 import fr.theorozier.procgen.client.gui.object.GuiScrollableContainer;
 import fr.theorozier.procgen.client.gui.object.event.GuiButtonActionEvent;
 import fr.theorozier.procgen.client.world.WorldList;
+import fr.theorozier.procgen.common.world.WorldServer;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextBase;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class SingleplayerScreen extends Screen {
 	private final GuiParent buttonsBlock;
 	private final GuiButton doneButton;
 	private final GuiButton createWorldButton;
+	private final GuiButton loadFirstWorldButton;
 	
 	private final List<GuiTextBase> listLines;
 	
@@ -53,6 +57,12 @@ public class SingleplayerScreen extends Screen {
 		this.createWorldButton.setPosition(-5, 0);
 		this.createWorldButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
 		this.buttonsBlock.addChild(this.createWorldButton);
+		
+		this.loadFirstWorldButton = new GuiButton(200, 40, "Load first world ...");
+		this.loadFirstWorldButton.setAnchor(1, 0);
+		this.loadFirstWorldButton.setPosition(-215, 0);
+		this.loadFirstWorldButton.addEventListener(GuiButtonActionEvent.class, this::onButtonClicked);
+		this.buttonsBlock.addChild(this.loadFirstWorldButton);
 		
 		// Text lines for worlds (temporary for debug)
 		this.listLines = new ArrayList<>();
@@ -123,6 +133,8 @@ public class SingleplayerScreen extends Screen {
 			
 		} else if (event.isOrigin(this.createWorldButton)) {
 			this.manager.loadScene(CreateWorldScreen.class);
+		} else if (event.isOrigin(this.loadFirstWorldButton)) {
+			this.worldList.getWorldEntriesView().keySet().stream().findFirst().ifPresent(this::loadWorld);
 		}
 		
 	}
@@ -137,6 +149,19 @@ public class SingleplayerScreen extends Screen {
 		
 		// Buttons block
 		this.buttonsBlock.setPosition(width / 2, height - 50);
+		
+	}
+	
+	private void loadWorld(String identifier) {
+		
+		System.out.println("Try loading '" + identifier + "' ...");
+		File worldDir = this.worldList.getWorldDirectory(identifier);
+		System.out.println("World directory : " + worldDir);
+		System.out.println("Creating server ...");
+		WorldServer server = new WorldServer(worldDir);
+		
+		ProcGenGame.getGameInstance().setServedWorld(server);
+		this.manager.loadScene(DebugScene.class);
 		
 	}
 	

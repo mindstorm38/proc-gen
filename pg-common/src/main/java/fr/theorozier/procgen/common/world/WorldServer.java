@@ -97,7 +97,18 @@ public class WorldServer {
 		
 	}
 	
+	/**
+	 * Called to unload world dimensions, after this, this world {@link #load(WorldLoadingManager) still loadable}.
+	 */
 	public void unload() {
+		
+		for (WorldDimension dim : this.dimensions) {
+			saveDimensionMetadata(dim);
+			// TODO : Final save all dimensions.
+		}
+		
+		this.dimensions = new WorldDimension[0];
+		this.dimensionsWorlds.clear();
 		
 		this.loadingManager = null;
 		

@@ -153,7 +153,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	protected void stop() {
 		
 		this.worldRenderer.stop();
-		this.worldLoadingManager.setCurrentDimensionManager(null);
+		this.setServedWorld(null);
 		
 		try {
 			this.options.save(true);
@@ -237,6 +237,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		if (worldServer != null) {
 			
 			worldServer.load(this.worldLoadingManager);
+			
+			// TODO Just for temporary tests.
+			worldServer.getMainDimension().addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
 			
 			this.clientWorld = new WorldSinglePlayer(worldServer.getMainDimension());
 			
