@@ -116,6 +116,16 @@ public class WorldDimension extends WorldBase {
 	}
 	
 	/**
+	 * Dynamically refresh metadata from new one, it only works for dynamic values (see {@link #getMetadata()}).
+	 * @param metadata The new metadata, internal instance is not replaced but dynamic values are copied from the new one.
+	 * @see #getMetadata()
+	 */
+	public void refreshMetadata(DimensionMetadata metadata) {
+		this.metadata.setDynamics(metadata);
+		this.time = metadata.getTime();
+	}
+	
+	/**
 	 * @return The world generation seed used by chunk generator.
 	 */
 	public long getSeed() {

@@ -115,15 +115,13 @@ public class CreateWorldScreen extends Screen {
 				
 				File worldDir = this.worldList.createNewWorldDirectory(this.worldIdentifier, worldName);
 				
-				System.out.println("world dir : " + worldDir);
-				
 				if (worldDir != null) {
 					
 					try {
 						
 						WorldServer servedWorld = new WorldServer(worldDir);
 						DimensionMetadata dimensionMetadata = new DimensionMetadata(this.getWorldSeed(), ChunkGeneratorProviders.BETA_3D_CHUNK_PROVIDER);
-						WorldDimension dimension = servedWorld.createNewDimension("testdim", dimensionMetadata);
+						WorldDimension dimension = servedWorld.createNewDimension("overworld", dimensionMetadata);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						
 						dimension.addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());

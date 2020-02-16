@@ -60,6 +60,10 @@ public class DimensionMetadata {
 		this.time = time;
 	}
 	
+	public void setDynamics(DimensionMetadata other) {
+		this.time = other.time;
+	}
+	
 	public static class Serializer implements JsonSerializer<DimensionMetadata>, JsonDeserializer<DimensionMetadata> {
 		
 		@Override
