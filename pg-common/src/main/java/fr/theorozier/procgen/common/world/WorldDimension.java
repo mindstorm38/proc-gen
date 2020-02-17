@@ -387,8 +387,6 @@ public class WorldDimension extends WorldBase {
 	
 	private void tryLoadSection(SectionPosition sectionPosition) {
 
-		WorldLoadingManager lm = this.getLoadingManager();
-
 		int x = sectionPosition.getX();
 		int z = sectionPosition.getZ();
 
@@ -482,7 +480,7 @@ public class WorldDimension extends WorldBase {
 	@Deprecated
 	private void submitSectionNextStatusLoadingTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
 		
-		PriorityRunnable task = section.getNextStatusLoadingTask(this, distanceToLoaders);
+		PriorityRunnable task = section.getNextStatusGenerateTask(this, distanceToLoaders);
 		
 		if (task != null) {
 			

@@ -13,9 +13,9 @@ public class WorldServerSection extends WorldSection {
 	
 	protected final Map<Heightmap.Type, Heightmap> heightmaps;
 	
-	public WorldServerSection(WorldDimension world, SectionPositioned position) {
+	public WorldServerSection(WorldDimension dimension, SectionPositioned position) {
 		
-		super(world, position);
+		super(dimension, position);
 		
 		this.heightmaps = new EnumMap<>(Heightmap.Type.class);
 		

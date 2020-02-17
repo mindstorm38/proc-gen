@@ -3,6 +3,7 @@ package fr.theorozier.procgen.common.world.load;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.load.chunk.WorldLoadingTask;
 import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
@@ -38,8 +39,10 @@ public class DimensionLoader {
 
     // Common loading system, using primitive sections.
     private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
-    private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
-    private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
+    private final Map<SectionPositioned, Future<WorldLoadingTask>> loadingTasks = new HashMap<>();
+    
+    // This list also contains all primitive sections positions that will be only deleted when primitive section is finished.
+    private final List<ImmutableSectionPosition> loadingTasksList = new ArrayList<>();
 
     public DimensionLoader(WorldDimension dimension) {
 
@@ -71,17 +74,52 @@ public class DimensionLoader {
     public File getRegionsDir() {
         return this.regionsDir;
     }
+    
+    public void loadSection(SectionPositioned rawPos) {
+        
+        if (this.isSectionLoading(rawPos))
+            return;
+        
+        ImmutableSectionPosition pos = rawPos.immutableSectionPos();
+        WorldPrimitiveSection primitiveSection = new WorldPrimitiveSection(this.dimension, pos);
+        
+        this.primitiveSections.put(pos, primitiveSection);
+        this.loadingTasksList.add(pos);
+        
+        if (this.isSectionSaved(pos)) {
+        
+        } else {
+        
+        }
+        
+    }
 
     public void update() {
-
-
-
+    
     }
 
     private void updateChunkLoading() {
 
+    
 
-
+    }
+    
+    /**
+     * To know if a section is loading.
+     * @param pos The section position.
+     * @return True if the section is currently loading.
+     */
+    public boolean isSectionLoading(SectionPositioned pos) {
+        return this.primitiveSections.containsKey(pos);
+    }
+    
+    /**
+     * Get primitive section at specified position.
+     * @param pos Section position.
+     * @return The primitive section, or Null if no primitive section there.
+     */
+    public WorldPrimitiveSection getPrimitiveSection(SectionPositioned pos) {
+        return this.primitiveSections.get(pos);
     }
 
     /**

@@ -1,18 +1,19 @@
 package fr.theorozier.procgen.common.world.load.chunk;
 
-import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.ThreadUtils;
 
+import java.util.Objects;
+
 public class WorldPrimitiveSection extends WorldServerSection {
 	
 	private WorldSectionStatus status;
 	
-	public WorldPrimitiveSection(WorldDimension world, SectionPositioned position) {
+	public WorldPrimitiveSection(WorldDimension dimension, SectionPositioned position) {
 		
-		super(world, position);
+		super(dimension, position);
 		
 		this.status = WorldSectionStatus.EMPTY;
 		
@@ -20,6 +21,10 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	
 	public final WorldSectionStatus getStatus() {
 		return this.status;
+	}
+	
+	public final void setStatus(WorldSectionStatus status) {
+		this.status = Objects.requireNonNull(status);
 	}
 	
 	public final void gotoNextStatus() {
@@ -32,10 +37,10 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	}
 	
 	public boolean isFinished() {
-		return this.status == WorldSectionStatus.FINISHED;
+		return this.status.isLast();
 	}
 	
-	public PriorityRunnable getNextStatusLoadingTask(WorldDimension world, int distanceToLoaders) {
+	public WorldLoadingTask getNextStatusGenerateTask(WorldDimension world, int distanceToLoaders) {
 	
 		WorldSectionStatus next = this.status.getNext();
 		
@@ -61,22 +66,17 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			
 		}
 		
-		return new PriorityRunnable() {
+		return new WorldLoadingTask(this, WorldLoadingType.GENERATE, distanceToLoaders, () -> {
 			
-			@Override
-			public int getPriority() {
-				return distanceToLoaders;
-			}
+			next.generate(world.getLoader().getGenerator(), WorldPrimitiveSection.this);
+			ThreadUtils.safesleep(10); // TODO Remove this
 			
-			public void run() {
-				
-				next.generate(world.getLoader().getGenerator(), WorldPrimitiveSection.this);
-				ThreadUtils.safesleep(10); // TODO Remove this
-				
-			}
-			
-		};
+		});
 	
+	}
+	
+	public WorldLoadingTask getLoadingTask() {
+		return null;
 	}
 	
 }
