@@ -25,7 +25,7 @@ public class WorldLoadingManager {
 	private static final ThreadingDispatch WORLD_CHUNK_LOADING_DISPATCH = ThreadingDispatch.register("WORLD_CHUNK_LOADING", 3);
 	private static final long MAX_IDLE_TIME = 60000;
 
-	private final Map<String, DimensionData> dimensionsLoadData = new HashMap<>();
+	private final Map<String, DimensionLoader> dimensionsLoadData = new HashMap<>();
 	private WorldServer dimensionManager = null;
 	private PriorityThreadPoolExecutor loadingThreadPool = null;
 	private long poolIdleStartTime = 0;
@@ -80,18 +80,18 @@ public class WorldLoadingManager {
 
 	}
 
-	private DimensionData getDimensionData(WorldDimension dim) {
+	private DimensionLoader getDimensionData(WorldDimension dim) {
 
 		if (this.dimensionManager == null)
 			throw new IllegalStateException("Can't get dimension data if no dimension manager is running");
 
-		DimensionData data = this.dimensionsLoadData.get(dim.getIdentifier());
+		DimensionLoader data = this.dimensionsLoadData.get(dim.getIdentifier());
 
 		if (data == null) {
 
 			try {
 
-				data = new DimensionData(dim);
+				data = new DimensionLoader(dim);
 				this.dimensionsLoadData.put(dim.getIdentifier(), data);
 
 			} catch (IllegalStateException e) {
@@ -108,7 +108,7 @@ public class WorldLoadingManager {
 	}
 
 	public boolean isSectionSaved(WorldDimension dim, SectionPositioned pos) {
-		DimensionData data = this.getDimensionData(dim);
+		DimensionLoader data = this.getDimensionData(dim);
 		return data != null && data.isSectionSaved(pos);
 	}
 	

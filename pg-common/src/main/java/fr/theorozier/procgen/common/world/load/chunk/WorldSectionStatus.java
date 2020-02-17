@@ -1,6 +1,7 @@
-package fr.theorozier.procgen.common.world.gen.chunk;
+package fr.theorozier.procgen.common.world.load.chunk;
 
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,11 +55,17 @@ public abstract class WorldSectionStatus {
 		registerStatus(FEATURES);
 		registerStatus(FINISHED);
 		
-		statusRegister.values().forEach(status -> {
-			status.next = status.nextId == null ? null : statusRegister.get(status.nextId);
-		});
+        updateStatusNextIds();
 		
 	}
+
+	public static void updateStatusNextIds() {
+
+        statusRegister.values().forEach(status -> {
+            status.next = status.nextId == null ? null : statusRegister.get(status.nextId);
+        });
+
+    }
 	
 	// Class //
 	

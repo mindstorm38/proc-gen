@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.gen.chunk;
+package fr.theorozier.procgen.common.world.load.chunk;
 
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.WorldDimension;
@@ -70,7 +70,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			
 			public void run() {
 				
-				next.generate(world.getChunkGenerator(), WorldPrimitiveSection.this);
+				next.generate(world.getLoader().getGenerator(), WorldPrimitiveSection.this);
 				ThreadUtils.safesleep(10); // TODO Remove this
 				
 			}

@@ -2,6 +2,9 @@ package fr.theorozier.procgen.common.world.load;
 
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.pool.FixedObjectPool;
@@ -9,33 +12,56 @@ import io.sutil.pool.FixedObjectPool;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
 
 /**
  *
- * A dimension data handler.
+ * A dimension loader, handle regions saving/loading.
+ *
+ * @author Théo Rozier
  *
  */
-public class DimensionData {
+public class DimensionLoader {
 
-    private final WorldDimension world;
+    private final WorldDimension dimension;
+    private final ChunkGenerator generator;
+
     private final File worldDir;
     private final File regionsDir;
 
+    // File loading system.
     private final Map<SectionPositioned, DimensionRegionFile> regions = new HashMap<>();
 
-    public DimensionData(WorldDimension world) {
+    // Common loading system, using primitive sections.
+    private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
+    private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
+    private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
 
-        this.world = world;
-        this.worldDir = world.getDirectory();
+    public DimensionLoader(WorldDimension dimension) {
+
+        if (dimension.getLoader() != null)
+            throw new IllegalArgumentException("This dimension already had a loader.");
+
+        this.dimension = dimension;
+        this.generator = Objects.requireNonNull(this.dimension.getMetadata().getChunkGeneratorProvider().create(this.dimension), "ChunkGenerator provider returned Null.");
+
+        this.worldDir = dimension.getDirectory();
         this.regionsDir = new File(this.worldDir, "regions");
         
         SaveUtils.mkdirOrThrowException(this.regionsDir, "The sections already exists but it's a file.");
 
+    }
+
+    public WorldDimension getDimension() {
+        return this.dimension;
+    }
+
+    public ChunkGenerator getGenerator() {
+        return this.generator;
     }
 
     public File getWorldDir() {
@@ -45,7 +71,19 @@ public class DimensionData {
     public File getRegionsDir() {
         return this.regionsDir;
     }
-    
+
+    public void update() {
+
+
+
+    }
+
+    private void updateChunkLoading() {
+
+
+
+    }
+
     /**
      * Get a region file from region position (region are groups of 32x32 sections).
      * @param pos Region position.
@@ -94,9 +132,13 @@ public class DimensionData {
      * @return True if the section is saved in the region file.
      */
     public boolean isSectionSaved(SectionPositioned pos) {
+        // TODO : Create other method than getSectionRegionFile to not create region file instance if not created.
         return this.getSectionRegionFile(pos).isSectionSaved(pos.getX() & 31, pos.getZ() & 31);
     }
 
+    /**
+     * No used for now.
+     */
     public void cleanup() {
     
     }

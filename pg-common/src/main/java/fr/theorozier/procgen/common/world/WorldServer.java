@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
-import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.load.DimensionMetadata;
 import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
 import io.msengine.common.util.GameProfiler;
@@ -19,7 +19,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
@@ -206,7 +208,17 @@ public class WorldServer {
 		}
 		
 	}
-	
+
+	public Optional<WorldLoadingManager> getLoadingManager() {
+		return Optional.ofNullable(this.loadingManager);
+	}
+
+	public void withLoadingManager(Consumer<WorldLoadingManager> manager) {
+		if (this.loadingManager != null) {
+			manager.accept(this.loadingManager);
+		}
+	}
+
 	/**
 	 * Save metadata of specified dimension into its directory.
 	 * @param dimension Dimension instance.

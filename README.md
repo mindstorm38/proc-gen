@@ -40,7 +40,7 @@ generation.
   - [ ] Controlable
   - [ ] Inventory
 - [x] Asynchronous (multi-threaded) chunk generation
-- [ ] Asynchronous world chunk saving on file system *(actively working on)*
+- [ ] Asynchronous dimension chunk saving on file system *(actively working on)*
 - [ ] Items
 - [x] All-model falling blocks
 - [x] TNT ***(WIP)***
@@ -50,6 +50,6 @@ generation.
 Do not hesitate to contribute through issues, either to report real **issues**, or to make **suggestions** for the game !
 
 This game is currently in development, it is not playable but it is
-already possible to move through the world.
+already possible to move through the dimension.
 
 For development I'm using Gradle (use wrapper with `./gradrew` and `./gradlew.bat`) and IntelliJ IDEA as IDE.

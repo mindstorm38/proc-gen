@@ -9,9 +9,8 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
-import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.gen.chunk.WorldSectionStatus;
+import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.chunk.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.load.*;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
@@ -35,16 +34,16 @@ public class WorldDimension extends WorldBase {
 	
 	public static final int NEAR_CHUNK_LOADING = 4;
 	
-	private final WorldServer dimensionManager;
+	private final WorldServer world;
 	private final String identifier;
 	private final File directory;
 	
 	private final DimensionMetadata metadata;
-	
+	private final DimensionLoader loader;
+
 	private final long seed;
 	private final Random random;
-	private final ChunkGenerator chunkGenerator;
-	
+
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
@@ -58,20 +57,20 @@ public class WorldDimension extends WorldBase {
 
 	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
 	
-	public WorldDimension(WorldServer dimensionManager, String identifier, File directory, DimensionMetadata metadata) {
+	public WorldDimension(WorldServer world, String identifier, File directory, DimensionMetadata metadata) {
 		
-		this.dimensionManager = Objects.requireNonNull(dimensionManager);
+		this.world = Objects.requireNonNull(world);
 		this.identifier = Objects.requireNonNull(identifier);
 		this.directory = Objects.requireNonNull(directory);
 		
 		this.metadata = Objects.requireNonNull(metadata);
-		
+		this.loader = new DimensionLoader(this);
+
 		this.time = this.metadata.getTime();
 		
 		this.seed = this.metadata.getSeed();
 		this.random = new Random(this.seed);
-		this.chunkGenerator = Objects.requireNonNull(this.metadata.getChunkGeneratorProvider().create(this), "ChunkGenerator provider returned Null.");
-		
+
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
 
@@ -82,8 +81,8 @@ public class WorldDimension extends WorldBase {
 	/**
 	 * @return The underlying dimension manager.
 	 */
-	public WorldServer getDimensionManager() {
-		return this.dimensionManager;
+	public WorldServer getWorld() {
+		return this.world;
 	}
 
 	/**
@@ -131,7 +130,14 @@ public class WorldDimension extends WorldBase {
 		this.metadata.setDynamics(metadata);
 		this.time = metadata.getTime();
 	}
-	
+
+	/**
+	 * @return Used dimension loader.
+	 */
+	public DimensionLoader getLoader() {
+		return this.loader;
+	}
+
 	/**
 	 * @return The world generation seed used by chunk generator.
 	 */
@@ -144,10 +150,6 @@ public class WorldDimension extends WorldBase {
 	 */
 	public Random getRandom() {
 		return this.random;
-	}
-	
-	public ChunkGenerator getChunkGenerator() {
-		return this.chunkGenerator;
 	}
 	
 	@Override
@@ -166,7 +168,15 @@ public class WorldDimension extends WorldBase {
 	public int getSeaLevel() {
 		return this.seaLevel;
 	}
-	
+
+	/**
+	 * @return Internal loading manager.
+	 * @throws IllegalStateException If the loading manager is not available.
+	 */
+	public WorldLoadingManager getLoadingManager() {
+		return this.world.getLoadingManager().orElseThrow(() -> new IllegalStateException("Can't load chunks if loading manager not initialized on world."));
+	}
+
 	// TICKING //
 	
 	@Override
@@ -308,7 +318,7 @@ public class WorldDimension extends WorldBase {
 	// SECTIONS //
 	
 	public WorldServerSection getSectionAt(int x, int z) {
-		if (this.isSectionLoadingAt(x, z)) {
+		if (this.isSectionLoading(x, z)) {
 			return this.getPrimitiveSectionAt(x, z);
 		} else {
 			return (WorldServerSection) super.getSectionAt(x, z);
@@ -376,11 +386,17 @@ public class WorldDimension extends WorldBase {
 	}
 	
 	private void tryLoadSection(SectionPosition sectionPosition) {
-		
+
+		WorldLoadingManager lm = this.getLoadingManager();
+
 		int x = sectionPosition.getX();
 		int z = sectionPosition.getZ();
-		
-		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoadingAt(x, z) && !this.isSectionSaved(sectionPosition)) {
+
+		//if (!this.isSectionLoadedAt(x, z) && lm.issec) {
+
+		//}
+
+		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoading(x, z) && !this.isSectionSaved(sectionPosition)) {
 			
 			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
 			WorldPrimitiveSection primitive = new WorldPrimitiveSection(this, immutableSectionPosition);
@@ -393,7 +409,8 @@ public class WorldDimension extends WorldBase {
 		}
 	
 	}
-	
+
+	@Deprecated
 	private void updateChunkLoading() {
 		
 		Iterator<ImmutableSectionPosition> primitiveSectionsIt = this.primitiveSectionsList.iterator();
@@ -435,7 +452,7 @@ public class WorldDimension extends WorldBase {
 							);
 
 							/*
-							this.dimensionManager.submitOtherTask(new PriorityRunnable() {
+							this.world.submitOtherTask(new PriorityRunnable() {
 								
 								public int getPriority() { return 0; }
 								
@@ -461,14 +478,15 @@ public class WorldDimension extends WorldBase {
 		}
 		
 	}
-	
+
+	@Deprecated
 	private void submitSectionNextStatusLoadingTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
 		
 		PriorityRunnable task = section.getNextStatusLoadingTask(this, distanceToLoaders);
 		
 		if (task != null) {
 			
-			Future<WorldPrimitiveSection> taskFuture = this.dimensionManager.submitWorldLoadingTask(section, task);
+			Future<WorldPrimitiveSection> taskFuture = this.world.submitWorldLoadingTask(section, task);
 			this.loadingSections.put(pos, taskFuture);
 			
 		}
@@ -480,13 +498,15 @@ public class WorldDimension extends WorldBase {
 			return this.primitiveSections.get(pos.get().set(x, z));
 		}
 	}
-	
-	public boolean isSectionLoadingAt(int x, int z) {
+
+	@Deprecated
+	public boolean isSectionLoading(int x, int z) {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
 			return this.primitiveSections.containsKey(pos.get().set(x, z));
 		}
 	}
-	
+
+	@Deprecated
 	public void debugLoadingChunkAround(int x, int z, int range) {
 		
 		int minX = x - range;
@@ -551,6 +571,7 @@ public class WorldDimension extends WorldBase {
 	
 	// SECTIONS SAVING //
 
+	@Deprecated
 	public boolean isSectionSaved(SectionPositioned pos) {
 		
 		/*return this.savedSections.computeIfAbsent(pos, p ->

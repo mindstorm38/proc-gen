@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
-import fr.theorozier.procgen.common.world.gen.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 import java.util.EnumMap;
