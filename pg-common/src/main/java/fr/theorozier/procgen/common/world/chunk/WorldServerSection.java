@@ -1,9 +1,18 @@
 package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
-import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.DimensionLoader;
+import fr.theorozier.procgen.common.world.load.DimensionRegionFile;
+import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
+import fr.theorozier.procgen.common.world.load.section.WorldLoadingTask;
+import fr.theorozier.procgen.common.world.load.section.WorldLoadingType;
+import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.section.WorldSectionSerializer;
+import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -92,5 +101,28 @@ public class WorldServerSection extends WorldSection {
 	public void recomputeHeightmap(Heightmap.Type type) {
 		this.recomputeHeightmap(EnumSet.of(type));
 	}
-	
+
+	public WorldLoadingTask getSavingTask(DimensionLoader loader) {
+
+		ImmutableSectionPosition pos = this.getSectionPos();
+
+		return new WorldLoadingTask(this, WorldLoadingType.SAVING, 0, () -> {
+
+			DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
+
+			if (file != null) {
+
+				try {
+
+					DataOutputStream out = new DataOutputStream(file.getSectionOutputStream(pos.getX() & 31, pos.getZ() & 31));
+					WorldSectionSerializer.TEMP_INSTANCE.serialize(this, out);
+
+				} catch (IOException ignored) {}
+
+			}
+
+		});
+
+	}
+
 }

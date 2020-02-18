@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.chunk;
+package fr.theorozier.procgen.common.world.load.section;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;

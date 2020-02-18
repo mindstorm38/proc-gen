@@ -134,7 +134,7 @@ public class DimensionRegionFile {
 	 * @throws IOException If the format version is invalid, or creation of output streams fails.
 	 * @see #getSectionOutputStream(int, int, int)
 	 */
-	public OutputStream getSectionOutputStream(int x, int z) throws IOException {
+	public <R extends OutputStream & SectionOutputStream> R getSectionOutputStream(int x, int z) throws IOException {
 		return this.getSectionOutputStream(x, z, SECTION_VERSION_LAST);
 	}
 
@@ -161,7 +161,8 @@ public class DimensionRegionFile {
 	}
 
 	/**
-	 * Low level byte array stream used to write section data in the region sectors.
+	 * Low level byte array stream used to write section data in the region sectors.<br>
+	 * Note that {@link ByteArrayOutputStream} are internally buffered.
 	 */
 	private class SectionBuffer extends ByteArrayOutputStream implements SectionOutputStream {
 		
@@ -313,7 +314,7 @@ public class DimensionRegionFile {
 	 * @return The section {@link InputStream}, or <b>Null</b>
 	 * @throws IOException If read errors occurs.
 	 */
-	private InputStream getSectionInputStream(int x, int z) throws IOException {
+	public InputStream getSectionInputStream(int x, int z) throws IOException {
 
 		int offset = this.getSectionOffset(x, z);
 		int sectorsCount = getSectCount(offset);
@@ -357,7 +358,7 @@ public class DimensionRegionFile {
 		}
 
 	}
-	
+
 	// LOAD UTILS //
 
 	/**
@@ -369,7 +370,7 @@ public class DimensionRegionFile {
 	public boolean isSectionSaved(int x, int z) {
 		return getSectCount(this.getSectionOffset(x, z)) != 0;
 	}
-	
+
 	/**
 	 * Close the random access file.
 	 */
@@ -429,5 +430,5 @@ public class DimensionRegionFile {
 	public static int buildSectionOffset(int sectOffset, int sectCount) {
 		return (sectOffset << 11) | sectCount;
 	}
-	
+
 }

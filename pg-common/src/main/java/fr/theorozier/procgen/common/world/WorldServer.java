@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
-import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.load.DimensionMetadata;
 import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
 import io.msengine.common.util.GameProfiler;

@@ -6,15 +6,13 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.load.section.WorldSectionBlockRegistry;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.buffer.VariableBuffer;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  *
@@ -124,6 +122,14 @@ public class WorldChunk {
 	}
 	
 	// SAVING //
+
+	/**
+	 * Unsafe method to access internal block data.
+	 * @return The internal block data array, of a length of 4096.
+	 */
+	public short[] getBlockData() {
+		return this.data;
+	}
 	
 	public void saveChunk(WorldSectionBlockRegistry blockRegistry, VariableBuffer chunkBuf) {
 		

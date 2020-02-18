@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.load.chunk;
+package fr.theorozier.procgen.common.world.load.section;
 
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
@@ -24,7 +24,7 @@ public class WorldLoadingTask implements PriorityRunnable {
 	}
 	
 	public boolean isPrimitiveSection() {
-		return this.section.getClass() == WorldPrimitiveSection.class;
+		return this.section instanceof WorldPrimitiveSection;
 	}
 	
 	public WorldPrimitiveSection getPrimitiveSection() {

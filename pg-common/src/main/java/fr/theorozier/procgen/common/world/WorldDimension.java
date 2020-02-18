@@ -9,8 +9,8 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
-import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.load.chunk.WorldSectionStatus;
+import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.section.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.load.*;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
@@ -480,7 +480,7 @@ public class WorldDimension extends WorldBase {
 	@Deprecated
 	private void submitSectionNextStatusLoadingTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
 		
-		PriorityRunnable task = section.getNextStatusGenerateTask(this, distanceToLoaders);
+		PriorityRunnable task = section.getNextStatusGenerateTask(this.loader, distanceToLoaders);
 		
 		if (task != null) {
 			

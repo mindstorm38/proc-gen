@@ -3,8 +3,8 @@ package fr.theorozier.procgen.common.world.load;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.load.chunk.WorldLoadingTask;
-import fr.theorozier.procgen.common.world.load.chunk.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.load.section.WorldLoadingTask;
+import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
@@ -87,9 +87,9 @@ public class DimensionLoader {
         this.loadingTasksList.add(pos);
         
         if (this.isSectionSaved(pos)) {
-        
+
         } else {
-        
+
         }
         
     }
@@ -124,54 +124,69 @@ public class DimensionLoader {
 
     /**
      * Get a region file from region position (region are groups of 32x32 sections).
-     * @param pos Region position.
-     * @return The opened region file, should never return closed region file.
+     * @param pos Region position ("sectionPosComponents" >> 5).
+     * @return The opened region file, should never return Null nor closed region file.
      */
-    public DimensionRegionFile getRegionFile(SectionPositioned pos) {
-    
+    public DimensionRegionFile getRegionFileCreate(SectionPositioned pos) {
+
         return this.regions.computeIfAbsent(pos, p -> {
-        
+
             File file = new File(this.regionsDir, WorldLoadingManager.getRegionFileName(pos));
-        
+
             try {
-            
+
                 SaveUtils.mkdirOrThrowException(file, "Can't create region file '" + file + "' because a file with the same name already exits.");
                 RandomAccessFile rafile = new RandomAccessFile(file, "rw");
-            
+
                 return new DimensionRegionFile(rafile);
-            
+
             } catch (IllegalStateException | IOException e) {
-            
+
                 LOGGER.log(Level.WARNING, "Failed to create a region file '" + file + "'.", e);
                 return null;
-            
+
             }
-        
+
         });
         
     }
-    
+
+    /**
+     * Get a region file from region position (region are groups of 32x32 sections).
+     * @param pos Region position ("sectionPosComponents" >> 5).
+     * @return The opened region file (should never return closed region file), or Null if this region file is not opened.
+     */
+    public DimensionRegionFile getRegionFile(SectionPositioned pos) {
+        return this.regions.get(pos);
+    }
+
     /**
      * Get a region file from section position (region are groups of 32x32 sections).
      * @param pos Section position.
-     * @return The opened region file, should never return closed region file.
+     * @param create True to create (or load) and initialize the region file if not cached.
+     * @return The opened region file, should never return closed region file but can return Null if 'create' parameter is set to False.
+     * @see #getRegionFileCreate(SectionPositioned)
+     * @see #getRegionFile(SectionPositioned)
      */
-    public DimensionRegionFile getSectionRegionFile(SectionPositioned pos) {
+    public DimensionRegionFile getSectionRegionFile(SectionPositioned pos, boolean create) {
 
         try (FixedObjectPool<SectionPosition>.PoolObject poolPos = SectionPosition.POOL.acquire()) {
-            return this.getRegionFile(poolPos.get().set(pos.getX() >> 5, pos.getZ() >> 5));
+
+            SectionPosition regpos = poolPos.get().set(pos.getX() >> 5, pos.getZ() >> 5);
+            return create ? this.getRegionFileCreate(regpos) : this.getRegionFile(regpos);
+
         }
 
     }
-    
+
     /**
      * To know if a section is saved, can be used to know if the section have to be generated.
      * @param pos Section position.
      * @return True if the section is saved in the region file.
      */
     public boolean isSectionSaved(SectionPositioned pos) {
-        // TODO : Create other method than getSectionRegionFile to not create region file instance if not created.
-        return this.getSectionRegionFile(pos).isSectionSaved(pos.getX() & 31, pos.getZ() & 31);
+        DimensionRegionFile file = this.getSectionRegionFile(pos, false);
+        return file != null && file.isSectionSaved(pos.getX() & 31, pos.getZ() & 31);
     }
 
     /**

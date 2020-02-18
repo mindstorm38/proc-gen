@@ -1,10 +1,15 @@
-package fr.theorozier.procgen.common.world.load.chunk;
+package fr.theorozier.procgen.common.world.load.section;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.load.DimensionLoader;
+import fr.theorozier.procgen.common.world.load.DimensionRegionFile;
+import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.ThreadUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 public class WorldPrimitiveSection extends WorldServerSection {
@@ -40,7 +45,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		return this.status.isLast();
 	}
 	
-	public WorldLoadingTask getNextStatusGenerateTask(WorldDimension world, int distanceToLoaders) {
+	public WorldLoadingTask getNextStatusGenerateTask(DimensionLoader loader, int distanceToLoaders) {
 	
 		WorldSectionStatus next = this.status.getNext();
 		
@@ -55,8 +60,8 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			
 			for (int x = this.getSectionPos().getX() - 1; x <= maxX; ++x) {
 				for (int z = this.getSectionPos().getZ() - 1; z <= maxZ; ++z) {
-					if (!world.isSectionLoadedAt(x, z)) {
-						other = world.getPrimitiveSectionAt(x, z);
+					if (!loader.getDimension().isSectionLoadedAt(x, z)) {
+						other = loader.getDimension().getPrimitiveSectionAt(x, z);
 						if (other == null || !other.getStatus().isAsLeastAt(this.status)) {
 							return null;
 						}
@@ -68,15 +73,34 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		
 		return new WorldLoadingTask(this, WorldLoadingType.GENERATE, distanceToLoaders, () -> {
 			
-			next.generate(world.getLoader().getGenerator(), WorldPrimitiveSection.this);
+			next.generate(loader.getGenerator(), WorldPrimitiveSection.this);
 			ThreadUtils.safesleep(10); // TODO Remove this
 			
 		});
 	
 	}
 	
-	public WorldLoadingTask getLoadingTask() {
-		return null;
+	public WorldLoadingTask getLoadingTask(DimensionLoader loader, int distanceToLoaders) {
+
+		ImmutableSectionPosition pos = this.getSectionPos();
+
+		return new WorldLoadingTask(this, WorldLoadingType.LOADING, distanceToLoaders, () -> {
+
+			DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
+
+			if (file == null)
+				return;
+
+			try {
+
+				InputStream stream = file.getSectionInputStream(pos.getX() & 31, pos.getZ() & 31);
+
+
+
+			} catch (IOException ignored) {}
+
+		});
+
 	}
 	
 }
