@@ -4,6 +4,7 @@ import io.sutil.LazyLoadValue;
 import io.sutil.math.MathHelper;
 
 import java.util.HashSet;
+import java.util.Iterator;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
 
@@ -41,21 +42,28 @@ public class ThreadingDispatch {
 		if (totalRatio == 0)
 			return;
 		
-		int availableThreads = getAvailableCores() - 1; // Remove the main thread.
+		// Keep on core for main thread.
+		int availableCores = getAvailableCores() - 1;
 		int affectedCores = 0;
 		
 		for (ThreadingDispatch d : dispatches) {
 			
-			d.effectiveCount = MathHelper.floorFloatInt(d.ratio / (float) totalRatio * availableThreads);
+			d.effectiveCount = MathHelper.floorFloatInt(d.ratio / (float) totalRatio * availableCores);
 			affectedCores += d.effectiveCount;
 			
 		}
 		
-		while (affectedCores < availableThreads) {
-			for (ThreadingDispatch d : dispatches) {
-				d.effectiveCount++;
+		Iterator<ThreadingDispatch> it;
+		
+		while (affectedCores < availableCores) {
+			
+			it = dispatches.iterator();
+			
+			while (it.hasNext() && affectedCores < availableCores) {
+				it.next().effectiveCount++;
 				affectedCores++;
 			}
+			
 		}
 		
 	}
@@ -64,6 +72,7 @@ public class ThreadingDispatch {
 		
 		LOGGER.info("Available cores : " + ThreadingDispatch.getAvailableCores());
 		LOGGER.info("Threads dispatching :");
+		LOGGER.info("- MAIN_THREAD : 1 thread (native).");
 		for (ThreadingDispatch dispatch : ThreadingDispatch.getDispatches()) {
 			LOGGER.info("- " + dispatch.getIdentifier() + " : " + dispatch.getEffectiveCount() + " threads.");
 		}
