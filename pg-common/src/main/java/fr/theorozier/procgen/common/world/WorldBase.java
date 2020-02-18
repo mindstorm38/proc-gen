@@ -101,25 +101,27 @@ public abstract class WorldBase implements WorldAccessor {
 	// SECTIONS //
 	
 	@Override
-	public WorldSection getSectionAt(SectionPositioned pos) {
-		return this.sections.get(pos);
-	}
-	
-	@Override
 	public WorldSection getSectionAt(int x, int z) {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
 			return this.sections.get(pos.get().set(x, z));
 		}
 	}
 	
+	@Override
+	public WorldSection getSectionAt(SectionPositioned pos) {
+		return this.sections.get(pos);
+	}
+	
+	@Override
 	public boolean isSectionLoadedAt(int x, int z) {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
 			return this.sections.containsKey(pos.get().set(x, z));
 		}
 	}
 	
-	public boolean isSectionLoadedAtBlock(int x, int z) {
-		return this.isSectionLoadedAt(x >> 4, z >> 4);
+	@Override
+	public boolean isSectionLoadedAt(SectionPositioned pos) {
+		return this.sections.containsKey(pos);
 	}
 	
 	public void forEachSection(Consumer<WorldSection> cons) {
@@ -132,6 +134,12 @@ public abstract class WorldBase implements WorldAccessor {
 	public WorldChunk getChunkAt(int x, int y, int z) {
 		WorldSection section = this.getSectionAt(x, z);
 		return section == null ? null : section.getChunkAt(y);
+	}
+	
+	@Override
+	public WorldChunk getChunkAt(BlockPositioned pos) {
+		WorldSection section = this.getSectionAt(pos);
+		return section == null ? null : section.getChunkAt(pos.getY());
 	}
 	
 	// BIOMES //
@@ -155,7 +163,7 @@ public abstract class WorldBase implements WorldAccessor {
 		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
 		if (chunk != null) {
 			chunk.setBlockAt(x & 15, y & 15, z & 15, state);
-			try (FixedObjectPool<BlockPosition>.PoolObject pos  = BlockPosition.POOL.acquire()) {
+			try (FixedObjectPool<BlockPosition>.PoolObject pos = BlockPosition.POOL.acquire()) {
 				this.eventManager.fireListeners(WorldChunkListener.class, l -> l.worldChunkBlockChanged(this, chunk, pos.get().set(x, y, z), state));
 			}
 		}

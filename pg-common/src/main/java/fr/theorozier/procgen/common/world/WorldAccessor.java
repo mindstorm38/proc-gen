@@ -14,19 +14,21 @@ public interface WorldAccessor {
 	// SECTIONS //
 	
 	/**
-	 * Internal method to get a section a specific position.
-	 * @param pos The section position.
-	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
-	 */
-	WorldSection getSectionAt(SectionPositioned pos);
-	
-	/**
 	 * Internal method to get a section at specific position.
 	 * @param x The X section coordinate.
 	 * @param z The Z section coordinate.
 	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
 	 */
 	WorldSection getSectionAt(int x, int z);
+	
+	/**
+	 * Internal method to get a section a specific position.
+	 * @param pos The section position.
+	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
+	 */
+	default WorldSection getSectionAt(SectionPositioned pos) {
+		return this.getSectionAt(pos.getX(), pos.getZ());
+	}
 	
 	/**
 	 * Internal method to get a section at specific block position.
@@ -36,6 +38,16 @@ public interface WorldAccessor {
 	 */
 	default WorldSection getSectionAtBlock(int x, int z) {
 		return this.getSectionAt(x >> 4, z >> 4);
+	}
+	
+	default WorldSection getSectionAtBlock(BlockPositioned pos) {
+		return this.getSectionAtBlock(pos.getX(), pos.getZ());
+	}
+	
+	boolean isSectionLoadedAt(int x, int z);
+	
+	default boolean isSectionLoadedAt(SectionPositioned pos) {
+		return this.isSectionLoadedAt(pos.getX(), pos.getZ());
 	}
 	
 	// CHUNKS //

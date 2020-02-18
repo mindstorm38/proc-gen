@@ -48,10 +48,10 @@ public class WorldDimension extends WorldBase {
 	private final int seaLevel;
 	
 	// Keep using SectionPositioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones as keys.
-	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
-	private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
-	private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
-	private final Map<SectionPositioned, Boolean> savedSections = new HashMap<>();
+	@Deprecated private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
+	@Deprecated private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
+	@Deprecated private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
+	@Deprecated private final Map<SectionPositioned, Boolean> savedSections = new HashMap<>();
 	
 	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
 
@@ -185,7 +185,7 @@ public class WorldDimension extends WorldBase {
 		super.update();
 		
 		this.updateChunkLoadingPositions();
-		this.updateChunkLoading();
+		//this.updateChunkLoading();
 		
 		this.blockTickList.tick();
 		
@@ -324,11 +324,11 @@ public class WorldDimension extends WorldBase {
 	
 	@Override
 	public WorldServerSection getSectionAt(int x, int z) {
-		if (this.isSectionLoading(x, z)) {
+		/*if (this.isSectionLoading(x, z)) {
 			return this.getPrimitiveSectionAt(x, z);
-		} else {
+		} else {*/
 			return (WorldServerSection) super.getSectionAt(x, z);
-		}
+		//}
 	}
 	
 	@Override
@@ -390,7 +390,7 @@ public class WorldDimension extends WorldBase {
 		
 	}
 	
-	private int getDistanceToLoaders(SectionPositioned sectionPos) {
+	public int getDistanceToLoaders(SectionPositioned sectionPos) {
 		
 		return this.worldLoadingPositions.stream()
 				.mapToInt(sp -> (int) sp.distSquared(sectionPos))
@@ -399,15 +399,26 @@ public class WorldDimension extends WorldBase {
 		
 	}
 	
+	public void loadPrimitiveSection(WorldPrimitiveSection primitiveSection) {
+		
+		WorldServerSection newSection = new WorldServerSection(primitiveSection);
+		this.sections.put(primitiveSection.getSectionPos(), newSection);
+		
+		newSection.forEachChunk(chunk ->
+				this.eventManager.fireListeners(WorldLoadingListener.class, l ->
+						l.worldChunkLoaded(this, chunk)
+				)
+		);
+		
+	}
+	
 	private void tryLoadSection(SectionPosition sectionPosition) {
 
-		int x = sectionPosition.getX();
-		int z = sectionPosition.getZ();
+		if (!this.isSectionLoadedAt(sectionPosition)) {
+			this.loader.loadSection(sectionPosition);
+		}
 
-		//if (!this.isSectionLoadedAt(x, z) && lm.issec) {
-
-		//}
-
+		/*
 		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoading(x, z) && !this.isSectionSaved(sectionPosition)) {
 			
 			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
@@ -418,7 +429,7 @@ public class WorldDimension extends WorldBase {
 			
 			this.submitSectionNextStatusLoadingTask(immutableSectionPosition, primitive, this.getDistanceToLoaders(sectionPosition));
 			
-		}
+		}*/
 	
 	}
 
@@ -505,6 +516,7 @@ public class WorldDimension extends WorldBase {
 		
 	}
 	
+	@Deprecated
 	public WorldPrimitiveSection getPrimitiveSectionAt(int x, int z) {
 		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
 			return this.primitiveSections.get(pos.get().set(x, z));

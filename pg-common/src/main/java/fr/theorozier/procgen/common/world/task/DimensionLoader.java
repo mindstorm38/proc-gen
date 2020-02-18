@@ -8,12 +8,14 @@ import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
+import fr.theorozier.procgen.common.world.task.section.WorldSectionStatus;
 import io.sutil.pool.FixedObjectPool;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 
@@ -79,17 +81,25 @@ public class DimensionLoader {
         
         if (this.isSectionLoading(pos))
             return;
-        
+    
         ImmutableSectionPosition immutablePos = pos.immutableSectionPos();
         WorldPrimitiveSection primitiveSection = new WorldPrimitiveSection(this.dimension, immutablePos);
         
         this.primitiveSections.put(immutablePos, primitiveSection);
         this.tasksList.add(immutablePos);
+    
+        int distanceToLoaders = this.getDistanceToLoaders(pos);
         
         if (this.isSectionSaved(immutablePos)) {
-        
+            
+            primitiveSection.setStatus(WorldSectionStatus.LOADING);
+            WorldTask task = primitiveSection.getLoadingTask(this, distanceToLoaders);
+            Future<WorldTask> future = this.dimension.getTaskManager().submitWorldTask(task);
+            
+            this.tasks.put(immutablePos, future);
+            
         } else {
-
+            this.submitNextStatusGenerateTask(immutablePos, primitiveSection, distanceToLoaders);
         }
         
     }
@@ -117,12 +127,68 @@ public class DimensionLoader {
 
     public void update() {
     
-    }
-
-    private void updateChunkLoading() {
-
+        ImmutableSectionPosition immutablePos;
+        Future<WorldTask> futureTask;
+        
+        WorldTask doneTask;
+        
+        for (int i = 0; i < this.tasksList.size(); ++i) {
     
-
+            immutablePos = this.tasksList.get(i);
+            futureTask = this.tasks.get(immutablePos);
+            
+            if (futureTask == null) {
+    
+                this.submitNextStatusGenerateTask(immutablePos, this.primitiveSections.get(immutablePos), this.getDistanceToLoaders(immutablePos));
+                
+            } else {
+            
+                if (futureTask.isDone()) {
+                
+                    try {
+                        doneTask = futureTask.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    
+                    if (doneTask.hasPrimitiveSection()) {
+                        if (doneTask.getPrimitiveSection().gotoNextStatus()) {
+                            
+                            this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection());
+                            this.primitiveSections.remove(immutablePos);
+                            this.tasksList.remove(i--);
+                            
+                        }
+                    } else {
+                        this.tasksList.remove(i--);
+                    }
+                    
+                    this.tasks.remove(immutablePos);
+                
+                }
+            
+            }
+        
+        }
+    
+    }
+    
+    private int getDistanceToLoaders(SectionPositioned pos) {
+        return this.dimension.getDistanceToLoaders(pos);
+    }
+    
+    private void submitNextStatusGenerateTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
+        
+        WorldTask task = section.getNextStatusGenerateTask(this, distanceToLoaders);
+        
+        if (task != null) {
+            
+            Future<WorldTask> future = this.dimension.getTaskManager().submitWorldTask(task);
+            this.tasks.put(pos, future);
+            
+        }
+        
     }
     
     /**

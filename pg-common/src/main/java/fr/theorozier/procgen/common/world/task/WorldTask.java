@@ -24,7 +24,7 @@ public class WorldTask implements PriorityRunnable {
 		return this.section;
 	}
 	
-	public boolean isPrimitiveSection() {
+	public boolean hasPrimitiveSection() {
 		return this.section instanceof WorldPrimitiveSection;
 	}
 	

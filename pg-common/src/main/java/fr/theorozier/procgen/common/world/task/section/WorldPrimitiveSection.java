@@ -18,11 +18,11 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	
 	private WorldSectionStatus status;
 	
-	public WorldPrimitiveSection(WorldDimension dimension, SectionPositioned position, WorldSectionStatus initialStatus) {
+	public WorldPrimitiveSection(WorldDimension dimension, SectionPositioned position) {
 		
 		super(dimension, position);
 		
-		this.status = initialStatus;
+		this.status = WorldSectionStatus.EMPTY;
 		
 	}
 	
@@ -34,16 +34,22 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		this.status = Objects.requireNonNull(status);
 	}
 	
-	public final void gotoNextStatus() {
+	/**
+	 * Goto the next section status, and return true if new status is the last.
+	 * @return True if new status is last (using {@link WorldSectionStatus#isLast()}).
+	 */
+	public final boolean gotoNextStatus() {
 		
 		WorldSectionStatus status = this.status.getNext();
 		
 		if (status != null)
 			this.status = status;
 		
+		return this.status.isLast();
+		
 	}
 	
-	public boolean isFinished() {
+	public final boolean isFinished() {
 		return this.status.isLast();
 	}
 	
