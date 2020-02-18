@@ -11,10 +11,10 @@ import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.*;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.load.WorldLoadingPosition;
+import fr.theorozier.procgen.common.world.task.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
-import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
+import fr.theorozier.procgen.common.world.task.WorldTaskManager;
 import io.msengine.client.game.DefaultRenderGame;
 import io.msengine.client.game.RenderGameOptions;
 import io.msengine.client.option.OptionKey;
@@ -65,7 +65,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	private final WorldLoadingPosition testLoadingPosition = new WorldLoadingPosition();
 	
 	private final WorldRenderer worldRenderer;
-	private final WorldLoadingManager worldLoadingManager;
+	private final WorldTaskManager worldTaskManager;
 	
 	private boolean escaped = false;
 	
@@ -76,7 +76,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.worldList = new WorldList(new File(this.getAppdata(), "worlds"));
 		
 		this.worldRenderer = new WorldRenderer();
-		this.worldLoadingManager = new WorldLoadingManager();
+		this.worldTaskManager = new WorldTaskManager();
 		
 		this.options.addOption(KEY_FORWARD);
 		this.options.addOption(KEY_BACKWARD);
@@ -102,8 +102,8 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		return this.worldRenderer;
 	}
 	
-	public WorldLoadingManager getWorldLoadingManager() {
-		return this.worldLoadingManager;
+	public WorldTaskManager getWorldTaskManager() {
+		return this.worldTaskManager;
 	}
 	
 	@Override
@@ -190,7 +190,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		this.guiManager.update();
 		
 		this.profiler.endStartSection("world_loading_update");
-		this.worldLoadingManager.update();
+		this.worldTaskManager.update();
 		
 		if (this.servedWorld != null) {
 			
@@ -236,7 +236,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 		if (worldServer != null) {
 			
-			worldServer.load(this.worldLoadingManager);
+			worldServer.load(this.worldTaskManager);
 			
 			// TODO Just for temporary tests.
 			worldServer.getMainDimension().addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
@@ -244,12 +244,12 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 			this.clientWorld = new WorldSinglePlayer(worldServer.getMainDimension());
 			
 			this.worldRenderer.renderWorld(this.clientWorld);
-			this.worldLoadingManager.setCurrentDimensionManager(worldServer);
+			this.worldTaskManager.setCurrentDimensionManager(worldServer);
 			
 		} else {
 			
 			this.worldRenderer.renderWorld(null);
-			this.worldLoadingManager.setCurrentDimensionManager(null);
+			this.worldTaskManager.setCurrentDimensionManager(null);
 			
 		}
 		

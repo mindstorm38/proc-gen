@@ -1,10 +1,10 @@
-package fr.theorozier.procgen.common.world.load;
+package fr.theorozier.procgen.common.world.task;
 
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.load.section.WorldLoadingTask;
-import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
@@ -39,10 +39,10 @@ public class DimensionLoader {
 
     // Common loading system, using primitive sections.
     private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
-    private final Map<SectionPositioned, Future<WorldLoadingTask>> loadingTasks = new HashMap<>();
+    private final Map<SectionPositioned, Future<WorldTask>> tasks = new HashMap<>();
     
-    // This list also contains all primitive sections positions that will be only deleted when primitive section is finished.
-    private final List<ImmutableSectionPosition> loadingTasksList = new ArrayList<>();
+    // This list also contains all primitive sections positions that will be only deleted when primitive section is sent to dimension.
+    private final List<ImmutableSectionPosition> tasksList = new ArrayList<>();
 
     public DimensionLoader(WorldDimension dimension) {
 
@@ -75,21 +75,42 @@ public class DimensionLoader {
         return this.regionsDir;
     }
     
-    public void loadSection(SectionPositioned rawPos) {
+    public void loadSection(SectionPositioned pos) {
         
-        if (this.isSectionLoading(rawPos))
+        if (this.isSectionLoading(pos))
             return;
         
-        ImmutableSectionPosition pos = rawPos.immutableSectionPos();
-        WorldPrimitiveSection primitiveSection = new WorldPrimitiveSection(this.dimension, pos);
+        ImmutableSectionPosition immutablePos = pos.immutableSectionPos();
+        WorldPrimitiveSection primitiveSection = new WorldPrimitiveSection(this.dimension, immutablePos);
         
-        this.primitiveSections.put(pos, primitiveSection);
-        this.loadingTasksList.add(pos);
+        this.primitiveSections.put(immutablePos, primitiveSection);
+        this.tasksList.add(immutablePos);
         
-        if (this.isSectionSaved(pos)) {
-
+        if (this.isSectionSaved(immutablePos)) {
+        
         } else {
 
+        }
+        
+    }
+    
+    public void saveSection(SectionPositioned pos) {
+    
+        if (this.isSectionLoading(pos))
+            return;
+    
+        WorldServerSection section = this.dimension.getSectionAt(pos);
+        
+        if (section != null) {
+            
+            ImmutableSectionPosition immutablePos = section.getSectionPos();
+            
+            WorldTask task = section.getSavingTask(this);
+            Future<WorldTask> future = this.dimension.getTaskManager().submitWorldTask(task);
+            
+            this.tasks.put(immutablePos, future);
+            this.tasksList.add(immutablePos);
+            
         }
         
     }
@@ -110,7 +131,7 @@ public class DimensionLoader {
      * @return True if the section is currently loading.
      */
     public boolean isSectionLoading(SectionPositioned pos) {
-        return this.primitiveSections.containsKey(pos);
+        return this.primitiveSections.containsKey(pos) || this.tasks.containsKey(pos);
     }
     
     /**
@@ -131,7 +152,7 @@ public class DimensionLoader {
 
         return this.regions.computeIfAbsent(pos, p -> {
 
-            File file = new File(this.regionsDir, WorldLoadingManager.getRegionFileName(pos));
+            File file = new File(this.regionsDir, WorldTaskManager.getRegionFileName(pos));
 
             try {
 

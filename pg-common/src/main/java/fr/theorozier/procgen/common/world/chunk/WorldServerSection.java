@@ -1,13 +1,12 @@
 package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
-import fr.theorozier.procgen.common.world.load.DimensionLoader;
-import fr.theorozier.procgen.common.world.load.DimensionRegionFile;
-import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
-import fr.theorozier.procgen.common.world.load.section.WorldLoadingTask;
-import fr.theorozier.procgen.common.world.load.section.WorldLoadingType;
-import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.load.section.WorldSectionSerializer;
+import fr.theorozier.procgen.common.world.task.DimensionLoader;
+import fr.theorozier.procgen.common.world.task.DimensionRegionFile;
+import fr.theorozier.procgen.common.world.task.WorldTask;
+import fr.theorozier.procgen.common.world.task.WorldTaskType;
+import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.task.section.WorldSectionSerializer;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
@@ -102,11 +101,11 @@ public class WorldServerSection extends WorldSection {
 		this.recomputeHeightmap(EnumSet.of(type));
 	}
 
-	public WorldLoadingTask getSavingTask(DimensionLoader loader) {
+	public WorldTask getSavingTask(DimensionLoader loader) {
 
 		ImmutableSectionPosition pos = this.getSectionPos();
 
-		return new WorldLoadingTask(this, WorldLoadingType.SAVING, 0, () -> {
+		return new WorldTask(this, WorldTaskType.SAVING, 0, () -> {
 
 			DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
 

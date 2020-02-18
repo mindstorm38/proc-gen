@@ -6,7 +6,7 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
-import fr.theorozier.procgen.common.world.load.section.WorldSectionBlockRegistry;
+import fr.theorozier.procgen.common.world.task.section.WorldSectionBlockRegistry;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.buffer.VariableBuffer;

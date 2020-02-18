@@ -1,6 +1,6 @@
-package fr.theorozier.procgen.common.world.load.section;
+package fr.theorozier.procgen.common.world.task;
 
-public enum WorldLoadingType {
+public enum WorldTaskType {
 	
 	GENERATE (true),
 	LOADING (true),
@@ -9,7 +9,7 @@ public enum WorldLoadingType {
 	// Just an information boolean, currently only for dev.
 	public final boolean usePrimitive;
 
-	WorldLoadingType(boolean usePrimitive) {
+	WorldTaskType(boolean usePrimitive) {
 		this.usePrimitive = usePrimitive;
 	}
 

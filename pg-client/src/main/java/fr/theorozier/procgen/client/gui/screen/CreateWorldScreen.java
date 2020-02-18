@@ -11,7 +11,7 @@ import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.provider.ChunkGeneratorProviders;
 import fr.theorozier.procgen.common.world.gen.option.WorldGenerationOption;
-import fr.theorozier.procgen.common.world.load.DimensionMetadata;
+import fr.theorozier.procgen.common.world.task.DimensionMetadata;
 import io.msengine.client.gui.GuiParent;
 import io.msengine.client.gui.GuiScene;
 import io.msengine.client.gui.GuiTextColorable;

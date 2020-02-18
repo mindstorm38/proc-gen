@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
-import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.load.DimensionMetadata;
-import fr.theorozier.procgen.common.world.load.WorldLoadingManager;
+import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.task.DimensionMetadata;
+import fr.theorozier.procgen.common.world.task.WorldTaskManager;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.profiler.Profiler;
 
@@ -50,7 +50,7 @@ public class WorldServer {
 	private final Map<String, WorldDimension> dimensionsWorlds = new HashMap<>();
 	private WorldDimension[] dimensions = {};
 	
-	private WorldLoadingManager loadingManager = null;
+	private WorldTaskManager taskManager = null;
 	
 	@Deprecated
 	private final PriorityThreadPoolExecutor generatorComputer;
@@ -80,9 +80,9 @@ public class WorldServer {
 	/**
 	 * Load the world dimensions from file system. This is called before starting a world.
 	 */
-	public void load(WorldLoadingManager loadingManager) {
+	public void load(WorldTaskManager taskManager) {
 	
-		this.loadingManager = loadingManager;
+		this.taskManager = taskManager;
 		
 		this.dimensionsDirectory.listFiles((File file) -> {
 		
@@ -100,7 +100,7 @@ public class WorldServer {
 	}
 	
 	/**
-	 * Called to unload world dimensions, after this, this world {@link #load(WorldLoadingManager) still loadable}.
+	 * Called to unload world dimensions, after this, this world {@link #load(WorldTaskManager) still loadable}.
 	 */
 	public void unload() {
 		
@@ -112,7 +112,7 @@ public class WorldServer {
 		this.dimensions = new WorldDimension[0];
 		this.dimensionsWorlds.clear();
 		
-		this.loadingManager = null;
+		this.taskManager = null;
 		
 	}
 	
@@ -209,13 +209,13 @@ public class WorldServer {
 		
 	}
 
-	public Optional<WorldLoadingManager> getLoadingManager() {
-		return Optional.ofNullable(this.loadingManager);
+	public Optional<WorldTaskManager> getTaskManager() {
+		return Optional.ofNullable(this.taskManager);
 	}
 
-	public void withLoadingManager(Consumer<WorldLoadingManager> manager) {
-		if (this.loadingManager != null) {
-			manager.accept(this.loadingManager);
+	public void withTaskManager(Consumer<WorldTaskManager> manager) {
+		if (this.taskManager != null) {
+			manager.accept(this.taskManager);
 		}
 	}
 

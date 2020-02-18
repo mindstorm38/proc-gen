@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.load;
+package fr.theorozier.procgen.common.world.task;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;

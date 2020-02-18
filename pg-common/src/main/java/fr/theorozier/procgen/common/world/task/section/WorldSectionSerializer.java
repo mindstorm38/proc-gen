@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.load.section;
+package fr.theorozier.procgen.common.world.task.section;
 
 import fr.theorozier.procgen.common.util.io.ByteDataOutputStream;
 import fr.theorozier.procgen.common.util.io.ByteOutputStream;

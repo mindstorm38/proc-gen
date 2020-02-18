@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.load.section;
+package fr.theorozier.procgen.common.world.task.section;
 
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;

@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.load;
+package fr.theorozier.procgen.common.world.task;
 
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;

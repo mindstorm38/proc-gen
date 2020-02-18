@@ -1,9 +1,11 @@
-package fr.theorozier.procgen.common.world.load.section;
+package fr.theorozier.procgen.common.world.task.section;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
-import fr.theorozier.procgen.common.world.load.DimensionLoader;
-import fr.theorozier.procgen.common.world.load.DimensionRegionFile;
+import fr.theorozier.procgen.common.world.task.DimensionLoader;
+import fr.theorozier.procgen.common.world.task.DimensionRegionFile;
+import fr.theorozier.procgen.common.world.task.WorldTask;
+import fr.theorozier.procgen.common.world.task.WorldTaskType;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.ThreadUtils;
@@ -45,7 +47,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		return this.status.isLast();
 	}
 	
-	public WorldLoadingTask getNextStatusGenerateTask(DimensionLoader loader, int distanceToLoaders) {
+	public WorldTask getNextStatusGenerateTask(DimensionLoader loader, int distanceToLoaders) {
 	
 		WorldSectionStatus next = this.status.getNext();
 		
@@ -71,7 +73,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			
 		}
 		
-		return new WorldLoadingTask(this, WorldLoadingType.GENERATE, distanceToLoaders, () -> {
+		return new WorldTask(this, WorldTaskType.GENERATE, distanceToLoaders, () -> {
 			
 			next.generate(loader.getGenerator(), WorldPrimitiveSection.this);
 			ThreadUtils.safesleep(10); // TODO Remove this
@@ -80,11 +82,11 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	
 	}
 	
-	public WorldLoadingTask getLoadingTask(DimensionLoader loader, int distanceToLoaders) {
+	public WorldTask getLoadingTask(DimensionLoader loader, int distanceToLoaders) {
 
 		ImmutableSectionPosition pos = this.getSectionPos();
 
-		return new WorldLoadingTask(this, WorldLoadingType.LOADING, distanceToLoaders, () -> {
+		return new WorldTask(this, WorldTaskType.LOADING, distanceToLoaders, () -> {
 
 			DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
 

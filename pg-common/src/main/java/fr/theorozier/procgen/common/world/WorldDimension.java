@@ -9,9 +9,9 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
-import fr.theorozier.procgen.common.world.load.section.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.load.section.WorldSectionStatus;
-import fr.theorozier.procgen.common.world.load.*;
+import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.task.section.WorldSectionStatus;
+import fr.theorozier.procgen.common.world.task.*;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
@@ -173,8 +173,8 @@ public class WorldDimension extends WorldBase {
 	 * @return Internal loading manager.
 	 * @throws IllegalStateException If the loading manager is not available.
 	 */
-	public WorldLoadingManager getLoadingManager() {
-		return this.world.getLoadingManager().orElseThrow(() -> new IllegalStateException("Can't load chunks if loading manager not initialized on world."));
+	public WorldTaskManager getTaskManager() {
+		return this.world.getTaskManager().orElseThrow(() -> new IllegalStateException("Can't load chunks if task manager not initialized on world."));
 	}
 
 	// TICKING //
@@ -317,6 +317,12 @@ public class WorldDimension extends WorldBase {
 	
 	// SECTIONS //
 	
+	@Override
+	public WorldServerSection getSectionAt(SectionPositioned pos) {
+		return (WorldServerSection) super.getSectionAt(pos);
+	}
+	
+	@Override
 	public WorldServerSection getSectionAt(int x, int z) {
 		if (this.isSectionLoading(x, z)) {
 			return this.getPrimitiveSectionAt(x, z);
@@ -325,6 +331,7 @@ public class WorldDimension extends WorldBase {
 		}
 	}
 	
+	@Override
 	public WorldServerSection getSectionAtBlock(int x, int z) {
 		return (WorldServerSection) super.getSectionAtBlock(x, z);
 	}
@@ -335,10 +342,17 @@ public class WorldDimension extends WorldBase {
 		return (WorldServerChunk) super.getChunkAt(x, y, z);
 	}
 	
+	@Override
+	public WorldServerChunk getChunkAt(BlockPositioned pos) {
+		return (WorldServerChunk) super.getChunkAt(pos);
+	}
+	
+	@Override
 	public WorldServerChunk getChunkAtBlock(int x, int y, int z) {
 		return (WorldServerChunk) super.getChunkAtBlock(x, y, z);
 	}
 	
+	@Override
 	public WorldServerChunk getChunkAtBlock(BlockPositioned pos) {
 		return (WorldServerChunk) super.getChunkAtBlock(pos);
 	}

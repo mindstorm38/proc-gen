@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.load;
+package fr.theorozier.procgen.common.world.task;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

@@ -1,15 +1,11 @@
-package fr.theorozier.procgen.common.world.load;
+package fr.theorozier.procgen.common.world.task;
 
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
 import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.WorldDimension;
-import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
+import java.util.concurrent.Future;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
 
@@ -20,17 +16,17 @@ import static io.msengine.common.util.GameLogger.LOGGER;
  * @author Theo Rozier
  *
  */
-public class WorldLoadingManager {
+public class WorldTaskManager {
 	
-	private static final ThreadingDispatch WORLD_CHUNK_LOADING_DISPATCH = ThreadingDispatch.register("WORLD_CHUNK_LOADING", 3);
+	private static final ThreadingDispatch WORLD_TASKS_DISPATCH = ThreadingDispatch.register("WORLD_TASKS", 3);
 	private static final long MAX_IDLE_TIME = 60000;
 
-	private final Map<String, DimensionLoader> dimensionsLoadData = new HashMap<>();
+	//private final Map<String, DimensionLoader> dimensionsLoadData = new HashMap<>();
 	private WorldServer dimensionManager = null;
-	private PriorityThreadPoolExecutor loadingThreadPool = null;
+	private PriorityThreadPoolExecutor threadPool = null;
 	private long poolIdleStartTime = 0;
 
-	public WorldLoadingManager() { }
+	public WorldTaskManager() { }
 
 	/**
 	 * Set active dimension manager to run, it will stop current tasks if an dimension manager is active in.<br>
@@ -41,7 +37,7 @@ public class WorldLoadingManager {
 
 		if (this.dimensionManager != null) {
 
-			this.dimensionsLoadData.clear();
+			//this.dimensionsLoadData.clear();
 
 		}
 
@@ -49,17 +45,17 @@ public class WorldLoadingManager {
 
 		if (manager != null) {
 
-			if (this.loadingThreadPool == null) {
+			if (this.threadPool == null) {
 
-				int poolSize = WORLD_CHUNK_LOADING_DISPATCH.getEffectiveCount();
+				int poolSize = WORLD_TASKS_DISPATCH.getEffectiveCount();
 
-				LOGGER.info("Started world loading thread pool (" + poolSize + " threads) ...");
-				this.loadingThreadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
+				LOGGER.info("Started world tasks thread pool (" + poolSize + " threads) ...");
+				this.threadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 
 			}
 
 
-		} else if (this.loadingThreadPool != null) {
+		} else if (this.threadPool != null) {
 			this.poolIdleStartTime = System.currentTimeMillis();
 		}
 
@@ -70,16 +66,17 @@ public class WorldLoadingManager {
 	 */
 	public void update() {
 
-		if (this.dimensionManager == null && this.loadingThreadPool != null && (System.currentTimeMillis() - this.poolIdleStartTime) > MAX_IDLE_TIME) {
+		if (this.dimensionManager == null && this.threadPool != null && (System.currentTimeMillis() - this.poolIdleStartTime) > MAX_IDLE_TIME) {
 
-			LOGGER.info("Shutting down world loading thread pool... (" + this.loadingThreadPool.getCorePoolSize() + " threads)");
-			this.loadingThreadPool.shutdown(); // FIXME: Potential leaks if tasks never finished
-			this.loadingThreadPool = null;
+			LOGGER.info("Shutting down world loading thread pool... (" + this.threadPool.getCorePoolSize() + " threads)");
+			this.threadPool.shutdown(); // FIXME: Potential leaks if tasks never finished
+			this.threadPool = null;
 
 		}
 
 	}
 
+	/*
 	private DimensionLoader getDimensionData(WorldDimension dim) {
 
 		if (this.dimensionManager == null)
@@ -105,25 +102,12 @@ public class WorldLoadingManager {
 
 		return data;
 
-	}
-
-	public boolean isSectionSaved(WorldDimension dim, SectionPositioned pos) {
-		DimensionLoader data = this.getDimensionData(dim);
-		return data != null && data.isSectionSaved(pos);
+	}*/
+	
+	public Future<WorldTask> submitWorldTask(WorldTask task) {
+		return this.threadPool.submit(task, task);
 	}
 	
-	public boolean isSectionSaving(WorldDimension dim, SectionPositioned pos) {
-		return false;
-	}
-	
-	public void loadSectionTo(WorldDimension dim, WorldServerSection section) {
-	
-	}
-	
-	public boolean isSectionLoading(WorldDimension dim, SectionPositioned pos) {
-		return false;
-	}
-
 	public static String getRegionFileName(SectionPositioned pos) {
 		return pos.getX() + "." + pos.getZ() + ".pgr";
 	}

@@ -1,16 +1,17 @@
-package fr.theorozier.procgen.common.world.load.section;
+package fr.theorozier.procgen.common.world.task;
 
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 
-public class WorldLoadingTask implements PriorityRunnable {
+public class WorldTask implements PriorityRunnable {
 	
 	private final WorldServerSection section;
-	private final WorldLoadingType type;
+	private final WorldTaskType type;
 	private final int priority;
 	private final Runnable action;
 	
-	public WorldLoadingTask(WorldServerSection section, WorldLoadingType type, int priority, Runnable action) {
+	public WorldTask(WorldServerSection section, WorldTaskType type, int priority, Runnable action) {
 		
 		this.section = section;
 		this.type = type;
@@ -31,7 +32,7 @@ public class WorldLoadingTask implements PriorityRunnable {
 		return (WorldPrimitiveSection) this.section;
 	}
 	
-	public WorldLoadingType getType() {
+	public WorldTaskType getType() {
 		return this.type;
 	}
 	
