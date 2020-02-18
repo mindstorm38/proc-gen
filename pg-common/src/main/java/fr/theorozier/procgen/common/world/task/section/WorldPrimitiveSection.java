@@ -69,7 +69,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 			for (int x = this.getSectionPos().getX() - 1; x <= maxX; ++x) {
 				for (int z = this.getSectionPos().getZ() - 1; z <= maxZ; ++z) {
 					if (!loader.getDimension().isSectionLoadedAt(x, z)) {
-						other = loader.getDimension().getPrimitiveSectionAt(x, z);
+						other = loader.getPrimitiveSection(x, z);
 						if (other == null || !other.getStatus().isAsLeastAt(this.status)) {
 							return null;
 						}
