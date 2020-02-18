@@ -14,8 +14,12 @@ public abstract class WorldSectionStatus {
 		statusRegister.put(status.getIdentifier(), status);
 	}
 	
+	// Generation //
+	
 	public static final WorldSectionStatus EMPTY = new WorldSectionStatus(0 ,"empty", "biomes", false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {}
+		public void generate(ChunkGenerator generator, WorldServerSection section) {
+			// NOOP
+		}
 	};
 	
 	public static final WorldSectionStatus BIOMES = new WorldSectionStatus(1, "biomes", "base", false) {
@@ -42,6 +46,16 @@ public abstract class WorldSectionStatus {
 		}
 	};
 	
+	// Loading //
+	
+	public static final WorldSectionStatus LOADING = new WorldSectionStatus(0, "loading", "finished", false) {
+		public void generate(ChunkGenerator generator, WorldServerSection section) {
+			// NOOP
+		}
+	};
+	
+	// Finished //
+	
 	public static final WorldSectionStatus FINISHED = new WorldSectionStatus(1000, "finished", null, false) {
 		public void generate(ChunkGenerator generator, WorldServerSection section) {}
 	};
@@ -53,6 +67,9 @@ public abstract class WorldSectionStatus {
 		registerStatus(BASE);
 		registerStatus(SURFACE);
 		registerStatus(FEATURES);
+		
+		registerStatus(LOADING);
+		
 		registerStatus(FINISHED);
 		
         updateStatusNextIds();

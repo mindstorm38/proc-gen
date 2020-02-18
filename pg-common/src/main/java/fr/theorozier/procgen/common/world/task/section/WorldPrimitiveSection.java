@@ -18,11 +18,11 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	
 	private WorldSectionStatus status;
 	
-	public WorldPrimitiveSection(WorldDimension dimension, SectionPositioned position) {
+	public WorldPrimitiveSection(WorldDimension dimension, SectionPositioned position, WorldSectionStatus initialStatus) {
 		
 		super(dimension, position);
 		
-		this.status = WorldSectionStatus.EMPTY;
+		this.status = initialStatus;
 		
 	}
 	
