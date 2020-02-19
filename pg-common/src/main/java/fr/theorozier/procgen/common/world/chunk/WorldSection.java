@@ -3,11 +3,13 @@ package fr.theorozier.procgen.common.world.chunk;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  *
@@ -32,6 +34,15 @@ public class WorldSection {
 		this.biomes = new Biome[256];
 		this.chunks = new WorldChunk[world.getVerticalChunkCount()];
 		
+		Function<ImmutableBlockPosition, WorldChunk> chunkProvider = this.getChunkProvider();
+		
+		for (int y = 0; y < this.chunks.length; ++y)
+			this.chunks[y] = chunkProvider.apply(new ImmutableBlockPosition(this.position, y));
+		
+	}
+	
+	protected Function<ImmutableBlockPosition, WorldChunk> getChunkProvider() {
+		return pos -> new WorldChunk(this.world, this, pos);
 	}
 	
 	// PROPERTIES //
@@ -62,9 +73,10 @@ public class WorldSection {
 		return this.getChunkAt(blockY >> 4);
 	}
 	
+	/*
 	public void setChunkAt(int y, WorldChunk chunk) {
 		this.chunks[y] = chunk;
-	}
+	}*/
 	
 	public void forEachChunk(Consumer<WorldChunk> cons) {
 		

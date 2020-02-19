@@ -1,7 +1,6 @@
 package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.WorldAccessorServer;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.biome.surface.BiomeSurface;
@@ -47,15 +46,9 @@ public abstract class ChunkGenerator {
 	
 	public void genSectionBase(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
 		
-		WorldServerChunk chunk;
-		for (int y = 0; y < world.getVerticalChunkCount(); ++y) {
-			
-			chunk = new WorldServerChunk(section.getWorld(), section, new ImmutableBlockPosition(pos, y));
-			section.setChunkAt(y, chunk);
-			
-			this.genBase(world, chunk, chunk.getChunkPos());
-			
-		}
+		section.forEachChunk(chunk -> {
+			this.genBase(world, (WorldServerChunk) chunk, chunk.getChunkPos());
+		});
 		
 		section.recomputeHeightmap(EnumSet.of(Heightmap.Type.WORLD_BASE_SURFACE, Heightmap.Type.WORLD_BASE_WATER_SURFACE));
 		

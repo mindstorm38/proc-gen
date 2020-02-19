@@ -34,7 +34,6 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	private final File directory;
 	
 	private final DimensionMetadata metadata;
-	private final DimensionLoader loader;
 
 	private final long seed;
 	private final Random random;
@@ -42,6 +41,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
+	private final DimensionLoader loader;
 	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
 
 	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
@@ -53,7 +53,6 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		this.directory = Objects.requireNonNull(directory);
 		
 		this.metadata = Objects.requireNonNull(metadata);
-		this.loader = new DimensionLoader(this);
 
 		this.time = this.metadata.getTime();
 		
@@ -62,6 +61,8 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 
 		this.blockTickList = new WorldTickList<>(this, Block::isTickable, this::tickBlock);
 		this.seaLevel = 63;
+		
+		this.loader = new DimensionLoader(this);
 
 	}
 	
@@ -372,7 +373,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	public int getDistanceToLoaders(SectionPositioned sectionPos) {
 		
 		return this.worldLoadingPositions.stream()
-				.mapToInt(sp -> (int) sp.distSquared(sectionPos))
+				.mapToInt(sp -> (int) sp.distSquared(sectionPos.getX() << 4, sectionPos.getZ() << 4))
 				.min()
 				.orElse(0);
 		

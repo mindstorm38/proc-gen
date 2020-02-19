@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.task.DimensionLoader;
 import fr.theorozier.procgen.common.world.task.DimensionRegionFile;
 import fr.theorozier.procgen.common.world.task.WorldTask;
@@ -13,10 +14,12 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 public class WorldServerSection extends WorldSection {
 	
@@ -41,16 +44,24 @@ public class WorldServerSection extends WorldSection {
 		
 	}
 	
+	@Override
+	protected Function<ImmutableBlockPosition, WorldChunk> getChunkProvider() {
+		return pos -> new WorldServerChunk(this.getWorld(), this, pos);
+	}
+	
+	@Override
 	public WorldDimension getWorld() {
 		return (WorldDimension) super.getWorld();
 	}
 	
 	// CHUNKS //
 	
+	@Override
 	public WorldServerChunk getChunkAt(int y) {
 		return (WorldServerChunk) super.getChunkAt(y);
 	}
 	
+	@Override
 	public WorldServerChunk getChunkAtBlock(int blockY) {
 		return (WorldServerChunk) super.getChunkAtBlock(blockY);
 	}

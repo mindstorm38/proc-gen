@@ -11,6 +11,7 @@ import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.buffer.VariableBuffer;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.function.Consumer;
 
@@ -131,51 +132,14 @@ public class WorldChunk {
 		return this.data;
 	}
 	
-	public void saveChunk(WorldSectionBlockRegistry blockRegistry, VariableBuffer chunkBuf) {
-		
-		// Typical chunk buffer :
-		//   [
-		//     00,  \
-		//     01,  -\ No block state for 1 length
-		//     06,
-		//     06,
-		//     00,  \
-		//     03,  -\ No block state for 3 length
-		//     A1,
-		//     00,  \
-		//     00   -\ Marker for the end of the chunk, no block state remaining
-		//   ]
-		
-		short limitStart = -1;
-		short val;
-		
-		for (short i = 0; i < 4096; ++i) {
-			
-			val = this.data[i];
-			
-			if (val == 0) {
-				
-				if (limitStart == -1) {
-					limitStart = i;
-					chunkBuf.writeShort(val);
-				}
-				
-			} else {
-				
-				if (limitStart != -1) {
-					chunkBuf.writeShort((short) (i - limitStart));
-					limitStart = -1;
-				}
-				
-				chunkBuf.writeShort(blockRegistry.getBlockStateUid(val));
-				
-			}
-			
-		}
-	
-	}
-	
 	// UTILS //
+	
+	@Override
+	public String toString() {
+		return "WorldChunk{" +
+				"position=" + position +
+				'}';
+	}
 	
 	public static int getBlockIndex(int x, int y, int z) {
 		return x * 256 + y * 16 + z;

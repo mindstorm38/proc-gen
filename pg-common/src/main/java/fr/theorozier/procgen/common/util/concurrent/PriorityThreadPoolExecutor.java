@@ -23,6 +23,24 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
 
 	};
 	
+	public static final Comparator<Runnable> DESC_COMPARATOR = (o1, o2) -> {
+		
+		if (o1 == null) {
+			
+			if (o2 == null) {
+				return 0;
+			} else {
+				return 1;
+			}
+			
+		} else if (o2 == null) {
+			return -1;
+		} else {
+			return ((PrioritySupplier) o2).getPriority() - ((PrioritySupplier) o1).getPriority();
+		}
+		
+	};
+	
 	public PriorityThreadPoolExecutor(int poolSize, Comparator<Runnable> comp) {
 		super(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(8, comp));
 	}

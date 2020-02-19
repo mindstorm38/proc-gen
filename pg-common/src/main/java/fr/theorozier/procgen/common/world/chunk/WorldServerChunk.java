@@ -9,10 +9,12 @@ public class WorldServerChunk extends WorldChunk {
 		super(world, section, position);
 	}
 	
+	@Override
 	public WorldDimension getWorld() {
 		return (WorldDimension) super.getWorld();
 	}
 	
+	@Override
 	public WorldServerSection getSection() {
 		return (WorldServerSection) super.getSection();
 	}

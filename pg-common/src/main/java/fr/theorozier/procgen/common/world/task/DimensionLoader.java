@@ -90,7 +90,7 @@ public class DimensionLoader {
 	}
 
 	/**
-	 * @return Internal virtual that delegate calls to non-primitive sections as expected, but
+	 * @return Internal virtual world that delegate calls to non-primitive sections as expected, but
 	 * 	       also allow interraction with primitive sections.
 	 */
 	public WorldAccessorServer getVirtualWorld() {
@@ -178,22 +178,28 @@ public class DimensionLoader {
 				if (futureTask.isDone()) {
 					
 					try {
-						doneTask = futureTask.get();
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-						return;
-					}
-					
-					if (doneTask.hasPrimitiveSection()) {
-						if (doneTask.getPrimitiveSection().gotoNextStatus()) {
 						
-							this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection());
-							this.primitiveSections.remove(immutablePos);
+						doneTask = futureTask.get();
+						
+						if (doneTask.hasPrimitiveSection()) {
+							if (doneTask.getPrimitiveSection().gotoNextStatus()) {
+								
+								this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection());
+								this.primitiveSections.remove(immutablePos);
+								this.tasksList.remove(i--);
+								
+							}
+						} else {
 							this.tasksList.remove(i--);
-							
 						}
-					} else {
+						
+					} catch (InterruptedException | ExecutionException e) {
+						
+						this.primitiveSections.remove(immutablePos);
 						this.tasksList.remove(i--);
+						
+						e.printStackTrace();
+						
 					}
 					
 					this.tasks.remove(immutablePos);
