@@ -387,12 +387,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		
 	}
 
-	/**
-	 *
-	 * @param primitiveSection
-	 * @return True to enabled auto saving on generation.
-	 */
-	public boolean loadPrimitiveSection(WorldPrimitiveSection primitiveSection) {
+	public void loadPrimitiveSection(WorldPrimitiveSection primitiveSection) {
 		
 		WorldServerSection newSection = new WorldServerSection(primitiveSection);
 		this.sections.put(primitiveSection.getSectionPos(), newSection);
@@ -402,9 +397,9 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 						l.worldChunkLoaded(this, chunk)
 				)
 		);
-
-		return true;
 		
+		this.loader.saveSectionAfter(newSection.getSectionPos());
+
 	}
 	
 	private void tryLoadSection(SectionPosition sectionPosition) {

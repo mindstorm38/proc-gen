@@ -23,4 +23,12 @@ public class ConfiguredFeature<C extends FeatureConfig> {
 		return this.feature.place(world, generator, rand, at, this.config);
 	}
 	
+	@Override
+	public String toString() {
+		return "ConfiguredFeature{" +
+				"feature=" + feature +
+				", config=" + config +
+				'}';
+	}
+	
 }

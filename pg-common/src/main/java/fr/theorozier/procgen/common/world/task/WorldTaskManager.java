@@ -46,13 +46,12 @@ public class WorldTaskManager {
 
 			if (this.threadPool == null) {
 
-				int poolSize = WORLD_TASKS_DISPATCH.getEffectiveCount();
+				int poolSize = WORLD_TASKS_DISPATCH.getEffectiveCount(2);
 
 				LOGGER.info("Started world tasks thread pool (" + poolSize + " threads) ...");
 				this.threadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 
 			}
-
 
 		} else if (this.threadPool != null) {
 			this.poolIdleStartTime = System.currentTimeMillis();

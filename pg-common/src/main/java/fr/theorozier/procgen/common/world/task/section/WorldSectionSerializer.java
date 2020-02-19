@@ -1,11 +1,11 @@
 package fr.theorozier.procgen.common.world.task.section;
 
 import fr.theorozier.procgen.common.util.io.ByteDataOutputStream;
-import fr.theorozier.procgen.common.util.io.ByteOutputStream;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import io.sutil.StringUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ public class WorldSectionSerializer {
         ByteDataOutputStream chunkBuf = new ByteDataOutputStream(1024);
 
         WorldSectionBlockRegistry blockRegistry = new WorldSectionBlockRegistry();
-        ByteOutputStream rawChunkBuf;
+        ByteArrayOutputStream rawChunkBuf;
 
         for (int y = 0; y < section.getWorld().getVerticalChunkCount(); ++y) {
 

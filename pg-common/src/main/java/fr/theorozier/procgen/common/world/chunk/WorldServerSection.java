@@ -12,6 +12,7 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -101,26 +102,31 @@ public class WorldServerSection extends WorldSection {
 		this.recomputeHeightmap(EnumSet.of(type));
 	}
 
-	public WorldTask getSavingTask(DimensionLoader loader) {
+	public <STREAM extends OutputStream & DimensionRegionFile.SectionOutputStream> WorldTask getSavingTask(DimensionLoader loader) {
 
 		ImmutableSectionPosition pos = this.getSectionPos();
+		DimensionRegionFile file = loader.getSectionRegionFile(pos, true);
+		
+		if (file != null) {
 
-		return new WorldTask(this, WorldTaskType.SAVING, 0, () -> {
-
-			DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
-
-			if (file != null) {
-
+			return new WorldTask(this, WorldTaskType.SAVING, 0, () -> {
+				
 				try {
-
-					DataOutputStream out = new DataOutputStream(file.getSectionOutputStream(pos.getX() & 31, pos.getZ() & 31));
+					
+					STREAM raw = file.getSectionOutputStream(pos.getX() & 31, pos.getZ() & 31);
+					DataOutputStream out = new DataOutputStream(raw);
 					WorldSectionSerializer.TEMP_INSTANCE.serialize(this, out);
-
+					out.flush();
+					raw.writeSectionData();
+					out.close();
+					
 				} catch (IOException ignored) {}
 
-			}
-
-		});
+			});
+			
+		} else {
+			return null;
+		}
 
 	}
 

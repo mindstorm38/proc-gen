@@ -106,7 +106,7 @@ public abstract class ChunkGenerator {
 	}
 	
 	public void genFeatures(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
-	
+		
 		Biome biome = section.getBiomeAt(7, 7);
 		Random random = new Random();
 		

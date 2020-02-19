@@ -82,7 +82,7 @@ public class WorldPrimitiveSection extends WorldServerSection {
 		return new WorldTask(this, WorldTaskType.GENERATE, distanceToLoaders, () -> {
 			
 			next.generate(loader.getGenerator(), loader.getVirtualWorld(), WorldPrimitiveSection.this);
-			ThreadUtils.safesleep(10); // TODO Remove this
+			//ThreadUtils.safesleep(10); // TODO Remove this
 			
 		});
 	

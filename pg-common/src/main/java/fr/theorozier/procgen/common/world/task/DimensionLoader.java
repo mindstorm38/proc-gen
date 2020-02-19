@@ -21,7 +21,6 @@ import io.sutil.pool.FixedObjectPool;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -53,6 +52,7 @@ public class DimensionLoader {
 
 	// This list also contains all primitive sections positions that will be only deleted when primitive section is sent to dimension.
 	private final List<ImmutableSectionPosition> tasksList = new ArrayList<>();
+	private final Deque<ImmutableSectionPosition> saveQueue = new ArrayDeque<>();
 	
 	private final VirtualLoaderWorld virtualWorld;
 	
@@ -125,31 +125,43 @@ public class DimensionLoader {
 	}
 	
 	public void saveSection(AbsSectionPosition pos) {
-
+		
 		if (this.isSectionLoading(pos))
 			return;
-
+		
 		WorldServerSection section = this.dimension.getSectionAt(pos);
 
 		if (section != null) {
-
+			
 			ImmutableSectionPosition immutablePos = section.getSectionPos();
-
 			WorldTask task = section.getSavingTask(this);
-			Future<WorldTask> future = this.dimension.getTaskManager().submitWorldTask(task);
-
-			this.tasks.put(immutablePos, future);
-			this.tasksList.add(immutablePos);
-
+			
+			if (task != null) {
+				
+				Future<WorldTask> future = this.dimension.getTaskManager().submitWorldTask(task);
+				
+				this.tasks.put(immutablePos, future);
+				this.tasksList.add(immutablePos);
+				
+			}
+			
 		}
 
+	}
+	
+	public void saveSectionAfter(AbsSectionPosition pos) {
+		this.saveQueue.addLast(pos.immutableSectionPos());
 	}
 	
 	public void update() {
 		
 		ImmutableSectionPosition immutablePos;
-		Future<WorldTask> futureTask;
 		
+		while ((immutablePos = this.saveQueue.pollFirst()) != null) {
+			this.saveSection(immutablePos);
+		}
+		
+		Future<WorldTask> futureTask;
 		WorldTask doneTask;
 		
 		for (int i = 0; i < this.tasksList.size(); ++i) {
@@ -174,7 +186,7 @@ public class DimensionLoader {
 					
 					if (doneTask.hasPrimitiveSection()) {
 						if (doneTask.getPrimitiveSection().gotoNextStatus()) {
-							
+						
 							this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection());
 							this.primitiveSections.remove(immutablePos);
 							this.tasksList.remove(i--);
@@ -254,10 +266,13 @@ public class DimensionLoader {
 			
 			try {
 				
-				SaveUtils.mkdirOrThrowException(file, "Can't create region file '" + file + "' because a file with the same name already exits.");
-				RandomAccessFile rafile = new RandomAccessFile(file, "rw");
+				if (file.isDirectory())
+					throw new IllegalStateException("Can't create region file '" + file + "' because it's already a directory.");
 				
-				return new DimensionRegionFile(rafile);
+				if (!file.isFile())
+					file.createNewFile();
+				
+				return new DimensionRegionFile(file);
 				
 			} catch (IllegalStateException | IOException e) {
 				
@@ -317,6 +332,7 @@ public class DimensionLoader {
 		
 		private final WorldDimension dim = DimensionLoader.this.dimension;
 		
+		/*
 		public boolean inPrimitiveSection(SectionPosition pos) {
 			return DimensionLoader.this.primitiveSections.containsKey(pos);
 		}
@@ -326,6 +342,7 @@ public class DimensionLoader {
 				return this.inPrimitiveSection(pos.get().set(x, z));
 			}
 		}
+		*/
 
 		@Override
 		public long getSeed() {
@@ -372,7 +389,7 @@ public class DimensionLoader {
 
 		@Override
 		public short getHeightAt(Heightmap.Type type, int x, int z) {
-			WorldServerSection section = this.getSectionAt(x, z);
+			WorldServerSection section = (WorldServerSection) this.getSectionAtBlock(x, z);
 			return section == null ? 0 : section.getHeightAt(type, x & 15, z & 15);
 		}
 
@@ -405,7 +422,7 @@ public class DimensionLoader {
 			// can send events, then an explicit delegate is needed instead of just
 			// copying code.
 			
-			WorldPrimitiveSection p = DimensionLoader.this.getPrimitiveSection(x, z);
+			WorldPrimitiveSection p = DimensionLoader.this.getPrimitiveSection(x >> 4, z >> 4);
 			
 			if (p != null) {
 				

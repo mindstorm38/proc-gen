@@ -5,6 +5,7 @@ import com.github.luben.zstd.ZstdOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,9 +31,9 @@ public class DimensionRegionFile {
 	private static final int SECTION_HEADER_BYTES    = 5;
 	
 	// Section saving version formats.
-	private static final byte SECTION_VERSION_RAW    = 0;
-	private static final byte SECTION_VERSION_ZSTD   = 1;
-	private static final byte SECTION_VERSION_LAST   = SECTION_VERSION_ZSTD; // Last stable save format.
+	public static final byte SECTION_VERSION_RAW    = 0;
+	public static final byte SECTION_VERSION_ZSTD   = 1;
+	public static final byte SECTION_VERSION_LAST   = SECTION_VERSION_ZSTD; // Last stable save format.
 
 	// Empty sector constant for fast native writing.
 	private static final byte[] EMPTY_SECTOR         = new byte[4096];
@@ -47,9 +48,9 @@ public class DimensionRegionFile {
 	private final int[] sectionOffsets = new int[1024];
 	private final List<Boolean> freeSectors;
 	
-	public DimensionRegionFile(RandomAccessFile raFile) throws IOException {
+	public DimensionRegionFile(File file) throws IOException {
 		
-		this.raFile = raFile;
+		this.raFile = new RandomAccessFile(file, "rwd");
 		
 		if (raFile.length() < REGION_METADATA_BYTES) {
 			
@@ -219,7 +220,7 @@ public class DimensionRegionFile {
 		int sectorsOffset = getSectOffset(offset);
 		int sectorsCount = getSectCount(offset);
 		
-		int sectorsCountNeeded = (SECTION_HEADER_BYTES + length - 1) >> 12 + 1;
+		int sectorsCountNeeded = ((SECTION_HEADER_BYTES + length - 1) >> 12) + 1;
 		
 		if (sectorsCountNeeded > MAX_SECTORS_COUNT) {
 
@@ -232,8 +233,12 @@ public class DimensionRegionFile {
 			
 		}
 		
-		if (sectorsCount != sectorsCountNeeded) {
+		//System.out.println("Writing section at " + x + "/" + z + "...");
+		//System.out.println("- Current sectors : " + sectorsCount);
+		//System.out.println("- Sectors needed : " + sectorsCountNeeded);
 		
+		if (sectorsCount != sectorsCountNeeded) {
+			
 			// Set all previously used sectors to free.
 			for (int i = 0; i < sectorsCount; ++i)
 				this.freeSectors.set(sectorsOffset + i, true);
@@ -257,18 +262,24 @@ public class DimensionRegionFile {
 				
 			}
 			
-			// Check if enough free sectors available.
-			if (sectorsCount != sectorsCountNeeded) {
+			//System.out.println("-> Found sectors count : " + sectorsCount);
 			
+			// Check if enough free sectors available.
+			if (sectorsCount != sectorsCountNeeded) { // sectorsCount < sectorsCountNeeded
+				
 				if (sectorsCount == 0)
 					sectorsOffset = (int) (this.raFile.length() >> 12) - REGION_METADATA_SECTORS;
 				
-				this.raFile.seek((sectorsOffset + REGION_METADATA_SECTORS) << 12);
+				//System.out.println("-> Found sectors offset : " + sectorsOffset);
+				
+				this.raFile.seek((sectorsOffset + sectorsCount + REGION_METADATA_SECTORS) << 12);
 				
 				int missingSectors = sectorsCountNeeded - sectorsCount;
 				
-				for (int i = 0; i < missingSectors; ++i)
+				for (int i = 0; i < missingSectors; ++i) {
 					this.raFile.write(EMPTY_SECTOR);
+					this.freeSectors.add(true);
+				}
 				
 				sectorsCount = sectorsCountNeeded;
 			
@@ -278,10 +289,14 @@ public class DimensionRegionFile {
 			this.setSectionOffset(x, z, buildSectionOffset(sectorsOffset, sectorsCount));
 			
 			// Mark all sectors to 'not free'.
-			for (int i = 0; i < sectorsCount; i++)
+			for (int i = 0; i < sectorsCount; i++) {
 				this.freeSectors.set(sectorsOffset + i, false);
+			}
 			
 		}
+		
+		//System.out.println("--> Final sectors offset : " + sectorsOffset);
+		//System.out.println("--> Final sectors count : " + sectorsCount);
 		
 		// After all operations to free space for 'length' at 'sectorsOffset'.
 		this.writeSectionDataAtSector(sectorsOffset, data, length, version);
