@@ -37,13 +37,9 @@ public class BlockPosition extends AbsBlockPosition {
 		return new BlockPosition(this.x, this.y, this.z);
 	}
 	
-	public ImmutableBlockPosition immutable() {
-		return new ImmutableBlockPosition(this.x, this.y, this.z);
-	}
-	
 	@Override
 	public ImmutableBlockPosition immutableBlockPos() {
-		return this.immutable();
+		return new ImmutableBlockPosition(this.x, this.y, this.z);
 	}
 	
 	@Override

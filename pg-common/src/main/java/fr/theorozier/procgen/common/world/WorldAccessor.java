@@ -4,6 +4,8 @@ import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
+import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
+import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
@@ -26,7 +28,7 @@ public interface WorldAccessor {
 	 * @param pos The section position.
 	 * @return Section at this position, or <b>NULL</b> if no section loaded there.
 	 */
-	default WorldSection getSectionAt(SectionPositioned pos) {
+	default WorldSection getSectionAt(AbsSectionPosition pos) {
 		return this.getSectionAt(pos.getX(), pos.getZ());
 	}
 	
@@ -40,13 +42,13 @@ public interface WorldAccessor {
 		return this.getSectionAt(x >> 4, z >> 4);
 	}
 	
-	default WorldSection getSectionAtBlock(BlockPositioned pos) {
+	default WorldSection getSectionAtBlock(AbsBlockPosition pos) {
 		return this.getSectionAtBlock(pos.getX(), pos.getZ());
 	}
 	
 	boolean isSectionLoadedAt(int x, int z);
 	
-	default boolean isSectionLoadedAt(SectionPositioned pos) {
+	default boolean isSectionLoadedAt(AbsSectionPosition pos) {
 		return this.isSectionLoadedAt(pos.getX(), pos.getZ());
 	}
 	
@@ -61,7 +63,7 @@ public interface WorldAccessor {
 	 */
 	WorldChunk getChunkAt(int x, int y, int z);
 	
-	default WorldChunk getChunkAt(BlockPositioned pos) {
+	default WorldChunk getChunkAt(AbsBlockPosition pos) {
 		return this.getChunkAt(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
@@ -69,15 +71,27 @@ public interface WorldAccessor {
 		return this.getChunkAt(x >> 4, y >> 4, z >> 4);
 	}
 	
-	default WorldChunk getChunkAtBlock(BlockPositioned pos) {
+	default WorldChunk getChunkAtBlock(AbsBlockPosition pos) {
 		return this.getChunkAtBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
-	
+
+	/**
+	 * @return Number of chunks in a section's height.
+	 */
+	int getVerticalChunkCount();
+
+	/**
+	 * @return The height limit of the world.
+	 */
+	default int getHeightLimit() {
+		return this.getVerticalChunkCount() * 16;
+	}
+
 	// BIOMES //
 	
 	Biome getBiomeAt(int x, int z);
 	
-	default Biome getBiomeAt(SectionPositioned pos) {
+	default Biome getBiomeAt(AbsSectionPosition pos) {
 		return this.getBiomeAt(pos.getX(), pos.getZ());
 	}
 	
@@ -85,19 +99,19 @@ public interface WorldAccessor {
 	
 	BlockState getBlockAt(int x, int y, int z);
 	
-	default BlockState getBlockAt(BlockPositioned pos) {
+	default BlockState getBlockAt(AbsBlockPosition pos) {
 		return this.getBlockAt(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	void setBlockAt(int x, int y, int z, BlockState state);
 	
-	default void setBlockAt(BlockPositioned pos, BlockState state) {
+	default void setBlockAt(AbsBlockPosition pos, BlockState state) {
 		this.setBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
 	}
 	
 	boolean isBlockAt(int x, int y, int z, BlockState state);
 	
-	default boolean isBlockAt(BlockPositioned pos, BlockState state) {
+	default boolean isBlockAt(AbsBlockPosition pos, BlockState state) {
 		return this.isBlockAt(pos.getX(), pos.getY(), pos.getZ(), state);
 	}
 

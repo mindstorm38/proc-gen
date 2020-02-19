@@ -9,7 +9,7 @@ public interface SectionPositioned {
 	//      SectionPositioned keys, we are still able to put and call contains with
 	//      BlockPositioned and it's an issue because classes extending BlockPositioned
 	//      don't have this same hashcode() implementation.
-	
+
 	int getX();
 	int getZ();
 	

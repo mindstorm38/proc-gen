@@ -21,7 +21,6 @@ public class WorldTaskManager {
 	private static final ThreadingDispatch WORLD_TASKS_DISPATCH = ThreadingDispatch.register("WORLD_TASKS", 3);
 	private static final long MAX_IDLE_TIME = 60000;
 
-	//private final Map<String, DimensionLoader> dimensionsLoadData = new HashMap<>();
 	private WorldServer dimensionManager = null;
 	private PriorityThreadPoolExecutor threadPool = null;
 	private long poolIdleStartTime = 0;
@@ -75,34 +74,6 @@ public class WorldTaskManager {
 		}
 
 	}
-
-	/*
-	private DimensionLoader getDimensionData(WorldDimension dim) {
-
-		if (this.dimensionManager == null)
-			throw new IllegalStateException("Can't get dimension data if no dimension manager is running");
-
-		DimensionLoader data = this.dimensionsLoadData.get(dim.getIdentifier());
-
-		if (data == null) {
-
-			try {
-
-				data = new DimensionLoader(dim);
-				this.dimensionsLoadData.put(dim.getIdentifier(), data);
-
-			} catch (IllegalStateException e) {
-
-				LOGGER.log(Level.WARNING, "Failed to created dimension data !", e);
-				return null;
-
-			}
-
-		}
-
-		return data;
-
-	}*/
 	
 	public Future<WorldTask> submitWorldTask(WorldTask task) {
 		return this.threadPool.submit(task, task);

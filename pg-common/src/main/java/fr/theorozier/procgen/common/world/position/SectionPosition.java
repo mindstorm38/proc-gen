@@ -31,14 +31,10 @@ public class SectionPosition extends AbsSectionPosition {
 	public SectionPosition copy() {
 		return new SectionPosition(this.x, this.z);
 	}
-	
-	public ImmutableSectionPosition immutable() {
-		return new ImmutableSectionPosition(this.x, this.z);
-	}
-	
+
 	@Override
 	public ImmutableSectionPosition immutableSectionPos() {
-		return this.immutable();
+		return new ImmutableSectionPosition(this.x, this.z);
 	}
 	
 	@Override

@@ -185,7 +185,8 @@ public class WorldDimension extends WorldBase {
 		super.update();
 		
 		this.updateChunkLoadingPositions();
-		//this.updateChunkLoading();
+		this.loader.update();
+		// this.updateChunkLoading();
 		
 		this.blockTickList.tick();
 		
@@ -318,24 +319,25 @@ public class WorldDimension extends WorldBase {
 	// SECTIONS //
 	
 	@Override
-	public WorldServerSection getSectionAt(SectionPositioned pos) {
+	public WorldServerSection getSectionAt(AbsSectionPosition pos) {
 		return (WorldServerSection) super.getSectionAt(pos);
 	}
 	
 	@Override
 	public WorldServerSection getSectionAt(int x, int z) {
-		/*if (this.isSectionLoading(x, z)) {
-			return this.getPrimitiveSectionAt(x, z);
-		} else {*/
-			return (WorldServerSection) super.getSectionAt(x, z);
-		//}
+		return (WorldServerSection) super.getSectionAt(x, z);
 	}
 	
 	@Override
 	public WorldServerSection getSectionAtBlock(int x, int z) {
 		return (WorldServerSection) super.getSectionAtBlock(x, z);
 	}
-	
+
+	@Override
+	public WorldServerSection getSectionAtBlock(AbsBlockPosition pos) {
+		return (WorldServerSection) super.getSectionAtBlock(pos);
+	}
+
 	// CHUNKS //
 	
 	public WorldServerChunk getChunkAt(int x, int y, int z) {
@@ -343,7 +345,7 @@ public class WorldDimension extends WorldBase {
 	}
 	
 	@Override
-	public WorldServerChunk getChunkAt(BlockPositioned pos) {
+	public WorldServerChunk getChunkAt(AbsBlockPosition pos) {
 		return (WorldServerChunk) super.getChunkAt(pos);
 	}
 	
@@ -353,7 +355,7 @@ public class WorldDimension extends WorldBase {
 	}
 	
 	@Override
-	public WorldServerChunk getChunkAtBlock(BlockPositioned pos) {
+	public WorldServerChunk getChunkAtBlock(AbsBlockPosition pos) {
 		return (WorldServerChunk) super.getChunkAtBlock(pos);
 	}
 	

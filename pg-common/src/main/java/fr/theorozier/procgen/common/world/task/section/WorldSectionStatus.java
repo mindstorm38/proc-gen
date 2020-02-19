@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.world.task.section;
 
+import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 
@@ -17,39 +18,39 @@ public abstract class WorldSectionStatus {
 	// Generation //
 	
 	public static final WorldSectionStatus EMPTY = new WorldSectionStatus(0 ,"empty", "biomes", false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {
 			// NOOP
 		}
 	};
 	
 	public static final WorldSectionStatus BIOMES = new WorldSectionStatus(1, "biomes", "base", false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {
-			generator.genBiomes(section, section.getSectionPos());
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {
+			generator.genBiomes(primitivesAccessor, section, section.getSectionPos());
 		}
 	};
 	
 	public static final WorldSectionStatus BASE = new WorldSectionStatus(2,"base", "surface", false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {
-			generator.genSectionBase(section, section.getSectionPos());
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {
+			generator.genSectionBase(primitivesAccessor, section, section.getSectionPos());
 		}
 	};
 	
 	public static final WorldSectionStatus SURFACE = new WorldSectionStatus(3, "surface", "features", false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {
-			generator.genSurface(section, section.getSectionPos());
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {
+			generator.genSurface(primitivesAccessor, section, section.getSectionPos());
 		}
 	};
 	
 	public static final WorldSectionStatus FEATURES = new WorldSectionStatus(4, "features", "finished", true) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {
-			generator.genFeatures(section, section.getSectionPos());
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {
+			generator.genFeatures(primitivesAccessor, section, section.getSectionPos());
 		}
 	};
 	
 	// Loading //
 	
 	public static final WorldSectionStatus LOADING = new WorldSectionStatus(0, "loading", "finished", false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {
 			// NOOP
 		}
 	};
@@ -57,7 +58,7 @@ public abstract class WorldSectionStatus {
 	// Finished //
 	
 	public static final WorldSectionStatus FINISHED = new WorldSectionStatus(1000, "finished", null, false) {
-		public void generate(ChunkGenerator generator, WorldServerSection section) {}
+		public void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section) {}
 	};
 	
 	static {
@@ -78,9 +79,8 @@ public abstract class WorldSectionStatus {
 
 	public static void updateStatusNextIds() {
 
-        statusRegister.values().forEach(status -> {
-            status.next = status.nextId == null ? null : statusRegister.get(status.nextId);
-        });
+        statusRegister.values().forEach(status ->
+				status.next = status.nextId == null ? null : statusRegister.get(status.nextId));
 
     }
 	
@@ -125,6 +125,6 @@ public abstract class WorldSectionStatus {
 		return this.requireSameAround;
 	}
 	
-	public abstract void generate(ChunkGenerator generator, WorldServerSection section);
+	public abstract void generate(ChunkGenerator generator, WorldAccessor primitivesAccessor, WorldServerSection section);
 	
 }

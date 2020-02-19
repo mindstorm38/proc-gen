@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.world.feature;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.feature.config.OreFeatureConfig;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
@@ -19,7 +20,7 @@ public class OreFeature extends Feature<OreFeatureConfig> {
 	}
 	
 	@Override
-	public boolean place(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, OreFeatureConfig config) {
+	public boolean place(WorldAccessor world, ChunkGenerator generator, Random rand, BlockPositioned at, OreFeatureConfig config) {
 		
 		AtomicInteger oreCount = new AtomicInteger(config.getInfCount() + (int) (rand.nextFloat() * (config.getSupCount() - config.getInfCount())));
 		

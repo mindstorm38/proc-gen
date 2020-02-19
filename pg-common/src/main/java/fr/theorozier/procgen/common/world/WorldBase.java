@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  */
 public abstract class WorldBase implements WorldAccessor {
 
-	protected final Map<SectionPositioned, WorldSection> sections = new HashMap<>();
+	protected final Map<AbsSectionPosition, WorldSection> sections = new HashMap<>();
 	protected final Map<Long, Entity> entitiesById = new HashMap<>();
 	protected final List<Entity> entities = new ArrayList<>();
 	protected final List<Entity> entitiesView = Collections.unmodifiableList(this.entities);
@@ -63,19 +63,10 @@ public abstract class WorldBase implements WorldAccessor {
 	public long getTime() {
 		return this.time;
 	}
-	
-	/**
-	 * @return Number of chunks in a section's height.
-	 */
+
+	@Override
 	public int getVerticalChunkCount() {
 		return 16;
-	}
-	
-	/**
-	 * @return The height limit of the world.
-	 */
-	public int getHeightLimit() {
-		return this.getVerticalChunkCount() * 16;
 	}
 	
 	public MethodEventManager getEventManager() {
@@ -108,7 +99,7 @@ public abstract class WorldBase implements WorldAccessor {
 	}
 	
 	@Override
-	public WorldSection getSectionAt(SectionPositioned pos) {
+	public WorldSection getSectionAt(AbsSectionPosition pos) {
 		return this.sections.get(pos);
 	}
 	
@@ -120,7 +111,7 @@ public abstract class WorldBase implements WorldAccessor {
 	}
 	
 	@Override
-	public boolean isSectionLoadedAt(SectionPositioned pos) {
+	public boolean isSectionLoadedAt(AbsSectionPosition pos) {
 		return this.sections.containsKey(pos);
 	}
 	
@@ -134,12 +125,6 @@ public abstract class WorldBase implements WorldAccessor {
 	public WorldChunk getChunkAt(int x, int y, int z) {
 		WorldSection section = this.getSectionAt(x, z);
 		return section == null ? null : section.getChunkAt(y);
-	}
-	
-	@Override
-	public WorldChunk getChunkAt(BlockPositioned pos) {
-		WorldSection section = this.getSectionAt(pos);
-		return section == null ? null : section.getChunkAt(pos.getY());
 	}
 	
 	// BIOMES //

@@ -88,7 +88,11 @@ public class DimensionLoader {
 	public File getRegionsDir() {
 		return this.regionsDir;
 	}
-	
+
+	/**
+	 * @return Internal virtual that delegate calls to non-primitive sections as expected, but
+	 * 	       also allow interraction with primitive sections.
+	 */
 	public VirtualLoaderWorld getVirtualWorld() {
 		return this.virtualWorld;
 	}
@@ -323,7 +327,7 @@ public class DimensionLoader {
 				return this.inPrimitiveSection(pos.get().set(x, z));
 			}
 		}
-		
+
 		@Override
 		public WorldServerSection getSectionAt(SectionPositioned pos) {
 			WorldPrimitiveSection p = DimensionLoader.this.getPrimitiveSection(pos);
@@ -357,7 +361,17 @@ public class DimensionLoader {
 			WorldServerSection section = this.getSectionAt(pos);
 			return section == null ? null : section.getChunkAt(pos.getY());
 		}
-		
+
+		@Override
+		public int getVerticalChunkCount() {
+			return this.dim.getVerticalChunkCount();
+		}
+
+		@Override
+		public int getHeightLimit() {
+			return this.dim.getHeightLimit();
+		}
+
 		@Override
 		public Biome getBiomeAt(int x, int z) {
 			WorldSection section = this.getSectionAtBlock(x, z);
@@ -375,7 +389,7 @@ public class DimensionLoader {
 			
 			// Need to delegate in a specific way because methods that modify the world
 			// can send events, then an explicit delegate is needed instead of just
-			// copying behaviour.
+			// copying code.
 			
 			WorldPrimitiveSection p = DimensionLoader.this.getPrimitiveSection(x, z);
 			

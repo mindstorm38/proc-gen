@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
@@ -37,22 +37,22 @@ public abstract class ChunkGenerator {
 		return this.seed;
 	}
 	
-	public void genBiomes(WorldServerSection section, SectionPositioned pos) {
+	public void genBiomes(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
 		
 		Biome[] biomes = this.biomeProvider.getBiomes(pos.getX() << 4, pos.getZ() << 4, 16, 16);
 		section.setBiomes(biomes);
 		
 	}
 	
-	public void genSectionBase(WorldServerSection section, SectionPositioned pos) {
+	public void genSectionBase(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
 		
 		WorldServerChunk chunk;
-		for (int y = 0; y < section.getWorld().getVerticalChunkCount(); ++y) {
+		for (int y = 0; y < world.getVerticalChunkCount(); ++y) {
 			
 			chunk = new WorldServerChunk(section.getWorld(), section, new ImmutableBlockPosition(pos, y));
 			section.setChunkAt(y, chunk);
 			
-			this.genBase(chunk, chunk.getChunkPos());
+			this.genBase(world, chunk, chunk.getChunkPos());
 			
 		}
 		
@@ -60,16 +60,15 @@ public abstract class ChunkGenerator {
 		
 	}
 	
-	public abstract void genBase(WorldServerChunk chunk, BlockPositioned pos);
+	public abstract void genBase(WorldAccessor world, WorldServerChunk chunk, BlockPositioned pos);
 	
-	public void genBedrock(WorldServerSection section, SectionPositioned pos) { }
+	public void genBedrock(WorldAccessor world, WorldServerSection section, SectionPositioned pos) { }
 	
-	public void genSurface(WorldServerSection section, SectionPositioned pos) {
+	public void genSurface(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
 		
-		this.genBedrock(section, pos);
+		this.genBedrock(world, section, pos);
 		
-		WorldDimension world = section.getWorld();
-		int seaLimit = world.getSeaLevel() - 2;
+		int seaLimit = section.getWorld().getSeaLevel() - 2;
 		
 		short height, baseHeight;
 		Biome biome;
@@ -105,7 +104,7 @@ public abstract class ChunkGenerator {
 		
 	}
 	
-	public void genFeatures(WorldServerSection section, SectionPositioned pos) {
+	public void genFeatures(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
 	
 		Biome biome = section.getBiomeAt(7, 7);
 		Random random = new Random();
@@ -118,7 +117,7 @@ public abstract class ChunkGenerator {
 		for (ConfiguredFeature<?> feature : biome.getConfiguredFeatures()) {
 			
 			random.setSeed(featureSeed * (++featureIdx));
-			feature.place(section.getWorld(), this, random, at);
+			feature.place(world, this, random, at);
 			
 		}
 		
