@@ -64,11 +64,15 @@ public class WorldSinglePlayer extends WorldClient implements
 	@Override
 	public void worldChunkLoaded(WorldBase world, WorldChunk chunk) {
 		
+		PROFILER.startSection("chunk_loaded_listener");
+		
 		if (this.getSectionAt(chunk.getChunkPos().getX(), chunk.getChunkPos().getZ()) == null) {
 			this.sections.put(chunk.getSection().getSectionPos(), chunk.getSection());
 		}
 		
 		this.eventManager.fireListeners(WorldLoadingListener.class, l -> l.worldChunkLoaded(this, chunk));
+		
+		PROFILER.endSection();
 		
 	}
 	

@@ -17,7 +17,9 @@ import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import fr.theorozier.procgen.common.world.task.section.WorldSectionStatus;
+import io.msengine.common.util.GameProfiler;
 import io.sutil.pool.FixedObjectPool;
+import io.sutil.profiler.Profiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,8 @@ import static io.msengine.common.util.GameLogger.LOGGER;
  *
  */
 public class DimensionLoader {
+	
+	private static final Profiler PROFILER = GameProfiler.getInstance();
 	
 	private final WorldDimension dimension;
 	private final ChunkGenerator generator;
@@ -155,36 +159,51 @@ public class DimensionLoader {
 	
 	public void update() {
 		
+		PROFILER.startSection("pending_saves");
+		
 		ImmutableSectionPosition immutablePos;
 		
 		while ((immutablePos = this.saveQueue.pollFirst()) != null) {
 			this.saveSection(immutablePos);
 		}
 		
+		PROFILER.endStartSection("futures");
+		
 		Future<WorldTask> futureTask;
 		WorldTask doneTask;
 		
 		for (int i = 0; i < this.tasksList.size(); ++i) {
 			
+			PROFILER.startSection("maps_list_gets");
 			immutablePos = this.tasksList.get(i);
 			futureTask = this.tasks.get(immutablePos);
+			PROFILER.endSection();
 			
 			if (futureTask == null) {
 				
+				PROFILER.startSection("next_status_generate");
 				this.submitNextStatusGenerateTask(immutablePos, this.primitiveSections.get(immutablePos), this.getDistanceToLoaders(immutablePos));
+				PROFILER.endSection();
 				
 			} else {
 				
 				if (futureTask.isDone()) {
 					
+					PROFILER.startSection("task_done");
+					
 					try {
 						
+						PROFILER.startSection("future_get");
 						doneTask = futureTask.get();
+						PROFILER.endSection();
 						
 						if (doneTask.hasPrimitiveSection()) {
 							if (doneTask.getPrimitiveSection().gotoNextStatus()) {
 								
+								PROFILER.startSection("dim_load_primitive");
 								this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection());
+								PROFILER.endSection();
+								
 								this.primitiveSections.remove(immutablePos);
 								this.tasksList.remove(i--);
 								
@@ -195,6 +214,8 @@ public class DimensionLoader {
 						
 					} catch (InterruptedException | ExecutionException e) {
 						
+						PROFILER.endSection();
+						
 						this.primitiveSections.remove(immutablePos);
 						this.tasksList.remove(i--);
 						
@@ -204,11 +225,15 @@ public class DimensionLoader {
 					
 					this.tasks.remove(immutablePos);
 					
+					PROFILER.endSection();
+					
 				}
 				
 			}
 			
 		}
+		
+		PROFILER.endSection();
 		
 	}
 	

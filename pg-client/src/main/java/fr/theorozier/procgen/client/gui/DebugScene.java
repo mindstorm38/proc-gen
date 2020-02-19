@@ -32,13 +32,13 @@ public class DebugScene extends GuiScene {
 		this.game = (ProcGenGame) ProcGenGame.getCurrent();
 		this.worldRenderer = this.game.getWorldRenderer();
 		
-		this.posTexts = new GuiTextBase[36];
+		this.posTexts = new GuiTextBase[50];
 		for (int i = 0; i < this.posTexts.length; i++) {
 			
 			this.posTexts[i] = new GuiTextBase();
 			this.posTexts[i].setAnchor(-1f, -1f);
-			this.posTexts[i].setPosition(20f, 20f + (i * 24f));
-			this.posTexts[i].setHeight(20);
+			this.posTexts[i].setPosition(20f, 20f + (i * 12f));
+			this.posTexts[i].setHeight(10);
 			this.addChild(this.posTexts[i]);
 			
 		}

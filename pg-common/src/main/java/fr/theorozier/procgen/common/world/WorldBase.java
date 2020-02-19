@@ -9,9 +9,11 @@ import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldMethodEventManager;
 import fr.theorozier.procgen.common.world.position.*;
+import io.msengine.common.util.GameProfiler;
 import io.msengine.common.util.event.MethodEventManager;
 import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
+import io.sutil.profiler.Profiler;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -26,7 +28,9 @@ import java.util.function.Consumer;
  *
  */
 public abstract class WorldBase implements WorldAccessor {
-
+	
+	protected static final Profiler PROFILER = GameProfiler.getInstance();
+	
 	protected final Map<AbsSectionPosition, WorldSection> sections = new HashMap<>();
 	protected final Map<Long, Entity> entitiesById = new HashMap<>();
 	protected final List<Entity> entities = new ArrayList<>();

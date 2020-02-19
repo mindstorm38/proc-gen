@@ -3,9 +3,6 @@ package fr.theorozier.procgen.common.world;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.theorozier.procgen.common.util.SaveUtils;
-import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
-import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
-import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.task.DimensionMetadata;
 import fr.theorozier.procgen.common.world.task.WorldTaskManager;
 import io.msengine.common.util.GameProfiler;
@@ -20,7 +17,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -52,9 +48,6 @@ public class WorldServer {
 	
 	private WorldTaskManager taskManager = null;
 	
-	@Deprecated
-	private final PriorityThreadPoolExecutor generatorComputer;
-	
 	public WorldServer(File worldDirectory) {
 		
 		SaveUtils.mkdirOrThrowException(worldDirectory, "The world directory already exists but it's a file.");
@@ -65,8 +58,6 @@ public class WorldServer {
 		
 		SaveUtils.mkdirOrThrowException(this.playersDirectory, "The players directory already exists but it's a file.");
 		SaveUtils.mkdirOrThrowException(this.dimensionsDirectory, "The dimensions directory already exists but it's a file.");
-		
-		this.generatorComputer = new PriorityThreadPoolExecutor(4, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 		
 	}
 	
@@ -204,7 +195,11 @@ public class WorldServer {
 	public void update() {
 		
 		for (WorldDimension dim : this.dimensions) {
+			
+			PROFILER.startSection(dim.getIdentifier());
 			dim.update();
+			PROFILER.endSection();
+			
 		}
 		
 	}
@@ -292,16 +287,6 @@ public class WorldServer {
 	 */
 	public static File getDimensionMetadataFile(File dimensionDirectory) {
 		return new File(dimensionDirectory, DIMENSION_METADATA_FILE);
-	}
-	
-	@Deprecated
-	Future<WorldPrimitiveSection> submitWorldLoadingTask(WorldPrimitiveSection section, PriorityRunnable run) {
-		return this.generatorComputer.submit(run, section);
-	}
-	
-	@Deprecated
-	void submitOtherTask(PriorityRunnable run) {
-		this.generatorComputer.submit(run);
 	}
 
 }

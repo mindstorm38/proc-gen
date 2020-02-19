@@ -8,14 +8,25 @@ import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
+import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
+import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
+import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.SectionPosition;
+import fr.theorozier.procgen.common.world.position.SectionPositioned;
+import fr.theorozier.procgen.common.world.task.DimensionLoader;
+import fr.theorozier.procgen.common.world.task.DimensionMetadata;
+import fr.theorozier.procgen.common.world.task.WorldLoadingPosition;
+import fr.theorozier.procgen.common.world.task.WorldTaskManager;
 import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.task.*;
-import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
+import io.msengine.common.util.GameProfiler;
+import io.sutil.profiler.Profiler;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  *
@@ -168,13 +179,19 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		
 		super.update();
 		
+		PROFILER.startSection("loading_pos");
 		this.updateChunkLoadingPositions();
-		this.loader.update();
-		// this.updateChunkLoading();
 		
+		PROFILER.endStartSection("loader");
+		this.loader.update();
+
+		PROFILER.endStartSection("block_ticks");
 		this.blockTickList.tick();
 		
+		PROFILER.endStartSection("entities");
 		this.updateEntities();
+		
+		PROFILER.endSection();
 		
 	}
 
@@ -381,17 +398,21 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 
 	public void loadPrimitiveSection(WorldPrimitiveSection primitiveSection) {
 		
+		PROFILER.startSection("new_obj_and_add");
 		WorldServerSection newSection = new WorldServerSection(primitiveSection);
 		this.sections.put(primitiveSection.getSectionPos(), newSection);
 		
+		PROFILER.endStartSection("listeners");
 		newSection.forEachChunk(chunk ->
 				this.eventManager.fireListeners(WorldLoadingListener.class, l ->
 						l.worldChunkLoaded(this, chunk)
 				)
 		);
 		
+		PROFILER.endStartSection("request_save");
 		this.loader.saveSectionAfter(newSection.getSectionPos());
-
+		PROFILER.endSection();
+		
 	}
 	
 	private void tryLoadSection(SectionPosition sectionPosition) {

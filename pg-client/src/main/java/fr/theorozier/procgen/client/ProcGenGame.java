@@ -183,25 +183,25 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	@Override
 	protected void update() {
 		
-		this.profiler.startSection("world_renderer_update");
+		this.profiler.startSection("world_renderer");
 		this.worldRenderer.update();
 		
-		this.profiler.endStartSection("gui_update");
+		this.profiler.endStartSection("gui");
 		this.guiManager.update();
 		
-		this.profiler.endStartSection("world_loading_update");
+		this.profiler.endStartSection("world_tasks_manager");
 		this.worldTaskManager.update();
 		
 		if (this.servedWorld != null) {
 			
-			this.profiler.endStartSection("dimensions_update");
+			this.profiler.endStartSection("world");
 			this.servedWorld.update();
 			
 		}
 		
 		if (this.clientWorld != null) {
 			
-			this.profiler.endStartSection("client_world_update");
+			this.profiler.endStartSection("client_world");
 			this.clientWorld.update();
 			
 		}
