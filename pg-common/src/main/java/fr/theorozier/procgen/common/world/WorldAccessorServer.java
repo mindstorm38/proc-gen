@@ -1,6 +1,9 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
+import fr.theorozier.procgen.common.world.chunk.WorldSection;
+import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
@@ -24,7 +27,27 @@ public interface WorldAccessorServer extends WorldAccessor {
      * @return This world sea level.
      */
     int getSeaLevel();
-
+    
+    // SECTIONS //
+    
+    @Override
+    WorldServerSection getSectionAt(int x, int z);
+    
+    @Override
+    default WorldServerSection getSectionAt(AbsSectionPosition pos) {
+        return this.getSectionAt(pos.getX(), pos.getZ());
+    }
+    
+    @Override
+    default WorldServerSection getSectionAtBlock(int x, int z) {
+        return this.getSectionAt(x >> 4, z >> 4);
+    }
+    
+    @Override
+    default WorldServerSection getSectionAtBlock(AbsBlockPosition pos) {
+        return this.getSectionAtBlock(pos.getX(), pos.getZ());
+    }
+    
     // HEIGHTMAPS //
 
     short getHeightAt(Heightmap.Type type, int x, int z);

@@ -3,24 +3,19 @@ package fr.theorozier.procgen.common.world;
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
-import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.task.section.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.task.*;
 import fr.theorozier.procgen.common.world.position.*;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
-import io.sutil.pool.FixedObjectPool;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  *
@@ -152,6 +147,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		return this;
 	}
 
+	@Override
 	public int getSeaLevel() {
 		return this.seaLevel;
 	}
@@ -306,13 +302,13 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	// SECTIONS //
 	
 	@Override
-	public WorldServerSection getSectionAt(AbsSectionPosition pos) {
-		return (WorldServerSection) super.getSectionAt(pos);
+	public WorldServerSection getSectionAt(int x, int z) {
+		return (WorldServerSection) super.getSectionAt(x, z);
 	}
 	
 	@Override
-	public WorldServerSection getSectionAt(int x, int z) {
-		return (WorldServerSection) super.getSectionAt(x, z);
+	public WorldServerSection getSectionAt(AbsSectionPosition pos) {
+		return (WorldServerSection) super.getSectionAt(pos);
 	}
 	
 	@Override
@@ -327,6 +323,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 
 	// CHUNKS //
 	
+	@Override
 	public WorldServerChunk getChunkAt(int x, int y, int z) {
 		return (WorldServerChunk) super.getChunkAt(x, y, z);
 	}

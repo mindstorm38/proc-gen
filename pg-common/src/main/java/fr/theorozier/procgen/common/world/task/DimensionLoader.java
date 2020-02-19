@@ -389,7 +389,7 @@ public class DimensionLoader {
 
 		@Override
 		public short getHeightAt(Heightmap.Type type, int x, int z) {
-			WorldServerSection section = (WorldServerSection) this.getSectionAtBlock(x, z);
+			WorldServerSection section = this.getSectionAtBlock(x, z);
 			return section == null ? 0 : section.getHeightAt(type, x & 15, z & 15);
 		}
 
