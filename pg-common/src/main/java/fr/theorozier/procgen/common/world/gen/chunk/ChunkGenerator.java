@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.world.gen.chunk;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
+import fr.theorozier.procgen.common.world.WorldAccessorServer;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.biome.surface.BiomeSurface;
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
@@ -37,14 +38,14 @@ public abstract class ChunkGenerator {
 		return this.seed;
 	}
 	
-	public void genBiomes(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
+	public void genBiomes(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
 		
 		Biome[] biomes = this.biomeProvider.getBiomes(pos.getX() << 4, pos.getZ() << 4, 16, 16);
 		section.setBiomes(biomes);
 		
 	}
 	
-	public void genSectionBase(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
+	public void genSectionBase(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
 		
 		WorldServerChunk chunk;
 		for (int y = 0; y < world.getVerticalChunkCount(); ++y) {
@@ -60,11 +61,11 @@ public abstract class ChunkGenerator {
 		
 	}
 	
-	public abstract void genBase(WorldAccessor world, WorldServerChunk chunk, BlockPositioned pos);
+	public abstract void genBase(WorldAccessorServer world, WorldServerChunk chunk, BlockPositioned pos);
 	
-	public void genBedrock(WorldAccessor world, WorldServerSection section, SectionPositioned pos) { }
+	public void genBedrock(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) { }
 	
-	public void genSurface(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
+	public void genSurface(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
 		
 		this.genBedrock(world, section, pos);
 		
@@ -104,7 +105,7 @@ public abstract class ChunkGenerator {
 		
 	}
 	
-	public void genFeatures(WorldAccessor world, WorldServerSection section, SectionPositioned pos) {
+	public void genFeatures(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
 	
 		Biome biome = section.getBiomeAt(7, 7);
 		Random random = new Random();

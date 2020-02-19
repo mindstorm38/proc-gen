@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.gen.beta;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.util.MathUtils;
-import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.WorldAccessorServer;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
@@ -45,13 +45,12 @@ public class Beta3DChunkGenerator extends ChunkGenerator {
 	}
 	
 	@Override
-	public void genBase(WorldServerChunk chunk, BlockPositioned pos) {
+	public void genBase(WorldAccessorServer world, WorldServerChunk chunk, BlockPositioned pos) {
 		
 		int chunkX = pos.getX() << 4;
 		int chunkY = pos.getY() << 4;
 		int chunkZ = pos.getZ() << 4;
 		
-		WorldDimension world = chunk.getWorld();
 		int maxHeight = world.getHeightLimit();
 		int seaLevel = world.getSeaLevel();
 		
@@ -192,7 +191,7 @@ public class Beta3DChunkGenerator extends ChunkGenerator {
 	}
 	
 	@Override
-	public void genBedrock(WorldServerSection section, SectionPositioned pos) {
+	public void genBedrock(WorldAccessorServer world, WorldServerSection section, SectionPositioned pos) {
 		
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {

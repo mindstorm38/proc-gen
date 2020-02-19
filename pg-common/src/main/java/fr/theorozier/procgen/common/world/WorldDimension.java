@@ -30,7 +30,7 @@ import java.util.concurrent.Future;
  * @author Theo Rozier
  *
  */
-public class WorldDimension extends WorldBase {
+public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	
 	public static final int NEAR_CHUNK_LOADING = 4;
 	
@@ -138,16 +138,12 @@ public class WorldDimension extends WorldBase {
 		return this.loader;
 	}
 
-	/**
-	 * @return The world generation seed used by chunk generator.
-	 */
+	@Override
 	public long getSeed() {
 		return this.seed;
 	}
 
-	/**
-	 * @return The world global random, used in entities for example.
-	 */
+	@Override
 	public Random getRandom() {
 		return this.random;
 	}
@@ -161,10 +157,7 @@ public class WorldDimension extends WorldBase {
 	public WorldDimension getAsServer() {
 		return this;
 	}
-	
-	/**
-	 * @return This world sea level.
-	 */
+
 	public int getSeaLevel() {
 		return this.seaLevel;
 	}
@@ -360,18 +353,11 @@ public class WorldDimension extends WorldBase {
 	}
 	
 	// HEIGHTMAPS //
-	
+
+	@Override
 	public short getHeightAt(Heightmap.Type type, int x, int z) {
 		WorldServerSection section = this.getSectionAtBlock(x, z);
 		return section == null ? 0 : section.getHeightAt(type, x & 15, z & 15);
-	}
-	
-	public short getHeightAt(Heightmap.Type type, SectionPositioned pos) {
-		return this.getHeightAt(type, pos.getX(), pos.getZ());
-	}
-	
-	public ImmutableBlockPosition getBlockHeightAt(Heightmap.Type type, SectionPositioned pos) {
-		return new ImmutableBlockPosition(pos, this.getHeightAt(type, pos));
 	}
 	
 	// CHUNK LOADING //

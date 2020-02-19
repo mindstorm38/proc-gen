@@ -1,11 +1,11 @@
 package fr.theorozier.procgen.common.world.feature.placement;
 
-import fr.theorozier.procgen.common.world.WorldDimension;
+import fr.theorozier.procgen.common.world.WorldAccessorServer;
 import fr.theorozier.procgen.common.world.feature.ConfiguredFeature;
 import fr.theorozier.procgen.common.world.feature.config.FeatureConfig;
 import fr.theorozier.procgen.common.world.feature.placement.config.PlacementConfig;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
-import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 
 import java.util.Random;
 
@@ -21,7 +21,7 @@ public class ConfiguredPlacement<C extends PlacementConfig> {
 		
 	}
 	
-	public <FC extends FeatureConfig> boolean place(WorldDimension world, ChunkGenerator generator, Random rand, BlockPositioned at, ConfiguredFeature<FC> featureConfig) {
+	public <FC extends FeatureConfig> boolean place(WorldAccessorServer world, ChunkGenerator generator, Random rand, AbsBlockPosition at, ConfiguredFeature<FC> featureConfig) {
 		return placement.place(world, generator, rand, at, this.config, featureConfig);
 	}
 	

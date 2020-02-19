@@ -2,6 +2,7 @@ package fr.theorozier.procgen.common.world.gen.beta;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.world.WorldAccessorServer;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
@@ -35,15 +36,14 @@ public class BetaChunkGenerator extends ChunkGenerator {
 	}
 	
 	@Override
-	public void genBase(WorldServerChunk chunk, BlockPositioned pos) {
+	public void genBase(WorldAccessorServer world, WorldServerChunk chunk, BlockPositioned pos) {
 		
 		float[][] randomMap = new float[this.noiseHorizontalSize + 1][this.noiseHorizontalSize + 1];
 		
 		int chunkX = pos.getX() << 4;
 		int chunkY = pos.getY() << 4;
 		int chunkZ = pos.getZ() << 4;
-		WorldDimension world = chunk.getWorld();
-		
+
 		int maxHeight = world.getHeightLimit();
 		Biome biome;
 		

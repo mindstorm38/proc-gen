@@ -2,16 +2,16 @@ package fr.theorozier.procgen.common.world.task;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.SaveUtils;
-import fr.theorozier.procgen.common.world.WorldAccessor;
+import fr.theorozier.procgen.common.world.WorldAccessorServer;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.chunk.Heightmap;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
-import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
@@ -93,11 +93,11 @@ public class DimensionLoader {
 	 * @return Internal virtual that delegate calls to non-primitive sections as expected, but
 	 * 	       also allow interraction with primitive sections.
 	 */
-	public VirtualLoaderWorld getVirtualWorld() {
+	public WorldAccessorServer getVirtualWorld() {
 		return this.virtualWorld;
 	}
 	
-	public void loadSection(SectionPositioned pos) {
+	public void loadSection(AbsSectionPosition pos) {
 		
 		if (this.isSectionLoading(pos))
 			return;
@@ -124,25 +124,25 @@ public class DimensionLoader {
 		
 	}
 	
-	public void saveSection(SectionPositioned pos) {
-		
+	public void saveSection(AbsSectionPosition pos) {
+
 		if (this.isSectionLoading(pos))
 			return;
-		
+
 		WorldServerSection section = this.dimension.getSectionAt(pos);
-		
+
 		if (section != null) {
-			
+
 			ImmutableSectionPosition immutablePos = section.getSectionPos();
-			
+
 			WorldTask task = section.getSavingTask(this);
 			Future<WorldTask> future = this.dimension.getTaskManager().submitWorldTask(task);
-			
+
 			this.tasks.put(immutablePos, future);
 			this.tasksList.add(immutablePos);
-			
+
 		}
-		
+
 	}
 	
 	public void update() {
@@ -216,9 +216,8 @@ public class DimensionLoader {
 	 * @param pos The section position.
 	 * @return True if the section is currently loading.
 	 */
-	public boolean isSectionLoading(SectionPositioned pos) {
-		AbsSectionPosition spos = pos.asSectionPos();
-		return this.primitiveSections.containsKey(spos) || this.tasks.containsKey(spos);
+	public boolean isSectionLoading(AbsSectionPosition pos) {
+		return this.primitiveSections.containsKey(pos) || this.tasks.containsKey(pos);
 	}
 	
 	/**
@@ -226,8 +225,8 @@ public class DimensionLoader {
 	 * @param pos Section position.
 	 * @return The primitive section, or Null if no primitive section there.
 	 */
-	public WorldPrimitiveSection getPrimitiveSection(SectionPositioned pos) {
-		return this.primitiveSections.get(pos.asSectionPos());
+	public WorldPrimitiveSection getPrimitiveSection(AbsSectionPosition pos) {
+		return this.primitiveSections.get(pos);
 	}
 	
 	/**
@@ -247,7 +246,7 @@ public class DimensionLoader {
 	 * @param pos Region position ("sectionPosComponents" >> 5).
 	 * @return The opened region file, should never return Null nor closed region file.
 	 */
-	public DimensionRegionFile getRegionFileCreate(SectionPositioned pos) {
+	public DimensionRegionFile getRegionFileCreate(AbsSectionPosition pos) {
 		
 		return this.regions.computeIfAbsent(pos.immutableSectionPos(), p -> {
 			
@@ -276,8 +275,8 @@ public class DimensionLoader {
 	 * @param pos Region position ("sectionPosComponents" >> 5).
 	 * @return The opened region file (should never return closed region file), or Null if this region file is not opened.
 	 */
-	public DimensionRegionFile getRegionFile(SectionPositioned pos) {
-		return this.regions.get(pos.asSectionPos());
+	public DimensionRegionFile getRegionFile(AbsSectionPosition pos) {
+		return this.regions.get(pos);
 	}
 	
 	/**
@@ -285,8 +284,8 @@ public class DimensionLoader {
 	 * @param pos Section position.
 	 * @param create True to create (or load) and initialize the region file if not cached.
 	 * @return The opened region file, should never return closed region file but can return Null if 'create' parameter is set to False.
-	 * @see #getRegionFileCreate(SectionPositioned)
-	 * @see #getRegionFile(SectionPositioned)
+	 * @see #getRegionFileCreate(AbsSectionPosition)
+	 * @see #getRegionFile(AbsSectionPosition)
 	 */
 	public DimensionRegionFile getSectionRegionFile(SectionPositioned pos, boolean create) {
 		
@@ -314,7 +313,7 @@ public class DimensionLoader {
 	 * avoid giving real world with potential unexpected behaviours.<br>
 	 * It delegate calls to real worlds only if the used section is not primitive.
 	 */
-	public class VirtualLoaderWorld implements WorldAccessor {
+	private class VirtualLoaderWorld implements WorldAccessorServer {
 		
 		private final WorldDimension dim = DimensionLoader.this.dimension;
 		
@@ -329,7 +328,22 @@ public class DimensionLoader {
 		}
 
 		@Override
-		public WorldServerSection getSectionAt(SectionPositioned pos) {
+		public long getSeed() {
+			return this.dim.getSeed();
+		}
+
+		@Override
+		public Random getRandom() {
+			return this.dim.getRandom();
+		}
+
+		@Override
+		public int getSeaLevel() {
+			return this.dim.getSeaLevel();
+		}
+
+		@Override
+		public WorldServerSection getSectionAt(AbsSectionPosition pos) {
 			WorldPrimitiveSection p = DimensionLoader.this.getPrimitiveSection(pos);
 			return p == null ? this.dim.getSectionAt(pos) : p;
 		}
@@ -346,7 +360,7 @@ public class DimensionLoader {
 		}
 		
 		@Override
-		public boolean isSectionLoadedAt(SectionPositioned pos) {
+		public boolean isSectionLoadedAt(AbsSectionPosition pos) {
 			return this.dim.isSectionLoadedAt(pos);
 		}
 		
@@ -355,11 +369,11 @@ public class DimensionLoader {
 			WorldServerSection section = this.getSectionAt(x, z);
 			return section == null ? null : section.getChunkAt(y);
 		}
-		
+
 		@Override
-		public WorldServerChunk getChunkAt(BlockPositioned pos) {
-			WorldServerSection section = this.getSectionAt(pos);
-			return section == null ? null : section.getChunkAt(pos.getY());
+		public short getHeightAt(Heightmap.Type type, int x, int z) {
+			WorldServerSection section = this.getSectionAt(x, z);
+			return section == null ? 0 : section.getHeightAt(type, x, z);
 		}
 
 		@Override
