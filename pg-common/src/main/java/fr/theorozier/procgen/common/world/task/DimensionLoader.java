@@ -331,18 +331,6 @@ public class DimensionLoader {
 	private class VirtualLoaderWorld implements WorldAccessorServer {
 		
 		private final WorldDimension dim = DimensionLoader.this.dimension;
-		
-		/*
-		public boolean inPrimitiveSection(SectionPosition pos) {
-			return DimensionLoader.this.primitiveSections.containsKey(pos);
-		}
-		
-		public boolean inPrimitiveSection(int x, int z) {
-			try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
-				return this.inPrimitiveSection(pos.get().set(x, z));
-			}
-		}
-		*/
 
 		@Override
 		public long getSeed() {
