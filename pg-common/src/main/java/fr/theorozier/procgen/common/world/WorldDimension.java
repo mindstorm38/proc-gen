@@ -47,12 +47,6 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	private final WorldTickList<Block> blockTickList;
 	private final int seaLevel;
 	
-	// Keep using SectionPositioned to allow queries using mutable SectionPosition, but rememeber to only put immutable ones as keys.
-	@Deprecated private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
-	@Deprecated private final Map<SectionPositioned, Future<WorldPrimitiveSection>> loadingSections = new HashMap<>();
-	@Deprecated private final List<ImmutableSectionPosition> primitiveSectionsList = new ArrayList<>();
-	@Deprecated private final Map<SectionPositioned, Boolean> savedSections = new HashMap<>();
-	
 	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
 
 	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
@@ -407,119 +401,10 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		if (!this.isSectionLoadedAt(sectionPosition)) {
 			this.loader.loadSection(sectionPosition);
 		}
-
-		/*
-		if (!this.isSectionLoadedAt(x, z) && !this.isSectionLoading(x, z) && !this.isSectionSaved(sectionPosition)) {
-			
-			ImmutableSectionPosition immutableSectionPosition = sectionPosition.immutable();
-			WorldPrimitiveSection primitive = new WorldPrimitiveSection(this, immutableSectionPosition);
-			
-			this.primitiveSections.put(immutableSectionPosition, primitive);
-			this.primitiveSectionsList.add(immutableSectionPosition);
-			
-			this.submitSectionNextStatusLoadingTask(immutableSectionPosition, primitive, this.getDistanceToLoaders(sectionPosition));
-			
-		}*/
 	
 	}
 
-	@Deprecated
-	private void updateChunkLoading() {
-		
-		Iterator<ImmutableSectionPosition> primitiveSectionsIt = this.primitiveSectionsList.iterator();
-		ImmutableSectionPosition pos;
-		Future<WorldPrimitiveSection> future;
-		WorldPrimitiveSection section;
-		
-		while (primitiveSectionsIt.hasNext()) {
-			
-			pos = primitiveSectionsIt.next();
-			future = this.loadingSections.get(pos);
-			
-			if (future == null ) {
-			
-				section = this.primitiveSections.get(pos);
-				this.submitSectionNextStatusLoadingTask(pos, section, this.getDistanceToLoaders(pos));
-			
-			} else {
-			
-				if (future.isDone()) {
-					
-					try {
-						
-						section = future.get();
-						section.gotoNextStatus();
-						
-						if (section.isFinished()) {
-							
-							WorldServerSection newSection = new WorldServerSection(section);
-							this.sections.put(pos, newSection);
-							
-							this.primitiveSections.remove(pos);
-							primitiveSectionsIt.remove();
-							
-							newSection.forEachChunk(chunk ->
-								this.eventManager.fireListeners(WorldLoadingListener.class, l ->
-									l.worldChunkLoaded(this, chunk)
-								)
-							);
-
-							/*
-							this.world.submitOtherTask(new PriorityRunnable() {
-								
-								public int getPriority() { return 0; }
-								
-								public void run() {
-									WorldServer.this.saveSection(newSection);
-								}
-								
-							});
-							*/
-							
-						}
-						
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-					} finally {
-						this.loadingSections.remove(pos);
-					}
-					
-				}
-				
-			}
-			
-		}
-		
-	}
-
-	@Deprecated
-	private void submitSectionNextStatusLoadingTask(ImmutableSectionPosition pos, WorldPrimitiveSection section, int distanceToLoaders) {
-		
-		PriorityRunnable task = section.getNextStatusGenerateTask(this.loader, distanceToLoaders);
-		
-		if (task != null) {
-			
-			Future<WorldPrimitiveSection> taskFuture = this.world.submitWorldLoadingTask(section, task);
-			this.loadingSections.put(pos, taskFuture);
-			
-		}
-		
-	}
-	
-	@Deprecated
-	public WorldPrimitiveSection getPrimitiveSectionAt(int x, int z) {
-		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
-			return this.primitiveSections.get(pos.get().set(x, z));
-		}
-	}
-
-	@Deprecated
-	public boolean isSectionLoading(int x, int z) {
-		try (FixedObjectPool<SectionPosition>.PoolObject pos = SectionPosition.POOL.acquire()) {
-			return this.primitiveSections.containsKey(pos.get().set(x, z));
-		}
-	}
-
+	/*
 	@Deprecated
 	public void debugLoadingChunkAround(int x, int z, int range) {
 		
@@ -582,80 +467,6 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		}
 		
 	}
-	
-	// SECTIONS SAVING //
-
-	@Deprecated
-	public boolean isSectionSaved(SectionPositioned pos) {
-		
-		/*return this.savedSections.computeIfAbsent(pos, p ->
-				new File(this.sectionsDir, getSectionFileName(p.immutableSectionPos())).isFile());*/
-		return false;
-		
-	}
-
-	/*
-	public void saveSection(WorldServerSection section) {
-		
-		File sectionFile = new File(this.sectionsDir, getSectionFileName(section.getSectionPos()));
-		
-		if (sectionFile.isDirectory())
-			throw new IllegalStateException("The section at " + section.getSectionPos() + " can't be saved because a directory already exists with the name '" + sectionFile.getPath() + "'.");
-		
-		try {
-			
-			ZstdOutputStream stream = new ZstdOutputStream(new FileOutputStream(sectionFile));
-			
-			WorldSectionBlockRegistry blockRegistry = new WorldSectionBlockRegistry();
-			
-			VariableBuffer headerBuf = new VariableBuffer(ByteOrder.BIG_ENDIAN, 256);
-			VariableBuffer sectionBuf = new VariableBuffer(ByteOrder.BIG_ENDIAN);
-			VariableBuffer chunkBuf = new VariableBuffer(ByteOrder.BIG_ENDIAN, 8192);
-			
-			int chunkCount = this.getVerticalChunkCount();
-			int chunkSize;
-			
-			for (int y = 0; y < chunkCount; ++y) {
-				
-				chunkBuf.setWriteIndex(0);
-				section.getChunkAt(y).saveChunk(blockRegistry, chunkBuf);
-				chunkSize = chunkBuf.getWriteIndex();
-				
-				sectionBuf.writeInteger(chunkSize);
-				
-				if (chunkSize != 0)
-					sectionBuf.writeBuffer(chunkBuf, chunkSize);
-				
-			}
-			
-			blockRegistry.foreachStates((state, uid) -> {
-				
-				headerBuf.writeShort(uid);
-				headerBuf.writeStringIndexed(state.getBlock().getIdentifier());
-				headerBuf.writeUnsignedByte((short) state.getPropertiesCount()); // Using byte because state with so much properties can not be stored.
-				
-				state.getProperties().forEach((property, value) -> {
-					headerBuf.writeStringIndexed(property.getName());
-					headerBuf.writeStringIndexed(property.getValueNameSafe(value)); // Should never throw cast exceptions
-				});
-				
-			});
-			
-			stream.write(headerBuf.getBytes(), 0, headerBuf.getWriteIndex());
-			stream.write(sectionBuf.getBytes(), 0, sectionBuf.getWriteIndex());
-			
-			stream.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public static String getSectionFileName(SectionPositioned pos) {
-		return pos.getX() + "." + pos.getZ() + ".pgs.zstd";
-	}
-
-	 */
+	*/
 	
 }
