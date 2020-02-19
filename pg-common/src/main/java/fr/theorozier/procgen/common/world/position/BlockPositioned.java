@@ -5,7 +5,8 @@ public interface BlockPositioned extends SectionPositioned {
 	int getY();
 	
 	ImmutableBlockPosition immutableBlockPos();
-	
+	AbsBlockPosition asBlockPos();
+
 	default float distSquared(float x, float y, float z) {
 		float dx = this.getX() - x;
 		float dy = this.getY() - y;
@@ -15,24 +16,6 @@ public interface BlockPositioned extends SectionPositioned {
 	
 	default float distSquared(BlockPositioned other) {
 		return this.distSquared(other.getX(), other.getY(), other.getZ());
-	}
-	
-	static int hashCode(BlockPositioned blockPos) {
-		int result = 31 + blockPos.getX();
-		result = 31 * result + blockPos.getY();
-		result = 31 * result + blockPos.getZ();
-		return result;
-	}
-	
-	static boolean areEquals(BlockPositioned pos, Object o) {
-		if (pos == o) return true;
-		if (!(o instanceof BlockPositioned)) return false;
-		BlockPositioned that = (BlockPositioned) o;
-		return pos.getX() == that.getX() && pos.getY() == that.getY() && pos.getZ() == that.getZ();
-	}
-	
-	static String toString(BlockPositioned pos) {
-		return "<" + pos.getX() + "/" + pos.getY() + "/" + pos.getZ() + ">";
 	}
 	
 }

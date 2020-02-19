@@ -9,7 +9,7 @@ import io.sutil.pool.FixedObjectPool;
  * @author Theo Rozier
  *
  */
-public class SectionPosition implements SectionPositioned {
+public class SectionPosition extends AbsSectionPosition {
 
 	public static final FixedObjectPool<SectionPosition> POOL = new FixedObjectPool<>(SectionPosition::new, 32);
 	
@@ -84,21 +84,6 @@ public class SectionPosition implements SectionPositioned {
 	
 	public SectionPosition sub(SectionPositioned sectionPos) {
 		return this.sub(sectionPos.getX(), sectionPos.getZ());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		return SectionPositioned.areEquals(this, o);
-	}
-	
-	@Override
-	public int hashCode() {
-		return SectionPositioned.hashCode(this);
-	}
-	
-	@Override
-	public String toString() {
-		return SectionPositioned.toString(this);
 	}
 	
 }

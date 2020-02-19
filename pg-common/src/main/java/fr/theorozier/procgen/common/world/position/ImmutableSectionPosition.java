@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.position;
 
-public class ImmutableSectionPosition implements SectionPositioned {
+public class ImmutableSectionPosition extends AbsSectionPosition {
 	
 	private final int x, z;
 	
@@ -32,21 +32,6 @@ public class ImmutableSectionPosition implements SectionPositioned {
 	@Override
 	public int getZ() {
 		return this.z;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		return SectionPositioned.areEquals(this, o);
-	}
-	
-	@Override
-	public int hashCode() {
-		return SectionPositioned.hashCode(this);
-	}
-	
-	@Override
-	public String toString() {
-		return SectionPositioned.toString(this);
 	}
 	
 }

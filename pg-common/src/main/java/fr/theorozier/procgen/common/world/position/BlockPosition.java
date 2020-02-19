@@ -9,7 +9,7 @@ import io.sutil.pool.FixedObjectPool;
  * @author Theo Rozier
  *
  */
-public class BlockPosition implements BlockPositioned {
+public class BlockPosition extends AbsBlockPosition {
 	
 	public static final FixedObjectPool<BlockPosition> POOL = new FixedObjectPool<>(BlockPosition::new, 32);
 	
@@ -126,21 +126,6 @@ public class BlockPosition implements BlockPositioned {
 	
 	public BlockPosition sub(SectionPositioned sectionPos) {
 		return this.sub(sectionPos.getX(), 0, sectionPos.getZ());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		return BlockPositioned.areEquals(this, o);
-	}
-	
-	@Override
-	public int hashCode() {
-		return BlockPositioned.hashCode(this);
-	}
-	
-	@Override
-	public String toString() {
-		return BlockPositioned.toString(this);
 	}
 	
 }

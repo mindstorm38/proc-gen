@@ -10,6 +10,7 @@ import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
+import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
@@ -44,12 +45,12 @@ public class DimensionLoader {
 	private final File regionsDir;
 	
 	// File loading system.
-	private final Map<SectionPositioned, DimensionRegionFile> regions = new HashMap<>();
+	private final Map<AbsSectionPosition, DimensionRegionFile> regions = new HashMap<>();
 	
 	// Common loading system, using primitive sections.
-	private final Map<SectionPositioned, WorldPrimitiveSection> primitiveSections = new HashMap<>();
-	private final Map<SectionPositioned, Future<WorldTask>> tasks = new HashMap<>();
-	
+	private final Map<AbsSectionPosition, WorldPrimitiveSection> primitiveSections = new HashMap<>();
+	private final Map<AbsSectionPosition, Future<WorldTask>> tasks = new HashMap<>();
+
 	// This list also contains all primitive sections positions that will be only deleted when primitive section is sent to dimension.
 	private final List<ImmutableSectionPosition> tasksList = new ArrayList<>();
 	
@@ -212,7 +213,8 @@ public class DimensionLoader {
 	 * @return True if the section is currently loading.
 	 */
 	public boolean isSectionLoading(SectionPositioned pos) {
-		return this.primitiveSections.containsKey(pos) || this.tasks.containsKey(pos);
+		AbsSectionPosition spos = pos.asSectionPos();
+		return this.primitiveSections.containsKey(spos) || this.tasks.containsKey(spos);
 	}
 	
 	/**
@@ -221,7 +223,7 @@ public class DimensionLoader {
 	 * @return The primitive section, or Null if no primitive section there.
 	 */
 	public WorldPrimitiveSection getPrimitiveSection(SectionPositioned pos) {
-		return this.primitiveSections.get(pos);
+		return this.primitiveSections.get(pos.asSectionPos());
 	}
 	
 	/**
@@ -243,9 +245,9 @@ public class DimensionLoader {
 	 */
 	public DimensionRegionFile getRegionFileCreate(SectionPositioned pos) {
 		
-		return this.regions.computeIfAbsent(pos, p -> {
+		return this.regions.computeIfAbsent(pos.immutableSectionPos(), p -> {
 			
-			File file = new File(this.regionsDir, WorldTaskManager.getRegionFileName(pos));
+			File file = new File(this.regionsDir, WorldTaskManager.getRegionFileName(p));
 			
 			try {
 				
@@ -271,7 +273,7 @@ public class DimensionLoader {
 	 * @return The opened region file (should never return closed region file), or Null if this region file is not opened.
 	 */
 	public DimensionRegionFile getRegionFile(SectionPositioned pos) {
-		return this.regions.get(pos);
+		return this.regions.get(pos.asSectionPos());
 	}
 	
 	/**
@@ -389,11 +391,6 @@ public class DimensionLoader {
 			}
 			
 		}
-		
-		/*@Override TODO Implement it
-		public void setBlockAt(BlockPositioned pos, BlockState state) {
-		
-		}*/
 		
 		@Override
 		public boolean isBlockAt(int x, int y, int z, BlockState state) {

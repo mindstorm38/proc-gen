@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.common.world.position;
 
-public class ImmutableBlockPosition implements BlockPositioned {
+public class ImmutableBlockPosition extends AbsBlockPosition {
 	
 	private final int x, y, z;
 	
@@ -47,21 +47,6 @@ public class ImmutableBlockPosition implements BlockPositioned {
 	@Override
 	public int getZ() {
 		return this.z;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		return BlockPositioned.areEquals(this, o);
-	}
-	
-	@Override
-	public int hashCode() {
-		return BlockPositioned.hashCode(this);
-	}
-	
-	@Override
-	public String toString() {
-		return BlockPositioned.toString(this);
 	}
 	
 }
