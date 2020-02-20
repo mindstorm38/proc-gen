@@ -14,7 +14,6 @@ import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -120,7 +119,7 @@ public class WorldServerSection extends WorldSection {
 		
 		if (file != null) {
 
-			return new WorldTask(this, WorldTaskType.SAVING, 0, () -> {
+			return new WorldTask(this, WorldTaskType.SAVING, 9999999, () -> {
 				
 				try {
 					

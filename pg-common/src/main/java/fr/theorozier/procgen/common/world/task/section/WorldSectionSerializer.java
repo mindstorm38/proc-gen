@@ -90,52 +90,39 @@ public class WorldSectionSerializer {
 
     protected void serializeChunk(WorldChunk chunk, WorldSectionBlockRegistry blockRegistry, DataOutputStream buf) throws IOException {
 
-        // Typical chunk buffer :
-        //   [
-        //     00,  \
-        //     01,  -\ No block state for 1 length
-        //     06,
-        //     06,
-        //     00,  \
-        //     03,  -\ No block state for 3 length
-        //     A1,
-        //     00,  \
-        //     00   -\ Marker for the end of the chunk, no block state remaining
-        //   ]
-
+        // RLE (Run-Length Encoding) compression.
+        
         short[] data = chunk.getBlockData();
 
-        short limitStart = -1;
-        short val;
-
-        for (short i = 0; i < 4096; ++i) {
-
+        short val = data[0];
+        short last = 0, count = 1;
+        
+        for (short i = 1; i < 4096; ++i) {
+    
+            last = val;
             val = data[i];
-
-            if (val == 0) {
-
-                if (limitStart == -1) {
-                    limitStart = i;
-                    buf.writeShort(val);
-                }
-
-            } else {
-
-                if (limitStart != -1) {
-                    buf.writeShort((short) (i - limitStart));
-                    limitStart = -1;
-                }
-
-                buf.writeShort(blockRegistry.getBlockStateUid(val));
-
+    
+            if (last != val) {
+        
+                buf.writeShort(count);
+                buf.writeShort(blockRegistry.getBlockStateUid(last));
+                count = 0;
+        
             }
-
+    
+            ++count;
+    
         }
-
+        
+        buf.writeShort(count);
+        buf.writeShort(blockRegistry.getBlockStateUid(last));
+        
     }
 
     public void deserialize(WorldServerSection section, InputStream stream) {
 
+    
+    
     }
 
 }
