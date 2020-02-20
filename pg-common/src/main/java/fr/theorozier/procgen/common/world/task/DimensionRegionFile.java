@@ -43,6 +43,7 @@ public class DimensionRegionFile {
 	
 	// CLASS //
 	
+	private final File file;
 	private final RandomAccessFile raFile;
 	
 	private final int[] sectionOffsets = new int[1024];
@@ -50,7 +51,7 @@ public class DimensionRegionFile {
 	
 	public DimensionRegionFile(File file) throws IOException {
 		
-		this.raFile = new RandomAccessFile(file, "rwd");
+		this.raFile = new RandomAccessFile(this.file = file, "rwd");
 		
 		if (raFile.length() < REGION_METADATA_BYTES) {
 			
@@ -88,7 +89,7 @@ public class DimensionRegionFile {
 			sectcnt = getSectCount(offset);
 			
 			// If section has sectors, then set all these sectors to 'not free'.
-			if (offset != 0 && (sectoff + sectcnt) <= sectorsCount) {
+			if (sectcnt != 0 && (sectoff + sectcnt) <= sectorsCount) {
 				for (int j = 0; j < sectcnt; ++j) {
 					this.freeSectors.set(sectoff + j, false);
 				}
@@ -298,6 +299,9 @@ public class DimensionRegionFile {
 		//System.out.println("--> Final sectors offset : " + sectorsOffset);
 		//System.out.println("--> Final sectors count : " + sectorsCount);
 		
+		if (length == 22)
+			System.out.println("Writing section " + x + "/" + z + " data with length of 22");
+		
 		// After all operations to free space for 'length' at 'sectorsOffset'.
 		this.writeSectionDataAtSector(sectorsOffset, data, length, version);
 		
@@ -329,7 +333,7 @@ public class DimensionRegionFile {
 	 * @return The section {@link InputStream}, or <b>Null</b>
 	 * @throws IOException If read errors occurs.
 	 */
-	public InputStream getSectionInputStream(int x, int z) throws IOException {
+	public synchronized InputStream getSectionInputStream(int x, int z) throws IOException {
 
 		int offset = this.getSectionOffset(x, z);
 		int sectorsCount = getSectCount(offset);
@@ -339,20 +343,30 @@ public class DimensionRegionFile {
 			return null;
 
 		int sectorsOffset = getSectOffset(offset);
-		int sectorsByteOffset = (sectorsOffset + REGION_METADATA_SECTORS) << 12;
-
+		long sectorsByteOffset = (sectorsOffset + REGION_METADATA_SECTORS) << 12;
+		
 		// If the sectors byte offset is too large to the file length.
 		if (sectorsByteOffset >= this.raFile.length())
 			return null;
 
 		// Go to the sector position in the file.
-		this.raFile.seek((sectorsOffset + REGION_METADATA_SECTORS) << 12);
-
+		this.raFile.seek(sectorsByteOffset);
+		
+		if (this.raFile.getFilePointer() != sectorsByteOffset)
+			System.out.println("Seek " + sectorsByteOffset + ", current fp : " + this.raFile.getFilePointer());
+		
 		// Get section length in bytes
 		int dataLength = this.raFile.readInt();
+		
+		if (dataLength < 1)
+		System.out.println("Get section input stream " + x + "/" + z + " in region " + this.file.getName() + '\n' +
+				"- Offset : " + sectorsOffset + '(' + sectorsByteOffset + " bytes)\n" +
+				"- Count : " + sectorsCount + '\n' +
+				"- Data length : " + dataLength + '\n' +
+				"- Current file pointer : " + this.raFile.getFilePointer());
 
 		// If data length is too much for the file length, return null.
-		if ((sectorsByteOffset + dataLength) > this.raFile.length())
+		if (dataLength < 1 || (sectorsByteOffset + dataLength) > this.raFile.length())
 			return null;
 
 		// Get section data format version.
@@ -410,7 +424,7 @@ public class DimensionRegionFile {
 	 * @param z The relative Z section coordinate in this region.
 	 * @return Section offset data.
 	 */
-	public int getSectionOffset(int x, int z) {
+	private int getSectionOffset(int x, int z) {
 		return this.sectionOffsets[getRegionIndex(x, z)];
 	}
 
@@ -423,7 +437,7 @@ public class DimensionRegionFile {
 	 * @throws IOException If write errors occurs to r.a. file.
 	 * @see #getSectionOffset(int, int)
 	 */
-	public void setSectionOffset(int x, int z, int offset) throws IOException {
+	private void setSectionOffset(int x, int z, int offset) throws IOException {
 		int index = getRegionIndex(x, z);
 		this.sectionOffsets[index] = offset;
 		this.raFile.seek(index * 4);

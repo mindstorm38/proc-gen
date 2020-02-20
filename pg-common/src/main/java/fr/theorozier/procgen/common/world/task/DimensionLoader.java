@@ -193,15 +193,13 @@ public class DimensionLoader {
 					
 					try {
 						
-						PROFILER.startSection("future_get");
 						doneTask = futureTask.get();
-						PROFILER.endSection();
 						
 						if (doneTask.hasPrimitiveSection()) {
 							if (doneTask.getPrimitiveSection().gotoNextStatus()) {
 								
 								PROFILER.startSection("dim_load_primitive");
-								this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection());
+								this.dimension.loadPrimitiveSection(doneTask.getPrimitiveSection(), doneTask.getType());
 								PROFILER.endSection();
 								
 								this.primitiveSections.remove(immutablePos);
@@ -213,8 +211,6 @@ public class DimensionLoader {
 						}
 						
 					} catch (InterruptedException | ExecutionException e) {
-						
-						PROFILER.endSection();
 						
 						this.primitiveSections.remove(immutablePos);
 						this.tasksList.remove(i--);
@@ -287,15 +283,19 @@ public class DimensionLoader {
 	/**
 	 * Get a region file from region position (region are groups of 32x32 sections).
 	 * @param pos Region position ("sectionPosComponents" >> 5).
+	 * @param createIfAbsent True to return create a new region file if the file is not existing.
 	 * @return The opened region file, should never return Null nor closed region file.
 	 */
-	public DimensionRegionFile getRegionFileCreate(AbsSectionPosition pos) {
+	public DimensionRegionFile getRegionFileCreate(AbsSectionPosition pos, boolean createIfAbsent) {
 		
 		return this.regions.computeIfAbsent(pos.immutableSectionPos(), p -> {
 			
 			File file = new File(this.regionsDir, WorldTaskManager.getRegionFileName(p));
 			
 			try {
+				
+				if (!file.exists() && !createIfAbsent)
+					return null;
 				
 				if (file.isDirectory())
 					throw new IllegalStateException("Can't create region file '" + file + "' because it's already a directory.");
@@ -328,17 +328,17 @@ public class DimensionLoader {
 	/**
 	 * Get a region file from section position (region are groups of 32x32 sections).
 	 * @param pos Section position.
-	 * @param create True to create (or load) and initialize the region file if not cached.
+	 * @param createIfAbsent True to return create a new region file if the file is not existing.
 	 * @return The opened region file, should never return closed region file but can return Null if 'create' parameter is set to False.
-	 * @see #getRegionFileCreate(AbsSectionPosition)
+	 * @see #getRegionFileCreate(AbsSectionPosition, boolean)
 	 * @see #getRegionFile(AbsSectionPosition)
 	 */
-	public DimensionRegionFile getSectionRegionFile(SectionPositioned pos, boolean create) {
+	public DimensionRegionFile getSectionRegionFile(SectionPositioned pos, boolean createIfAbsent) {
 		
 		try (FixedObjectPool<SectionPosition>.PoolObject poolPos = SectionPosition.POOL.acquire()) {
 			
 			SectionPosition regpos = poolPos.get().set(pos.getX() >> 5, pos.getZ() >> 5);
-			return create ? this.getRegionFileCreate(regpos) : this.getRegionFile(regpos);
+			return this.getRegionFileCreate(regpos, createIfAbsent);
 			
 		}
 		

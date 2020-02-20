@@ -17,6 +17,7 @@ import fr.theorozier.procgen.common.world.task.DimensionLoader;
 import fr.theorozier.procgen.common.world.task.DimensionMetadata;
 import fr.theorozier.procgen.common.world.task.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.task.WorldTaskManager;
+import fr.theorozier.procgen.common.world.task.WorldTaskType;
 import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
@@ -396,7 +397,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		
 	}
 
-	public void loadPrimitiveSection(WorldPrimitiveSection primitiveSection) {
+	public void loadPrimitiveSection(WorldPrimitiveSection primitiveSection, WorldTaskType type) {
 		
 		PROFILER.startSection("new_obj_and_add");
 		WorldServerSection newSection = new WorldServerSection(primitiveSection);
@@ -408,10 +409,15 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 						l.worldChunkLoaded(this, chunk)
 				)
 		);
-		
-		PROFILER.endStartSection("request_save");
-		this.loader.saveSectionAfter(newSection.getSectionPos());
 		PROFILER.endSection();
+		
+		if (type == WorldTaskType.GENERATE) {
+			
+			PROFILER.startSection("request_save");
+			this.loader.saveSectionAfter(newSection.getSectionPos());
+			PROFILER.endSection();
+			
+		}
 		
 	}
 	

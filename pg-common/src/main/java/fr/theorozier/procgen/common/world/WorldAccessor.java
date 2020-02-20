@@ -6,10 +6,6 @@ import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
-import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.position.SectionPosition;
-import fr.theorozier.procgen.common.world.position.SectionPositioned;
-import io.sutil.pool.FixedObjectPool;
 
 public interface WorldAccessor {
 

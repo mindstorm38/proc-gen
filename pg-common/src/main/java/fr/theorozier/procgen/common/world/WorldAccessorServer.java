@@ -1,7 +1,9 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
+import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
+import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
@@ -46,6 +48,26 @@ public interface WorldAccessorServer extends WorldAccessor {
     @Override
     default WorldServerSection getSectionAtBlock(AbsBlockPosition pos) {
         return this.getSectionAtBlock(pos.getX(), pos.getZ());
+    }
+    
+    // CHUNKS //
+    
+    @Override
+    WorldServerChunk getChunkAt(int x, int y, int z);
+    
+    @Override
+    default WorldServerChunk getChunkAt(AbsBlockPosition pos) {
+        return this.getChunkAt(pos.getX(), pos.getY(), pos.getZ());
+    }
+    
+    @Override
+    default WorldServerChunk getChunkAtBlock(int x, int y, int z) {
+        return this.getChunkAt(x >> 4, y >> 4, z >> 4);
+    }
+    
+    @Override
+    default WorldServerChunk getChunkAtBlock(AbsBlockPosition pos) {
+        return this.getChunkAtBlock(pos.getX(), pos.getY(), pos.getZ());
     }
     
     // HEIGHTMAPS //
