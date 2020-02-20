@@ -352,18 +352,18 @@ public class DimensionRegionFile {
 		// Go to the sector position in the file.
 		this.raFile.seek(sectorsByteOffset);
 		
-		if (this.raFile.getFilePointer() != sectorsByteOffset)
-			System.out.println("Seek " + sectorsByteOffset + ", current fp : " + this.raFile.getFilePointer());
+		/*if (this.raFile.getFilePointer() != sectorsByteOffset)
+			System.out.println("Seek " + sectorsByteOffset + ", current fp : " + this.raFile.getFilePointer());*/
 		
 		// Get section length in bytes
 		int dataLength = this.raFile.readInt();
 		
-		if (dataLength < 1)
+		/*if (dataLength < 1)
 		System.out.println("Get section input stream " + x + "/" + z + " in region " + this.file.getName() + '\n' +
 				"- Offset : " + sectorsOffset + '(' + sectorsByteOffset + " bytes)\n" +
 				"- Count : " + sectorsCount + '\n' +
 				"- Data length : " + dataLength + '\n' +
-				"- Current file pointer : " + this.raFile.getFilePointer());
+				"- Current file pointer : " + this.raFile.getFilePointer());*/
 
 		// If data length is too much for the file length, return null.
 		if (dataLength < 1 || (sectorsByteOffset + dataLength) > this.raFile.length())
