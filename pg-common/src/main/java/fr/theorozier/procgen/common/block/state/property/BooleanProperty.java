@@ -31,4 +31,9 @@ public class BooleanProperty extends BlockStateProperty<Boolean> {
 		return value ? "true" : "false";
 	}
 	
+	@Override
+	public Boolean getValueFromName(String name) {
+		return name.equals("true");
+	}
+	
 }

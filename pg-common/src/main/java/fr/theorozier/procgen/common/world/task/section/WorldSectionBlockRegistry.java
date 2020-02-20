@@ -14,21 +14,24 @@ public class WorldSectionBlockRegistry {
 	private final List<BlockState> indexedStates = new ArrayList<>();
 	private final Map<Short, Short> statesToNewUids = new HashMap<>();
 	
-	public short getBlockStateUid(short rawUid) {
+	public short getBlockStateSaveUid(short realUid) {
 		
-		BlockState state = Blocks.getBlockState(rawUid);
+		BlockState state = Blocks.getBlockState(realUid);
 		
 		if (state == null || state.getBlock().isUnsavable())
 			return 0;
 		
-		return this.statesToNewUids.computeIfAbsent(rawUid, uid -> {
+		return this.statesToNewUids.computeIfAbsent(realUid, uid -> {
 			
-			short n = (short) this.indexedStates.size();
 			this.indexedStates.add(state);
-			return n;
+			return (short) this.indexedStates.size();
 			
 		});
 		
+	}
+	
+	public int size() {
+		return this.indexedStates.size();
 	}
 	
 	public void foreachStates(BiConsumer<BlockState, Short> consumer) {

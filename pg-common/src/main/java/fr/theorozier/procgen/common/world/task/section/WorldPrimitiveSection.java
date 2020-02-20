@@ -10,6 +10,8 @@ import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import io.sutil.ThreadUtils;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
@@ -88,26 +90,37 @@ public class WorldPrimitiveSection extends WorldServerSection {
 	
 	}
 	
+	/**
+	 * Build a loading task for this primitive section.
+	 * @param loader Dimension loader used to get region files.
+	 * @param distanceToLoaders Minimum distance to loaders.
+	 * @return The loading task, or Null if failed
+	 */
 	public WorldTask getLoadingTask(DimensionLoader loader, int distanceToLoaders) {
 
 		ImmutableSectionPosition pos = this.getSectionPos();
+		DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
 
-		return new WorldTask(this, WorldTaskType.LOADING, distanceToLoaders, () -> {
-
-			DimensionRegionFile file = loader.getSectionRegionFile(pos, false);
-
-			if (file == null)
-				return;
-
-			try {
-
-				InputStream stream = file.getSectionInputStream(pos.getX() & 31, pos.getZ() & 31);
-
-
-
-			} catch (IOException ignored) {}
-
-		});
+		if (file != null) {
+			
+			return new WorldTask(this, WorldTaskType.LOADING, distanceToLoaders, () -> {
+				
+				try {
+					
+					InputStream raw = file.getSectionInputStream(pos.getX() & 31, pos.getZ() & 31);
+					DataInputStream in = new DataInputStream(raw);
+					WorldSectionSerializer.TEMP_INSTANCE.deserialize(this, in);
+					in.close();
+					
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+				
+			});
+			
+		} else {
+			return null;
+		}
 
 	}
 	

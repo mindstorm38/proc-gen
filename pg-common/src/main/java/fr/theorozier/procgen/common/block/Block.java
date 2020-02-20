@@ -29,6 +29,7 @@ public class Block {
 		if (uid <= 0)
 			throw ErrorUtils.invalidUidArgument("Block");
 		
+		// Cast to short to store it as "unsigned short".
 		this.uid = (short) uid;
 		this.identifier = StringUtils.requireNonNullAndEmpty(identifier, "Block's identifier can't be null or empty.");
 		

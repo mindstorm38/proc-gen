@@ -111,7 +111,13 @@ public class WorldServerSection extends WorldSection {
 	public void recomputeHeightmap(Heightmap.Type type) {
 		this.recomputeHeightmap(EnumSet.of(type));
 	}
-
+	
+	/**
+	 * Build a saving task for this server section.
+	 * @param loader Dimension loader used to get region files.
+	 * @param <STREAM> Type parameter internally used to avoid casts.
+	 * @return The saving task, or Null if failed to get region file.
+	 */
 	public <STREAM extends OutputStream & DimensionRegionFile.SectionOutputStream> WorldTask getSavingTask(DimensionLoader loader) {
 
 		ImmutableSectionPosition pos = this.getSectionPos();
@@ -130,7 +136,9 @@ public class WorldServerSection extends WorldSection {
 					raw.writeSectionData();
 					out.close();
 					
-				} catch (IOException ignored) {}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 
 			});
 			

@@ -70,6 +70,10 @@ public class BlockStateContainer {
 		return this.states;
 	}
 	
+	public BlockStateProperty<?> getPropertiesByName(String name) {
+		return this.properties.get(name);
+	}
+	
 	public static class Builder {
 	
 		private final Block owner;

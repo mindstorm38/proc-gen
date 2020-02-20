@@ -27,6 +27,8 @@ public abstract class BlockStateProperty<T> {
 		return this.getValueName((T) rawValue);
 	}
 	
+	public abstract T getValueFromName(String name);
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

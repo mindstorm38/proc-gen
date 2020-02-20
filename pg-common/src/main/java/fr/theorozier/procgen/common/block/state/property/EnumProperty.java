@@ -26,8 +26,12 @@ public class EnumProperty<T extends Enum<T>> extends BlockStateProperty<T> {
 		this.names = new String[values.length];
 		
 		for (int i = 0; i < values.length; ++i) {
-			if (i > 0) this.valuesSet.add(values[i]);
+			
+			if (i > 0)
+				this.valuesSet.add(values[i]);
+			
 			this.names[i] = values[i].name().toLowerCase();
+			
 		}
 		
 	}
@@ -50,6 +54,19 @@ public class EnumProperty<T extends Enum<T>> extends BlockStateProperty<T> {
 	@Override
 	public String getValueName(T value) {
 		return this.names[value.ordinal()];
+	}
+	
+	@Override
+	public T getValueFromName(String name) {
+		
+		for (T cnst : this.valuesSet) {
+			if (name.equals(cnst.name())) {
+				return cnst;
+			}
+		}
+		
+		return this.defaultValue;
+		
 	}
 	
 }

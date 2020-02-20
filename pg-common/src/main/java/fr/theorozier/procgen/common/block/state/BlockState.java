@@ -160,7 +160,9 @@ public class BlockState {
 	}
 	
 	public <T> BlockState with(BlockStateProperty<T> property, T value) {
-	
+		return this.withRaw(property, value);
+		
+		/*
 		T v = this.get(property);
 		
 		if (v == value)
@@ -168,6 +170,23 @@ public class BlockState {
 		
 		BlockState state = this.statesByValues.get(property, value);
 	
+		if (state == null)
+			throw new IllegalStateException("Block state for " + this.owner.getIdentifier() + " doesn't allow the value " + value + " for property " + property.getName() + ".");
+		
+		return state;
+		*/
+		
+	}
+	
+	public BlockState withRaw(BlockStateProperty<?> property, Object value) {
+		
+		Object v = this.get(property);
+		
+		if (v == value)
+			return this;
+		
+		BlockState state = this.statesByValues.get(property, value);
+		
 		if (state == null)
 			throw new IllegalStateException("Block state for " + this.owner.getIdentifier() + " doesn't allow the value " + value + " for property " + property.getName() + ".");
 		
