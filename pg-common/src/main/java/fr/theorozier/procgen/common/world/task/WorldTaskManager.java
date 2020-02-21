@@ -34,12 +34,6 @@ public class WorldTaskManager {
 	 */
 	public void setCurrentDimensionManager(WorldServer manager) {
 
-		if (this.dimensionManager != null) {
-
-			//this.dimensionsLoadData.clear();
-
-		}
-
 		this.dimensionManager = manager;
 
 		if (manager != null) {

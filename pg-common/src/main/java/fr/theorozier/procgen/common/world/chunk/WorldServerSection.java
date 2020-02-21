@@ -2,12 +2,12 @@ package fr.theorozier.procgen.common.world.chunk;
 
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
-import fr.theorozier.procgen.common.world.task.DimensionLoader;
-import fr.theorozier.procgen.common.world.task.DimensionRegionFile;
+import fr.theorozier.procgen.common.world.load.DimensionLoader;
+import fr.theorozier.procgen.common.world.load.DimensionRegionFile;
 import fr.theorozier.procgen.common.world.task.WorldTask;
 import fr.theorozier.procgen.common.world.task.WorldTaskType;
-import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
-import fr.theorozier.procgen.common.world.task.section.WorldSectionSerializer;
+import fr.theorozier.procgen.common.world.chunk.primitive.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.serial.WorldSectionSerializer;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 

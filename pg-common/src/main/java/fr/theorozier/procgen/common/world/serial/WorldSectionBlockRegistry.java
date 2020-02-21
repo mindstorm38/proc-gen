@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.task.section;
+package fr.theorozier.procgen.common.world.serial;
 
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;

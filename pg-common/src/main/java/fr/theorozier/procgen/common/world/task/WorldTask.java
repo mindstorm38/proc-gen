@@ -2,7 +2,7 @@ package fr.theorozier.procgen.common.world.task;
 
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
-import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.chunk.primitive.WorldPrimitiveSection;
 
 public class WorldTask implements PriorityRunnable {
 	

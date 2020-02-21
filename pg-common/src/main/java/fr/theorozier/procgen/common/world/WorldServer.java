@@ -3,7 +3,7 @@ package fr.theorozier.procgen.common.world;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.theorozier.procgen.common.util.SaveUtils;
-import fr.theorozier.procgen.common.world.task.DimensionMetadata;
+import fr.theorozier.procgen.common.world.load.DimensionMetadata;
 import fr.theorozier.procgen.common.world.task.WorldTaskManager;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.profiler.Profiler;

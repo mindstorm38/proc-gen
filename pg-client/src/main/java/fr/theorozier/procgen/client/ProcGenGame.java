@@ -11,7 +11,7 @@ import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.*;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.WorldServer;
-import fr.theorozier.procgen.common.world.task.WorldLoadingPosition;
+import fr.theorozier.procgen.common.world.load.WorldLoadingPosition;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.task.WorldTaskManager;

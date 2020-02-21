@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.task.section;
+package fr.theorozier.procgen.common.world.serial;
 
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.Blocks;
@@ -149,9 +149,9 @@ public class WorldSectionSerializer {
 			short statesCount = stream.readShort();
 			byte[] buffer = null;
 			
-			Block block = null;
-			BlockState state = null;
-			BlockStateProperty<?> property = null;
+			Block block;
+			BlockState state;
+			BlockStateProperty<?> property;
 			
 			for (int i = 0; i < statesCount; ++i) {
 				
@@ -171,10 +171,12 @@ public class WorldSectionSerializer {
 					
 					// Skip each properties and values bytes.
 					for (int j = 0; j < propertiesCount; ++j) {
-						
-						// Use this instead of
-						buffer = newBufferOrKeep(buffer, stream.readInt());
-						stream.read(buffer);
+
+						// Don't use .skip method because it seems expensive
+						// instead of just reading bytes.
+						buffer = readStringBuffer(stream, buffer);
+						buffer = readStringBuffer(stream, buffer);
+
 					}
 					
 				} else {
@@ -236,11 +238,11 @@ public class WorldSectionSerializer {
 	 * @param length The new wanted length.
 	 * @return The old byte buffer is Null or <code>old.length == length</code>, else return a new buffer of <code>length</code>.
 	 */
-	private static byte[] newBufferOrKeep(byte[] old, int length) {
+	protected static byte[] newBufferOrKeep(byte[] old, int length) {
 		return old != null && old.length == length ? old : new byte[length];
 	}
-	
-	private static byte[] readStringBuffer(DataInputStream stream, byte[] old) throws IOException, EOFException {
+
+	protected static byte[] readStringBuffer(DataInputStream stream, byte[] old) throws IOException, EOFException {
 		
 		int length = stream.readInt();
 		byte[] buffer = newBufferOrKeep(old, length);
@@ -252,7 +254,7 @@ public class WorldSectionSerializer {
 		
 	}
 	
-	private static void deserializationWarning(String message, WorldServerSection section) {
+	protected static void deserializationWarning(String message, WorldServerSection section) {
 		LOGGER.warning("[Chunk Deserialization] " + message + " at section " + section.getSectionPos() + '.');
 	}
 	

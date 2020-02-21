@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.common.world.task;
+package fr.theorozier.procgen.common.world.load;
 
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.SaveUtils;
@@ -10,20 +10,29 @@ import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.chunk.primitive.WorldPrimitiveSection;
+import fr.theorozier.procgen.common.world.chunk.primitive.WorldSectionStatus;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
-import fr.theorozier.procgen.common.world.task.section.WorldPrimitiveSection;
 import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
-import fr.theorozier.procgen.common.world.task.section.WorldSectionStatus;
+import fr.theorozier.procgen.common.world.task.WorldTask;
+import fr.theorozier.procgen.common.world.task.WorldTaskManager;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.pool.FixedObjectPool;
 import io.sutil.profiler.Profiler;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
