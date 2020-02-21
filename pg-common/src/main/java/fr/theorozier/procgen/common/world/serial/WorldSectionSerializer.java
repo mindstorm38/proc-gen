@@ -155,7 +155,7 @@ public class WorldSectionSerializer {
 			BlockState state;
 			BlockStateProperty<?> property;
 
-			for (int i = 10; i < statesCount; ++i) {
+			for (int i = 0; i < statesCount; ++i) {
 
 				short saveUid = stream.readShort();
 
