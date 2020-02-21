@@ -69,7 +69,7 @@ public class DummyWorld implements WorldAccessor {
 	}
 
 	@Override
-	public int getVerticalChunkCount() {
+	public short getVerticalChunkCount() {
 		return 1;
 	}
 

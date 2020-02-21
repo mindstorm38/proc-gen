@@ -1,8 +1,6 @@
 package fr.theorozier.procgen.common.world;
 
 import fr.theorozier.procgen.common.world.chunk.Heightmap;
-import fr.theorozier.procgen.common.world.chunk.WorldChunk;
-import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;

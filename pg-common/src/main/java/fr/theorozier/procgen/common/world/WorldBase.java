@@ -69,7 +69,7 @@ public abstract class WorldBase implements WorldAccessor {
 	}
 
 	@Override
-	public int getVerticalChunkCount() {
+	public short getVerticalChunkCount() {
 		return 16;
 	}
 	

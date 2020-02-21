@@ -72,9 +72,9 @@ public interface WorldAccessor {
 	}
 
 	/**
-	 * @return Number of chunks in a section's height.
+	 * @return Number of chunks in a section's height, Must return unsigned byte (0-255).
 	 */
-	int getVerticalChunkCount();
+	short getVerticalChunkCount();
 
 	/**
 	 * @return The height limit of the world.

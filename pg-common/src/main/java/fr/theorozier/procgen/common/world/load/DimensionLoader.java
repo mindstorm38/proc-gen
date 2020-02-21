@@ -422,7 +422,7 @@ public class DimensionLoader {
 		}
 
 		@Override
-		public int getVerticalChunkCount() {
+		public short getVerticalChunkCount() {
 			return this.dim.getVerticalChunkCount();
 		}
 

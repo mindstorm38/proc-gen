@@ -6,6 +6,7 @@ import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateProperty;
 import fr.theorozier.procgen.common.util.io.ByteDataOutputStream;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
 import io.sutil.StringUtils;
 
@@ -38,8 +39,10 @@ public class WorldSectionSerializer {
 		
 		WorldSectionBlockRegistry blockRegistry = new WorldSectionBlockRegistry();
 		ByteArrayOutputStream rawChunkBuf;
-		
-		for (int y = 0; y < section.getWorld().getVerticalChunkCount(); ++y) {
+
+		int verticalChunkCount = section.getWorld().getVerticalChunkCount();
+
+		for (int y = 0; y < verticalChunkCount; ++y) {
 			
 			chunkBuf.reset();
 			
@@ -100,12 +103,12 @@ public class WorldSectionSerializer {
 				throw e;
 			}
 		}
-		
+
 		allChunksBuf.getByteStream().writeTo(stream);
 		
 	}
 	
-	protected void serializeChunk(WorldChunk chunk, WorldSectionBlockRegistry blockRegistry, DataOutputStream buf) throws IOException {
+	protected void serializeChunk(WorldServerChunk chunk, WorldSectionBlockRegistry blockRegistry, DataOutputStream buf) throws IOException {
 		
 		// RLE (Run-Length Encoding).
 		
@@ -160,7 +163,7 @@ public class WorldSectionSerializer {
 				buffer = readStringBuffer(stream, buffer);
 				String identifier = new String(buffer, CHARSET);
 				
-				int propertiesCount = stream.readByte() & 0xFF;
+				int propertiesCount = stream.readUnsignedByte();
 				
 				block = Blocks.getBlock(identifier);
 				
@@ -223,13 +226,32 @@ public class WorldSectionSerializer {
 				mappedBlockStates.put(saveUid, state);
 				
 			}
-			
+
+			int verticalChunkCount = section.getWorld().getVerticalChunkCount();
+			int chunkLength;
+
+			for (int y = 0; y < verticalChunkCount; ++y) {
+
+				chunkLength = stream.readInt();
+
+				if (chunkLength != 0) {
+					deserializeChunk(section.getChunkAt(y), mappedBlockStates, stream, chunkLength);
+				}
+
+			}
+
 			LOGGER.warning(section.getSectionPos() + " : " + mappedBlockStates.toString());
 			
 		} catch (EOFException e) {
 			throw new IOException("Wrong chunk format, End Of File should not happen right chunks.", e);
 		}
 		
+	}
+
+	protected void deserializeChunk(WorldServerChunk chunk, Map<Short, BlockState> mappedBlockStates, DataInputStream stream, int chunkLength) {
+
+
+
 	}
 	
 	/**
