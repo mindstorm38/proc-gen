@@ -58,7 +58,9 @@ public class EnumProperty<T extends Enum<T>> extends BlockStateProperty<T> {
 	
 	@Override
 	public T getValueFromName(String name) {
-		
+
+		name = name.toUpperCase();
+
 		for (T cnst : this.valuesSet) {
 			if (name.equals(cnst.name())) {
 				return cnst;

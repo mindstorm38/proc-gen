@@ -36,7 +36,7 @@ public class WorldSectionBlockRegistry {
 	
 	public void foreachStates(BiConsumer<BlockState, Short> consumer) {
 		for (short i = 0; i < this.indexedStates.size(); ++i) {
-			consumer.accept(this.indexedStates.get(i), i);
+			consumer.accept(this.indexedStates.get(i), (short) (i + 1));
 		}
 	}
 	
