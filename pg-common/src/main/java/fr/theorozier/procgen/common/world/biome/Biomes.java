@@ -8,7 +8,8 @@ import java.util.Map;
 public class Biomes {
 
 	private static final Map<Short, Biome> uidRegister = new HashMap<>();
-
+	private static final Map<String, Biome> identifierRegister = new HashMap<>();
+	
 	public static final BiomeSurface                           NO_SURFACE = new BiomeSurface(0);
 	public static final GrassSurface                        GRASS_SURFACE = new GrassSurface();
 	public static final DesertSurface                      DESERT_SURFACE = new DesertSurface();
@@ -38,9 +39,14 @@ public class Biomes {
 	public static <B extends Biome> B registerBiome(B biome) {
 	
 		uidRegister.put(biome.getUid(), biome);
+		identifierRegister.put(biome.getIdentifier(), biome);
 		
 		return biome;
 	
+	}
+	
+	public static Biome getBiome(String identifier) {
+		return identifierRegister.get(identifier);
 	}
 	
 }

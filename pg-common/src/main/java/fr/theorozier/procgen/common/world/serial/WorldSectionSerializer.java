@@ -4,12 +4,17 @@ import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.block.state.BlockStateProperty;
+import fr.theorozier.procgen.common.util.array.supplier.ArraySupplier;
 import fr.theorozier.procgen.common.util.io.ByteDataOutputStream;
+import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.common.world.biome.Biomes;
 import fr.theorozier.procgen.common.world.chunk.WorldServerChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldServerSection;
+import fr.theorozier.procgen.common.world.serial.registry.SaveShortRegistry;
+import fr.theorozier.procgen.common.world.serial.rle.SectionBiomeRLE;
+import fr.theorozier.procgen.common.world.serial.rle.SectionDataRLE;
 import io.sutil.StringUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -26,91 +31,99 @@ public class WorldSectionSerializer {
 
 	public static final Charset CHARSET = StringUtils.CHARSET_US_ASCII;
 	public static final BlockState INVALID_BLOCKSTATE = Blocks.AIR.getDefaultState();
-
+	
 	///////////////////
 	// SERIALIZATION //
 	///////////////////
 
 	public void serialize(WorldServerSection section, DataOutputStream stream) throws IOException {
-
+		
+		stream.writeShort(1);
+		
+		ByteDataOutputStream buf = new ByteDataOutputStream(1024);
+		
+		SectionBiomeRLE biomeRLE = new SectionBiomeRLE();
+		SectionDataRLE dataRLE = new SectionDataRLE();
+		
+		// == Biomes
+		SaveShortRegistry<Biome> biomeRegistry = new SaveShortRegistry<>();
+		biomeRLE.encode(ArraySupplier.from(section.getBiomesData()), buf, biomeRegistry);
+		
+		stream.writeShort((short) biomeRegistry.size());
+		
+		for (Map.Entry<Biome, Short> biomeMapping : biomeRegistry.getMappingsEntries()) {
+			
+			byte[] identifierBytes = biomeMapping.getKey().getIdentifier().getBytes(CHARSET);
+			
+			stream.writeShort(biomeMapping.getValue());
+			stream.writeInt(identifierBytes.length);
+			stream.write(identifierBytes);
+			
+		}
+		
+		stream.writeInt(buf.size());
+		buf.writeTo(stream);
+		buf.reset();
+		
+		// == Chunk data
 		ByteDataOutputStream allChunksBuf = new ByteDataOutputStream(4096);
-		ByteDataOutputStream chunkBuf = new ByteDataOutputStream(1024);
-
-		WorldSectionBlockRegistry blockRegistry = new WorldSectionBlockRegistry();
-		ByteArrayOutputStream rawChunkBuf;
-
+		SaveShortRegistry<BlockState> stateRegistry = new SaveShortRegistry<>();
 		int verticalChunkCount = section.getWorld().getVerticalChunkCount();
 
 		for (int y = 0; y < verticalChunkCount; ++y) {
 
-			chunkBuf.reset();
-
-			this.serializeChunk(section.getChunkAt(y), blockRegistry, chunkBuf);
-
-			rawChunkBuf = chunkBuf.getByteStream();
-			allChunksBuf.writeInt(rawChunkBuf.size());
-
-			if (rawChunkBuf.size() != 0)
-				rawChunkBuf.writeTo(allChunksBuf);
+			this.serializeChunk(dataRLE, section.getChunkAt(y), stateRegistry, buf);
+			allChunksBuf.writeInt(buf.getByteStream().size());
+			buf.getByteStream().writeTo(allChunksBuf);
+			
+			buf.reset();
 
 		}
 
-		try {
+		// Cast to short to store as "unsigned short".
+		stream.writeShort((short) stateRegistry.size());
+		
+		for (Map.Entry<BlockState, Short> stateMapping : stateRegistry.getMappingsEntries()) {
+			
+			BlockState state = stateMapping.getKey();
+			
+			byte[] identifierBytes = state.getBlock().getIdentifier().getBytes();
 
-			// Cast to short to store as "unsigned short".
-			stream.writeShort((short) blockRegistry.size());
-
-			blockRegistry.foreachStates((state, saveUid) -> {
+			stream.writeShort(stateMapping.getValue());
+			stream.writeInt(identifierBytes.length);
+			stream.write(identifierBytes);
+			stream.writeByte(state.getPropertiesCount()); // Using byte because state with so much properties can not be stored.
+		
+			for (Map.Entry<BlockStateProperty<?>, ?> statePropertyEntry : state.getProperties().entrySet()) {
 
 				try {
 
-					byte[] identifierBytes = state.getBlock().getIdentifier().getBytes();
+					byte[] propertyBytes = statePropertyEntry.getKey().getName().getBytes(CHARSET);
+					stream.writeInt(propertyBytes.length);
+					stream.write(propertyBytes);
 
-					stream.writeShort(saveUid);
-					stream.writeInt(identifierBytes.length);
-					stream.write(identifierBytes);
-					stream.writeByte(state.getPropertiesCount()); // Using byte because state with so much properties can not be stored.
-
-					state.getProperties().forEach((property, value) -> {
-
-						try {
-
-							byte[] propertyBytes = property.getName().getBytes(CHARSET);
-							stream.writeInt(propertyBytes.length);
-							stream.write(propertyBytes);
-
-							propertyBytes = property.getValueNameSafe(value).getBytes(CHARSET); // Should never throw cast exceptions
-							stream.writeInt(propertyBytes.length);
-							stream.write(propertyBytes);
-
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-
-					});
+					propertyBytes = statePropertyEntry.getKey().getValueNameSafe(statePropertyEntry.getValue()).getBytes(CHARSET); // Should never throw cast exceptions
+					stream.writeInt(propertyBytes.length);
+					stream.write(propertyBytes);
 
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 
-			});
-
-		} catch (RuntimeException e) {
-			if (e.getCause() instanceof IOException) {
-				throw (IOException) e.getCause();
-			} else {
-				throw e;
 			}
+
 		}
 
 		allChunksBuf.getByteStream().writeTo(stream);
 
 	}
 
-	protected void serializeChunk(WorldServerChunk chunk, WorldSectionBlockRegistry blockRegistry, DataOutputStream buf) throws IOException {
+	protected void serializeChunk(SectionDataRLE dataRLE, WorldServerChunk chunk, SaveShortRegistry<BlockState> stateRegistry, DataOutputStream buf) throws IOException {
 
 		// RLE (Run-Length Encoding).
-
+		dataRLE.encode(ArraySupplier.from(chunk.getBlockData()), buf, stateRegistry);
+		
+		/*
 		short[] data = chunk.getBlockData();
 
 		short val = data[0];
@@ -121,10 +134,12 @@ public class WorldSectionSerializer {
 			last = val;
 			val = data[i];
 
-			if (last != val || count == 0xFF) {
-
-				buf.writeByte(count);
+			if (last != val || count == 0x100) {
+				
+				// Remove one to store RLE count, because count = 0 would never occur.
+				buf.writeByte(count - 1);
 				buf.writeShort(blockRegistry.getBlockStateSaveUid(last));
+				
 				count = 0;
 
 			}
@@ -133,8 +148,8 @@ public class WorldSectionSerializer {
 
 		}
 
-		buf.writeByte(count);
-		buf.writeShort(blockRegistry.getBlockStateSaveUid(last));
+		buf.writeByte(count - 1);
+		buf.writeShort(blockRegistry.getBlockStateSaveUid(last));*/
 
 	}
 
@@ -143,13 +158,37 @@ public class WorldSectionSerializer {
 	/////////////////////
 
 	public void deserialize(WorldServerSection section, DataInputStream stream) throws IOException {
-
+		
 		try {
-
-			Map<Short, BlockState> mappedBlockStates = new HashMap<>();
-
-			short statesCount = stream.readShort();
+			
+			int version = stream.readUnsignedShort();
+			SectionBiomeRLE biomeRLE = new SectionBiomeRLE();
+			SectionDataRLE dataRLE = new SectionDataRLE();
 			byte[] buffer = null;
+			
+			// == Biomes
+			Map<Short, Biome> mappedBiomes = new HashMap<>();
+			int biomesCount = stream.readUnsignedShort();
+			
+			Biome biome;
+			
+			for (int i = 0; i < biomesCount; ++i) {
+			
+				short saveUid = stream.readShort();
+				buffer = readStringBuffer(stream, buffer);
+				String identifier = new String(buffer, CHARSET);
+			
+				biome = Biomes.getBiome(identifier);
+				mappedBiomes.put(saveUid, biome == null ? Biomes.EMPTY : biome);
+				
+			}
+			
+			int biomesLength = stream.readInt();
+			biomeRLE.decode(ArraySupplier.from(section.getBiomesData()), stream, biomesLength, mappedBiomes);
+			
+			// == Chunk data
+			Map<Short, BlockState> mappedBlockStates = new HashMap<>();
+			int statesCount = stream.readUnsignedShort();
 
 			Block block;
 			BlockState state;
@@ -234,7 +273,7 @@ public class WorldSectionSerializer {
 				chunkLength = stream.readInt();
 
 				if (chunkLength != 0) {
-					deserializeChunk(section.getChunkAt(y), mappedBlockStates, stream, chunkLength);
+					deserializeChunk(dataRLE, section.getChunkAt(y), stream, chunkLength, mappedBlockStates);
 				}
 
 			}
@@ -247,8 +286,12 @@ public class WorldSectionSerializer {
 
 	}
 
-	protected void deserializeChunk(WorldServerChunk chunk, Map<Short, BlockState> mappedBlockStates, DataInputStream stream, int chunkLength) throws IOException {
-
+	protected void deserializeChunk(SectionDataRLE dataRLE, WorldServerChunk chunk, DataInputStream stream, int chunkLength, Map<Short, BlockState> mappedBlockStates) throws IOException {
+		
+		// RLE (Run-Length Encoding).
+		dataRLE.decode(ArraySupplier.from(chunk.getBlockData()), stream, chunkLength, mappedBlockStates);
+		
+		/*
 		short[] data = chunk.getBlockData();
 
 		short dataIndex = 0;
@@ -259,7 +302,8 @@ public class WorldSectionSerializer {
 
 		for (int i = 0; i < chunkLength; i += 3) {
 
-			nextIndex = (short) (dataIndex + stream.readUnsignedByte());
+			// Re-add +1 because RLE count is stored with -1 offset (because 0-length RLE value never occur).
+			nextIndex = (short) (dataIndex + stream.readUnsignedByte() + 1);
 			saveUid = stream.readShort();
 
 			state = mappedBlockStates.get(saveUid);
@@ -275,6 +319,7 @@ public class WorldSectionSerializer {
 			}
 
 		}
+		*/
 
 	}
 

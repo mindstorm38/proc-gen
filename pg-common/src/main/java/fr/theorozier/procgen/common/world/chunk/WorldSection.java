@@ -117,6 +117,10 @@ public class WorldSection {
 		
 	}
 	
+	public Biome[] getBiomesData() {
+		return this.biomes;
+	}
+	
 	// BLOCKS //
 	
 	/**

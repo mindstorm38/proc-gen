@@ -55,7 +55,7 @@ public final class Blocks {
 		
 		for (Block block : uidRegister.values()) {
 			for (BlockState state : block.getStateContainer().getStates()) {
-				uidStateRegister.put(++idx, state);
+				uidStateRegister.put(++idx, state); // Pre-increment to avoid using 0
 				state.setUid(idx);
 			}
 		}

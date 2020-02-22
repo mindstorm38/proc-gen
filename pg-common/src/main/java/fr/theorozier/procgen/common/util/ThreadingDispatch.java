@@ -11,9 +11,12 @@ import static io.msengine.common.util.GameLogger.LOGGER;
 public class ThreadingDispatch {
 	
 	private static final LazyLoadValue<Integer> AVAILABLE_CORES = new LazyLoadValue<Integer>() {
+		
+		@Override
 		public Integer create() {
 			return Runtime.getRuntime().availableProcessors();
 		}
+		
 	};
 	
 	public static int getAvailableCores() {
