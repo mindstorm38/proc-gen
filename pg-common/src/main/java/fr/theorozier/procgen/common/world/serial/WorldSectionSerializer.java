@@ -278,8 +278,6 @@ public class WorldSectionSerializer {
 
 			}
 
-			LOGGER.warning(section.getSectionPos() + " : " + mappedBlockStates.toString());
-
 		} catch (EOFException e) {
 			throw new IOException("Wrong chunk format, End Of File should not happen right chunks.", e);
 		}

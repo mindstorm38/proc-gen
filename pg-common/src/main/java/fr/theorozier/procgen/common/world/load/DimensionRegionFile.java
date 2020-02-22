@@ -299,8 +299,8 @@ public class DimensionRegionFile {
 		//System.out.println("--> Final sectors offset : " + sectorsOffset);
 		//System.out.println("--> Final sectors count : " + sectorsCount);
 		
-		if (length == 22)
-			System.out.println("Writing section " + x + "/" + z + " data with length of 22");
+		/*if (length == 22)
+			System.out.println("Writing section " + x + "/" + z + " data with length of 22");*/
 		
 		// After all operations to free space for 'length' at 'sectorsOffset'.
 		this.writeSectionDataAtSector(sectorsOffset, data, length, version);
