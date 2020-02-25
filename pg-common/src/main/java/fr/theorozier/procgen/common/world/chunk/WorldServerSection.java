@@ -24,6 +24,8 @@ public class WorldServerSection extends WorldSection {
 	
 	protected final Map<Heightmap.Type, Heightmap> heightmaps;
 	
+	private int unloadTimer = 0;
+	
 	public WorldServerSection(WorldDimension dimension, SectionPositioned position) {
 		
 		super(dimension, position);
@@ -51,6 +53,26 @@ public class WorldServerSection extends WorldSection {
 	@Override
 	public WorldDimension getWorld() {
 		return (WorldDimension) super.getWorld();
+	}
+	
+	public int getUnloadTimer() {
+		return this.unloadTimer;
+	}
+	
+	public void setUnloadTimer(int unloadTimer) {
+		this.unloadTimer = unloadTimer;
+	}
+	
+	public void resetUnloadTimer() {
+		this.setUnloadTimer(100);
+	}
+	
+	/**
+	 * Decreatement unload time by 1 tick.
+	 * @return True if the unload timer reaches zero and tell that this section have to be unloaded.
+	 */
+	public boolean decreaseUnloadTimer() {
+		return --this.unloadTimer < 0;
 	}
 	
 	// CHUNKS //

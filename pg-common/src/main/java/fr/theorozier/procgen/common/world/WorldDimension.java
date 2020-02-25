@@ -23,7 +23,9 @@ import fr.theorozier.procgen.common.world.tick.WorldTickEntry;
 import fr.theorozier.procgen.common.world.tick.WorldTickList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -36,8 +38,6 @@ import java.util.Random;
  *
  */
 public class WorldDimension extends WorldBase implements WorldAccessorServer {
-	
-	public static final int NEAR_CHUNK_LOADING = 4;
 	
 	private final WorldServer world;
 	private final String identifier;
@@ -53,8 +53,7 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	
 	private final DimensionLoader loader;
 	private final HashSet<WorldLoadingPosition> worldLoadingPositions = new HashSet<>();
-
-	// TODO: Create a special world view, only used for generation and implementing WorldAccessor.
+	private final List<WorldServerSection> loadedServerSections = new ArrayList<>();
 	
 	public WorldDimension(WorldServer world, String identifier, File directory, DimensionMetadata metadata) {
 		
@@ -183,7 +182,27 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		
 		PROFILER.endStartSection("loader");
 		this.loader.update();
-
+		
+		PROFILER.endStartSection("unload_timers");
+		WorldServerSection section;
+		for (int i = 0; i < this.loadedServerSections.size(); ++i) {
+			section = this.loadedServerSections.get(i);
+			if (section.decreaseUnloadTimer()) {
+				
+				// Be careful to save section before removing it from 'loadedServerSections' and 'sections'.
+				this.loader.saveSection(section.getSectionPos());
+				this.sections.remove(section.getSectionPos());
+				this.loadedServerSections.remove(i--);
+				
+				section.forEachChunk(chunk ->
+						this.eventManager.fireListeners(WorldLoadingListener.class, l ->
+								l.worldChunkUnloaded(this, chunk.getChunkPos())
+						)
+				);
+				
+			}
+		}
+		
 		PROFILER.endStartSection("block_ticks");
 		this.blockTickList.tick();
 		
@@ -380,8 +399,20 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 	
 	private void updateChunkLoadingPositions() {
 		
-		for (WorldLoadingPosition poses : this.worldLoadingPositions) {
-			this.forEachSectionPosNear(poses.getX(), poses.getZ(), poses.getLoadingRadius(), this::tryLoadSection);
+		for (WorldLoadingPosition pos : this.worldLoadingPositions) {
+			this.forEachSectionPosNear(pos.getX(), pos.getZ(), pos.getLoadingRadius(), this::tryLoadSection);
+		}
+		
+	}
+	
+	private void tryLoadSection(SectionPosition sectionPosition) {
+		
+		WorldServerSection section = this.getSectionAt(sectionPosition);
+		
+		if (section == null) {
+			this.loader.loadSection(sectionPosition);
+		} else {
+			section.resetUnloadTimer();
 		}
 		
 	}
@@ -397,9 +428,16 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 
 	public void loadPrimitiveSection(WorldPrimitiveSection primitiveSection, WorldTaskType type) {
 		
+		if (this.isSectionLoadedAt(primitiveSection.getSectionPos()))
+			return;
+		
 		PROFILER.startSection("new_obj_and_add");
+		
 		WorldServerSection newSection = new WorldServerSection(primitiveSection);
+		newSection.resetUnloadTimer();
+		
 		this.sections.put(primitiveSection.getSectionPos(), newSection);
+		this.loadedServerSections.add(newSection);
 		
 		PROFILER.endStartSection("listeners");
 		newSection.forEachChunk(chunk ->
@@ -417,14 +455,6 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 			
 		}
 		
-	}
-	
-	private void tryLoadSection(SectionPosition sectionPosition) {
-
-		if (!this.isSectionLoadedAt(sectionPosition)) {
-			this.loader.loadSection(sectionPosition);
-		}
-	
 	}
 
 	/*

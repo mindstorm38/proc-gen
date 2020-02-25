@@ -269,16 +269,16 @@ public abstract class WorldBase implements WorldAccessor {
 	
 	public void forEachSectionPosNear(float x, float z, int range, Consumer<SectionPosition> consumer) {
 		
-		ImmutableSectionPosition sectionPos = new ImmutableSectionPosition(MathHelper.floorFloatInt(x) >> 4, MathHelper.floorFloatInt(z) >> 4);
-		SectionPosition minPos = new SectionPosition(sectionPos).sub(range, range);
+		int secX = MathHelper.floorFloatInt(x) >> 4;
+		int secZ = MathHelper.floorFloatInt(z) >> 4;
 		
-		int xmax = sectionPos.getX() + range;
-		int zmax = sectionPos.getZ() + range;
+		int xmax = secX + range;
+		int zmax = secZ + range;
 		
 		try (FixedObjectPool<SectionPosition>.PoolObject obj = SectionPosition.POOL.acquire()) {
 			
-			for (int xv = minPos.getX(); xv <= xmax; ++xv)
-				for (int zv = minPos.getZ(); zv <= zmax; ++zv)
+			for (int xv = secX - range; xv <= xmax; ++xv)
+				for (int zv = secZ - range; zv <= zmax; ++zv)
 					consumer.accept(obj.get().set(xv, zv));
 			
 		}

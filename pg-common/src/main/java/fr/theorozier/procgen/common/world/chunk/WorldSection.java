@@ -73,11 +73,6 @@ public class WorldSection {
 		return this.getChunkAt(blockY >> 4);
 	}
 	
-	/*
-	public void setChunkAt(int y, WorldChunk chunk) {
-		this.chunks[y] = chunk;
-	}*/
-	
 	public void forEachChunk(Consumer<WorldChunk> cons) {
 		
 		for (int y = 0; y < this.chunks.length; y++)
