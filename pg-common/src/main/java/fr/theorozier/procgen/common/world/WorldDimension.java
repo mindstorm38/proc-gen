@@ -11,6 +11,7 @@ import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 import fr.theorozier.procgen.common.world.position.AbsSectionPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
+import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPosition;
 import fr.theorozier.procgen.common.world.position.SectionPositioned;
 import fr.theorozier.procgen.common.world.load.DimensionLoader;
@@ -189,15 +190,15 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 			section = this.loadedServerSections.get(i);
 			if (section.decreaseUnloadTimer()) {
 				
+				ImmutableSectionPosition sectionPos = section.getSectionPos();
+				
 				// Be careful to save section before removing it from 'loadedServerSections' and 'sections'.
-				this.loader.saveSection(section.getSectionPos());
-				this.sections.remove(section.getSectionPos());
+				this.loader.saveSection(sectionPos);
+				this.sections.remove(sectionPos);
 				this.loadedServerSections.remove(i--);
 				
-				section.forEachChunk(chunk ->
-						this.eventManager.fireListeners(WorldLoadingListener.class, l ->
-								l.worldChunkUnloaded(this, chunk.getChunkPos())
-						)
+				this.eventManager.fireListeners(WorldLoadingListener.class, l ->
+					l.worldSectionUnloaded(this, sectionPos)
 				);
 				
 			}
@@ -440,10 +441,8 @@ public class WorldDimension extends WorldBase implements WorldAccessorServer {
 		this.loadedServerSections.add(newSection);
 		
 		PROFILER.endStartSection("listeners");
-		newSection.forEachChunk(chunk ->
-				this.eventManager.fireListeners(WorldLoadingListener.class, l ->
-						l.worldChunkLoaded(this, chunk)
-				)
+		this.eventManager.fireListeners(WorldLoadingListener.class, l ->
+				l.worldSectionLoaded(this, newSection)
 		);
 		PROFILER.endSection();
 		

@@ -5,11 +5,12 @@ import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
+import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 
 import java.util.Objects;
 
@@ -62,23 +63,23 @@ public class WorldSinglePlayer extends WorldClient implements
 	}
 	
 	@Override
-	public void worldChunkLoaded(WorldBase world, WorldChunk chunk) {
+	public void worldSectionLoaded(WorldBase world, WorldSection section) {
 		
 		PROFILER.startSection("chunk_loaded_listener");
 		
-		if (this.getSectionAt(chunk.getChunkPos().getX(), chunk.getChunkPos().getZ()) == null) {
-			this.sections.put(chunk.getSection().getSectionPos(), chunk.getSection());
-		}
-		
-		this.eventManager.fireListeners(WorldLoadingListener.class, l -> l.worldChunkLoaded(this, chunk));
+		this.sections.put(section.getSectionPos(), section);
+		this.eventManager.fireListeners(WorldLoadingListener.class, l -> l.worldSectionLoaded(this, section));
 		
 		PROFILER.endSection();
 		
 	}
 	
 	@Override
-	public void worldChunkUnloaded(WorldBase world, ImmutableBlockPosition position) {
-		this.eventManager.fireListeners(WorldLoadingListener.class, l -> l.worldChunkUnloaded(this, position));
+	public void worldSectionUnloaded(WorldBase world, ImmutableSectionPosition position) {
+		
+		this.sections.remove(position);
+		this.eventManager.fireListeners(WorldLoadingListener.class, l -> l.worldSectionUnloaded(this, position));
+		
 	}
 	
 	@Override

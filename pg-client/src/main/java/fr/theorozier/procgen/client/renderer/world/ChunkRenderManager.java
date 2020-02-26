@@ -8,6 +8,7 @@ import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerDataProvider;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
@@ -209,7 +210,7 @@ public class ChunkRenderManager {
 		
 	}
 	
-	private void deleteChunkRenderer(ImmutableBlockPosition pos) {
+	private void deleteChunkRenderer(AbsBlockPosition pos) {
 		
 		ChunkRenderer cr = this.chunkRenderers.get(pos);
 		
@@ -322,7 +323,7 @@ public class ChunkRenderManager {
 		
 	}
 	
-	void chunkUnloaded(ImmutableBlockPosition pos) {
+	void chunkUnloaded(AbsBlockPosition pos) {
 		this.deleteChunkRenderer(pos);
 	}
 	

@@ -2,16 +2,19 @@ package fr.theorozier.procgen.client.renderer.world;
 
 import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.world.WorldClient;
+import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
+import fr.theorozier.procgen.common.world.chunk.WorldSection;
 import fr.theorozier.procgen.common.world.event.WorldChunkListener;
 import fr.theorozier.procgen.common.world.event.WorldEntityListener;
 import fr.theorozier.procgen.common.world.event.WorldLoadingListener;
+import fr.theorozier.procgen.common.world.position.BlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
-import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
+import fr.theorozier.procgen.common.world.position.ImmutableSectionPosition;
 import io.msengine.client.game.RenderGame;
 import io.msengine.client.renderer.model.ModelApplyListener;
 import io.msengine.client.renderer.model.ModelHandler;
@@ -23,6 +26,7 @@ import io.msengine.client.renderer.window.listener.WindowMousePositionEventListe
 import io.msengine.client.util.camera.SmoothCamera3D;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
+import io.sutil.pool.FixedObjectPool;
 import io.sutil.profiler.Profiler;
 import org.joml.Matrix4f;
 
@@ -441,19 +445,23 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	@Override
-	public void worldChunkLoaded(WorldBase world, WorldChunk chunk) {
+	public void worldSectionLoaded(WorldBase world, WorldSection section) {
 		
 		if (this.renderingWorld == world) {
-			this.chunkRenderManager.chunkLoaded(chunk);
+			section.forEachChunk(this.chunkRenderManager::chunkLoaded);
 		}
 		
 	}
 	
 	@Override
-	public void worldChunkUnloaded(WorldBase world, ImmutableBlockPosition position) {
+	public void worldSectionUnloaded(WorldBase world, ImmutableSectionPosition position) {
 		
 		if (this.renderingWorld == world) {
-			this.chunkRenderManager.chunkUnloaded(position);
+			try (FixedObjectPool<BlockPosition>.PoolObject pos = BlockPosition.POOL.acquire()) {
+				for (int y = 0; y < world.getVerticalChunkCount(); ++y) {
+					this.chunkRenderManager.chunkUnloaded(pos.get().set(position.getX(), y, position.getZ()));
+				}
+			}
 		}
 		
 	}
