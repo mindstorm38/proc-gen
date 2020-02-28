@@ -28,11 +28,11 @@ public class BlockRenderers {
 		registerRenderer(Blocks.REDSTONE_ORE, new BlockCubeRenderer("redstone_ore"));
 		registerRenderer(Blocks.DIAMOND_ORE, new BlockCubeRenderer("diamond_ore"));
 		
-		registerRenderer(Blocks.PLANT_DEADBUSH, new BlockCrossRenderer("plant_deadbush", false));
-		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy", false));
-		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion", false));
-		registerRenderer(Blocks.PLANT_OAK, new BlockCrossRenderer("plant_oak", false));
-		registerRenderer(Blocks.PLANT_GRASS, new BlockCrossRenderer("plant_grass", true));
+		registerRenderer(Blocks.PLANT_DEADBUSH, new BlockCrossRenderer("plant_deadbush", null));
+		registerRenderer(Blocks.PLANT_POPPY, new BlockCrossRenderer("plant_poppy", null));
+		registerRenderer(Blocks.PLANT_DANDELION, new BlockCrossRenderer("plant_dandelion", null));
+		registerRenderer(Blocks.PLANT_OAK, new BlockCrossRenderer("plant_oak", null));
+		registerRenderer(Blocks.PLANT_GRASS, new BlockCrossRenderer("plant_grass", BlockColorResolver.GRASS_COLOR));
 		
 		registerRenderer(Blocks.CACTUS, new BlockCactusRenderer());
 		

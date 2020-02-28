@@ -7,7 +7,7 @@ import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
 
-public class BlockCrossRenderer extends BlockColorizableRenderer {
+public class BlockCrossRenderer extends BlockRenderer {
 	
 	private static final float OFFSET  = 0.1464466094f;
 	private static final float SIZE    = 0.7071067812f;
@@ -15,11 +15,12 @@ public class BlockCrossRenderer extends BlockColorizableRenderer {
 	private static final float HEIGHT  = 1f;
 	
 	private final String mapTileIdentifier;
+	private final BlockColorResolver colorResolver;
 	
-	public BlockCrossRenderer(String mapTileIdentifier, boolean needColorization) {
+	public BlockCrossRenderer(String mapTileIdentifier, BlockColorResolver colorResolver) {
 		
-		super(needColorization);
 		this.mapTileIdentifier = mapTileIdentifier;
+		this.colorResolver = colorResolver;
 		
 	}
 	
@@ -37,7 +38,7 @@ public class BlockCrossRenderer extends BlockColorizableRenderer {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
-		Color color = this.needColorization ? getBlockColor(world, bx, by, bz, BlockColorResolver.FOLIAGE_COLOR) : Color.WHITE;
+		Color color = this.colorResolver == null ? Color.WHITE : getBlockColor(world, bx, by, bz, this.colorResolver);
 		
 		int rand = posRand(bx, by, bz);
 		x += (rand % 3) * 0.1f;

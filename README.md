@@ -40,7 +40,8 @@ generation.
   - [ ] Controlable
   - [ ] Inventory
 - [x] Asynchronous (multi-threaded) chunk generation
-- [ ] Asynchronous dimension chunk saving on file system *(actively working on)*
+- [x] Asynchronous dimension chunk saving on file system
+- [ ] Rework of rendering system
 - [ ] Items
 - [x] All-model falling blocks
 - [x] TNT ***(WIP)***
