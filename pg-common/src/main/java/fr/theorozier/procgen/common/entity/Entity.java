@@ -18,7 +18,6 @@ import java.util.Random;
 public abstract class Entity {
 	
 	public static final float GRAVITY_FACTOR = 0.04f;
-	public static final float AIR_FRICTION   = 0.01f;
 	
 	private static final Random UID_RANDOM = new Random();
 	

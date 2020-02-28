@@ -334,7 +334,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 					this.rotation += 0.1f;
 					*/
 
-					/*if ((mods & GLFW.GLFW_MOD_ALT) == GLFW.GLFW_MOD_ALT) {
+					if ((mods & GLFW.GLFW_MOD_ALT) == GLFW.GLFW_MOD_ALT) {
 						
 						PrimedTNTEntity entity = new PrimedTNTEntity(serverWorld, Entity.getNewUid());
 						entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
@@ -351,13 +351,13 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 						
 						serverWorld.spawnEntity(entity);
 
-					}*/
+					}
 					
-					PlayerEntity entity = new PlayerEntity(serverWorld, Entity.getNewUid());
+					/*PlayerEntity entity = new PlayerEntity(serverWorld, Entity.getNewUid());
 					entity.setPositionInstant(cam.getX(), cam.getY() - 2f, cam.getZ());
 					entity.setVelocity(Math.cos(Math.PI * -0.5 + cam.getYaw()) * 2, Math.sin(cam.getPitch()), Math.sin(Math.PI * -0.5 + cam.getYaw()) * 2);
 					entity.setRotation(-cam.getYaw() + (float) Math.PI, 0f);
-                    serverWorld.spawnEntity(entity);
+                    serverWorld.spawnEntity(entity);*/
 
 				}
 				

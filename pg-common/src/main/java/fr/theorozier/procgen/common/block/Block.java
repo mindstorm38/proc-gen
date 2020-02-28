@@ -112,7 +112,7 @@ public class Block {
 	}
 	
 	public float getSurfaceFriction(Direction face) {
-		return 0.90f;
+		return 0.80f;
 	}
 	
 	public float getResistance(BlockState state) {
