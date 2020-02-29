@@ -1,14 +1,11 @@
 package fr.theorozier.procgen.client.renderer.entity.part;
 
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
-import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
-import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
+import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
-
-import java.util.EnumMap;
-import java.util.function.BiConsumer;
 
 public class EntityCubePart extends EntityModelPart {
 	

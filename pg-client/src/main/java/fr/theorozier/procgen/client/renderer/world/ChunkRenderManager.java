@@ -1,10 +1,12 @@
 package fr.theorozier.procgen.client.renderer.world;
 
+import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
+import fr.theorozier.procgen.client.renderer.world.chunk.ChunkUpdateDescriptor;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
-import fr.theorozier.procgen.client.renderer.world.layer.ChunkDirectLayerData;
-import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerData;
-import fr.theorozier.procgen.client.renderer.world.layer.ChunkLayerDataProvider;
+import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkDirectLayerData;
+import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkLayerData;
+import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkLayerDataProvider;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;

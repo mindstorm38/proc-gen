@@ -1,14 +1,10 @@
-package fr.theorozier.procgen.client.renderer.world.layer;
+package fr.theorozier.procgen.client.renderer.world.chunk.layer;
 
-import fr.theorozier.procgen.client.renderer.block.BlockColorResolver;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
-import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
-import fr.theorozier.procgen.common.world.WorldBase;
-import fr.theorozier.procgen.common.world.biome.Biome;
+import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
-import io.msengine.common.util.Color;
 
 import java.util.logging.Level;
 

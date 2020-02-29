@@ -1,10 +1,9 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.BlockFluid;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
-import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.texture.TextureMapTile;

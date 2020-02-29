@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.renderer.world.layer;
+package fr.theorozier.procgen.client.renderer.world.chunk.layer;
 
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderer;

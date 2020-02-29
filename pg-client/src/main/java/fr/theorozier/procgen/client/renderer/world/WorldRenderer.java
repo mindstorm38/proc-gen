@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.client.renderer.world;
 
 import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.client.world.WorldClient;
-import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
@@ -371,11 +371,11 @@ public class WorldRenderer implements ModelApplyListener,
 	 * Package private method.
 	 * @return The world shader manager.
 	 */
-	WorldShaderManager getShaderManager() {
+	public WorldShaderManager getShaderManager() {
 		return this.shaderManager;
 	}
 	
-	ModelHandler getModelHandler() {
+	public ModelHandler getModelHandler() {
 		return this.model;
 	}
 	

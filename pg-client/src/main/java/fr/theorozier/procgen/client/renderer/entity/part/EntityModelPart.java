@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.entity.part;
 
-import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
-import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
+import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 
 public abstract class EntityModelPart {
 

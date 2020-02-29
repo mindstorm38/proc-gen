@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.renderer.world;
+package fr.theorozier.procgen.client.renderer.world.util;
 
 import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.shader.ShaderUniformBase;

@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.client.renderer.world;
 
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import io.msengine.client.renderer.util.BufferUsage;
 import io.msengine.client.renderer.util.BufferUtils;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;

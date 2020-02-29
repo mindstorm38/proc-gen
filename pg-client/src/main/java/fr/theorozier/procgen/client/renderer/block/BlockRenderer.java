@@ -1,9 +1,8 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
-import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.biome.Biome;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.common.util.Color;

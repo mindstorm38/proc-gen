@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.renderer.world;
+package fr.theorozier.procgen.client.renderer.world.chunk;
 
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;

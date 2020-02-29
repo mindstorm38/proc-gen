@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.renderer.world;
+package fr.theorozier.procgen.client.renderer.world.util;
 
 import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.common.util.array.BufferedIntArray;
@@ -15,30 +15,24 @@ import java.nio.IntBuffer;
 
 /**
  *
- * Mon petit bijoux de simplification.
+ * <p>Mon petit bijoux de simplification.</p>
+ * <p>Allows in particular to avoid passing the 4 vertices, color, texcoords, and indices buffers.</p>
+ * <p>This is also an API to these buffers, then if in the future only one buffer has to be used instead
+ * of vertices, colors & texcoords buffers.</p>
  *
  * @author Theo Rozier
  *
  */
 public class WorldRenderDataArray {
 	
-	private final BufferedFloatArray vertices;
-	private final BufferedFloatArray colors;
-	private final BufferedFloatArray texcoords;
-	private final BufferedIntArray indices;
+	private final BufferedFloatArray vertices = new BufferedFloatArray();
+	private final BufferedFloatArray colors = new BufferedFloatArray();
+	private final BufferedFloatArray texcoords = new BufferedFloatArray();
+	private final BufferedIntArray indices = new BufferedIntArray();
 	
-	private int idx;
+	private int idx = 0;
 	
-	public WorldRenderDataArray() {
-		
-		this.vertices = new BufferedFloatArray();
-		this.colors = new BufferedFloatArray();
-		this.texcoords = new BufferedFloatArray();
-		this.indices = new BufferedIntArray();
-		
-		this.idx = 0;
-		
-	}
+	public WorldRenderDataArray() {}
 	
 	public void resetBuffers() {
 		
@@ -336,15 +330,15 @@ public class WorldRenderDataArray {
 		
 		try {
 			
-			verticesBuf = MemoryUtil.memAllocFloat(this.vertices.getSize());
-			colorsBuf = MemoryUtil.memAllocFloat(this.colors.getSize());
-			texcoordsBuf = MemoryUtil.memAllocFloat(this.texcoords.getSize());
-			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(this.indices.getSize()));
+			verticesBuf = MemoryUtil.memAllocFloat(vertices.getSize());
+			colorsBuf = MemoryUtil.memAllocFloat(colors.getSize());
+			texcoordsBuf = MemoryUtil.memAllocFloat(texcoords.getSize());
+			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(indices.getSize()));
 			
-			this.vertices.resultToBuffer(verticesBuf);
-			this.colors.resultToBuffer(colorsBuf);
-			this.texcoords.resultToBuffer(texcoordsBuf);
-			this.indices.resultToBuffer(indicesBuf);
+			vertices.resultToBuffer(verticesBuf);
+			colors.resultToBuffer(colorsBuf);
+			texcoords.resultToBuffer(texcoordsBuf);
+			indices.resultToBuffer(indicesBuf);
 			
 			verticesBuf.flip();
 			colorsBuf.flip();

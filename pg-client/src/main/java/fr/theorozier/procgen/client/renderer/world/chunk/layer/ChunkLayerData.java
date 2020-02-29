@@ -1,9 +1,9 @@
-package fr.theorozier.procgen.client.renderer.world.layer;
+package fr.theorozier.procgen.client.renderer.world.chunk.layer;
 
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
-import fr.theorozier.procgen.client.renderer.world.ChunkRenderer;
-import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
+import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderers;

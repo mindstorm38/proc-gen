@@ -2,8 +2,8 @@ package fr.theorozier.procgen.client.renderer.entity;
 
 import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.renderer.entity.part.EntityBlockRendererPart;
-import fr.theorozier.procgen.client.renderer.world.WorldRenderDataArray;
-import fr.theorozier.procgen.client.renderer.world.WorldShaderManager;
+import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
 import io.msengine.client.renderer.model.ModelHandler;
