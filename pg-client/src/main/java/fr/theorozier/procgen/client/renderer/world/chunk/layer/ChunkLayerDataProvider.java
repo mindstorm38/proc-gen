@@ -6,6 +6,6 @@ import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 
 public interface ChunkLayerDataProvider {
 	
-	ChunkLayerData provide(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager);
+	ChunkLayerData provide(BlockRenderLayer layer, ChunkRenderManager renderManager);
 	
 }

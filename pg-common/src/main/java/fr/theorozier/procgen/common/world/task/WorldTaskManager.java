@@ -42,7 +42,7 @@ public class WorldTaskManager {
 
 				int poolSize = WORLD_TASKS_DISPATCH.getEffectiveCount(2);
 
-				LOGGER.info("Started world tasks thread pool (" + poolSize + " threads) ...");
+				LOGGER.info("Starting world tasks thread pool (" + poolSize + " threads) ...");
 				this.threadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 
 			}

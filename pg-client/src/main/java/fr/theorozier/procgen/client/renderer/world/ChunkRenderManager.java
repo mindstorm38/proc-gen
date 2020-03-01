@@ -26,6 +26,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static io.msengine.common.util.GameLogger.LOGGER;
+
 /**
  *
  * Chunk render manager singleton, instantiated in {@link WorldRenderer}.
@@ -41,8 +43,8 @@ public class ChunkRenderManager {
 	public static final int RENDER_DISTANCE_CHUNKS = 12;
 	public static final int UNLOAD_DISTANCE_CHUNKS = 16;
 	
-	public static final int RENDER_DISTANCE = RENDER_DISTANCE_CHUNKS * 16;
-	public static final int UNLOAD_DISTANCE = UNLOAD_DISTANCE_CHUNKS * 16;
+	public static final int RENDER_DISTANCE = RENDER_DISTANCE_CHUNKS << 4;
+	public static final int UNLOAD_DISTANCE = UNLOAD_DISTANCE_CHUNKS << 4;
 	
 	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
 	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
@@ -65,7 +67,7 @@ public class ChunkRenderManager {
 	private float viewX, viewY, viewZ;
 	private int renderOffsetX, renderOffsetZ;
 	
-	ChunkRenderManager(WorldRenderer renderer) {
+	public ChunkRenderManager(WorldRenderer renderer) {
 		
 		this.renderer = renderer;
 		this.profiler = GameProfiler.getInstance();
@@ -91,24 +93,44 @@ public class ChunkRenderManager {
 		return this.renderer;
 	}
 	
-	void init() {
-		
-		this.chunkComputer = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
-	
-	}
-	
 	private void setLayerHandler(BlockRenderLayer layer, ChunkLayerDataProvider handler) {
 		this.layerHandlers[layer.ordinal()] = handler;
 	}
 	
-	public ChunkLayerData provideLayerData(BlockRenderLayer layer, WorldChunk chunk) {
-		return this.layerHandlers[layer.ordinal()].provide(chunk, layer, this);
+	public ChunkLayerData provideLayerData(BlockRenderLayer layer) {
+		return this.layerHandlers[layer.ordinal()].provide(layer, this);
 	}
 	
 	private void resortChunkRenderers() {
 		this.chunkRenderersList.sort(ChunkRenderer::compareTo);
 	}
 	
+	/**
+	 * Initialize the chunk render manager, this create the new thread pool for chunk render data recomputation.
+	 */
+	void init() {
+		
+		int poolSize = CHUNK_RENDERER_DISPATCH.getEffectiveCount();
+		
+		LOGGER.info("Starting world chunk renderer tasks thread pool (" + poolSize + " threads) ...");
+		this.chunkComputer = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
+		
+	}
+	
+	/**
+	 * Stop and shutdown internal thread pool.
+	 */
+	void stop() {
+		
+		LOGGER.info("Shutting down chunk renderer tasks thread pool ...");
+		this.chunkComputer.shutdown();
+		
+	}
+	
+	/**
+	 * Render
+	 * @param layer
+	 */
 	void render(BlockRenderLayer layer) {
 		
 		this.profiler.startSection("render_layer_" + layer.name());
@@ -126,8 +148,8 @@ public class ChunkRenderManager {
 		
 		Iterator<Future<ChunkUpdateDescriptor>> chunkUpdatesIt = this.chunkUpdatesDescriptors.iterator();
 		Future<ChunkUpdateDescriptor> future;
-		ChunkUpdateDescriptor descriptor = null;
-		ChunkRenderer renderer = null;
+		ChunkUpdateDescriptor descriptor;
+		ChunkRenderer renderer;
 		
 		while (chunkUpdatesIt.hasNext()) {
 			
@@ -169,6 +191,9 @@ public class ChunkRenderManager {
 		
 	}
 	
+	/**
+	 * Unload chunk renderers for current world.
+	 */
 	void unload() {
 		
 		this.chunkRenderersList.forEach(ChunkRenderer::delete);
@@ -188,7 +213,9 @@ public class ChunkRenderManager {
 			
 			//System.out.println("Loading chunk at " + pos + " (chunk in the middle : " + chunk.getBlockAt(7, 7, 7) + ")");
 			
-			cr = new ChunkRenderer(this, chunk);
+			cr = new ChunkRenderer(this);
+			cr.setChunk(chunk); // FIXME: Temporary retrocompat
+			
 			this.chunkRenderers.put(pos, cr);
 			this.chunkRenderersList.add(cr);
 			

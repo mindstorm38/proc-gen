@@ -5,7 +5,6 @@ import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
 import fr.theorozier.procgen.common.block.state.BlockState;
-import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
 
 import java.util.ArrayList;
@@ -15,9 +14,9 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	
 	private final List<ChunkCompiledBlock> cache;
 	
-	public ChunkSortedLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
+	public ChunkSortedLayerData(BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
-		super(chunk, layer, renderManager);
+		super(layer, renderManager);
 		
 		this.cache = new ArrayList<>();
 		

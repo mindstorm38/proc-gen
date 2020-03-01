@@ -19,20 +19,19 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private final ChunkRenderManager renderManager;
 	private final WorldRenderer renderer;
-	private final WorldChunk chunk;
 	
 	private final Map<Integer, ChunkRenderer> neighbours;
 	
 	private final ChunkLayerData[] layers;
 	private final IndicesDrawBuffer[] drawBuffers;
 	
-	private int distanceToCameraSquared;
+	private WorldChunk chunk = null;
+	private int distanceToCameraSquared = 0;
 	
-	ChunkRenderer(ChunkRenderManager renderManager, WorldChunk chunk) {
+	public ChunkRenderer(ChunkRenderManager renderManager) {
 		
 		this.renderManager = renderManager;
 		this.renderer = renderManager.getWorldRenderer();
-		this.chunk = chunk;
 		
 		this.neighbours = new HashMap<>();
 		
@@ -41,14 +40,15 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 		this.setupLayers();
 		
-		this.distanceToCameraSquared = 0;
-		
 	}
 	
+	/**
+	 * Internal method to setup layer
+	 */
 	private void setupLayers() {
 		
 		for (BlockRenderLayer layer : BlockRenderLayer.values())
-			this.layers[layer.ordinal()] = this.renderManager.provideLayerData(layer, this.chunk);
+			this.layers[layer.ordinal()] = this.renderManager.provideLayerData(layer);
 		
 	}
 	
@@ -64,7 +64,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.chunk.getChunkPos();
 	}
 	
-	void init() {
+	public void init() {
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
 			this.drawBuffers[i] = this.renderer.getShaderManager().createBasicDrawBuffer(true, true);
@@ -73,7 +73,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
-	void delete() {
+	public void delete() {
 		
 		this.neighbours.forEach((i, cr) -> cr.removeNeighbour(Direction.values()[i].oposite()));
 		
@@ -82,37 +82,46 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
-	void setNeighbour(Direction face, ChunkRenderer cr) {
+	public void setChunk(WorldChunk chunk) {
+		
+		this.chunk = chunk;
+		
+		for (BlockRenderLayer layer : BlockRenderLayer.values())
+			this.layers[layer.ordinal()].setChunk(chunk);
+			
+	}
+	
+	public void setNeighbour(Direction face, ChunkRenderer cr) {
 		this.neighbours.put(face.ordinal(), cr);
 	}
 	
-	void removeNeighbour(Direction face) {
+	public void removeNeighbour(Direction face) {
 		this.neighbours.remove(face.ordinal());
 	}
 	
-	void setNeedUpdate(BlockRenderLayer layer, boolean needUpdate) {
+	public void setNeedUpdate(BlockRenderLayer layer, boolean needUpdate) {
 		this.getLayerData(layer).setNeedUpdate(needUpdate);
 	}
 	
-	void setNeedUpdate(boolean needUpdate) {
+	public void setNeedUpdate(boolean needUpdate) {
 		
 		for (ChunkLayerData layerData : this.layers)
 			layerData.setNeedUpdate(needUpdate);
 		
 	}
 	
-	void render(BlockRenderLayer layer, int maxdist) {
+	public void render(BlockRenderLayer layer, int maxdist) {
 		
 		if (this.distanceToCameraSquared <= maxdist)
 			this.render(layer);
 		
 	}
 	
-	void render(BlockRenderLayer layer) {
+	public void render(BlockRenderLayer layer) {
 		this.drawBuffers[layer.ordinal()].drawElements();
 	}
 	
-	void update() {
+	public void update() {
 		
 		for (ChunkLayerData layerData : this.layers) {
 			if (layerData.doNeedUpdate()) {
@@ -125,11 +134,11 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	}
 	
-	float updateDistanceToCamera(float x, float y, float z) {
+	public float updateDistanceToCamera(float x, float y, float z) {
 		return this.distanceToCameraSquared = (int) this.chunk.getDistSquaredTo(x, y, z);
 	}
 	
-	void updateViewPosition(int x, int y, int z) {
+	public void updateViewPosition(int x, int y, int z) {
 		
 		for (ChunkLayerData layerData : this.layers) {
 			layerData.handleNewViewPosition(this, x, y, z);
@@ -137,7 +146,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
-	void chunkUpdateDone(BlockRenderLayer layer) {
+	public void chunkUpdateDone(BlockRenderLayer layer) {
 		
 		ChunkLayerData data = this.getLayerData(layer);
 		if (data != null) this.uploadLayerData(data);
@@ -151,7 +160,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	}
 	
-	void chunkUpdated(WorldChunk chunk) {
+	public void chunkUpdated(WorldChunk chunk) {
 		
 		if (this.chunk == chunk) {
 			
@@ -162,7 +171,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
-	void blockUpdated(WorldChunk chunk, BlockPositioned pos, BlockState block) {
+	public void blockUpdated(WorldChunk chunk, BlockPositioned pos, BlockState block) {
 		
 		if (this.chunk == chunk) {
 			

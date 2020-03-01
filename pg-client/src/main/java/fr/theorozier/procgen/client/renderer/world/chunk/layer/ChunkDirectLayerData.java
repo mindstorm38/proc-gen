@@ -3,7 +3,6 @@ package fr.theorozier.procgen.client.renderer.world.chunk.layer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
-import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import io.msengine.client.renderer.texture.TextureMap;
 
 import java.util.logging.Level;
@@ -12,8 +11,8 @@ import static io.msengine.common.util.GameLogger.LOGGER;
 
 public class ChunkDirectLayerData extends ChunkLayerData {
 	
-	public ChunkDirectLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
-		super(chunk, layer, renderManager);
+	public ChunkDirectLayerData(BlockRenderLayer layer, ChunkRenderManager renderManager) {
+		super(layer, renderManager);
 	}
 	
 	@Override

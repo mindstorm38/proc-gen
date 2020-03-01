@@ -14,24 +14,21 @@ import fr.theorozier.procgen.common.world.position.Direction;
 
 public abstract class ChunkLayerData {
 	
-	protected final WorldChunk chunk;
-	protected final WorldBase world;
 	protected final BlockRenderLayer layer;
 	protected final ChunkRenderManager renderManager;
-	
 	protected final WorldRenderDataArray dataArray;
+	
+	protected WorldChunk chunk;
+	protected WorldBase world;
 	
 	private boolean needUpdate = false;
 	
 	protected int roX, roZ;
 	
-	public ChunkLayerData(WorldChunk chunk, BlockRenderLayer layer, ChunkRenderManager renderManager) {
+	public ChunkLayerData(BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
-		this.chunk = chunk;
-		this.world = chunk.getWorld();
 		this.layer = layer;
 		this.renderManager = renderManager;
-		
 		this.dataArray = new WorldRenderDataArray();
 		
 	}
@@ -40,14 +37,17 @@ public abstract class ChunkLayerData {
 		return this.layer;
 	}
 	
+	public void setChunk(WorldChunk chunk) {
+		this.chunk = chunk;
+		this.world = chunk.getWorld();
+	}
+	
 	public boolean doNeedUpdate() {
 		return this.needUpdate;
 	}
 	
 	public void setNeedUpdate(boolean needUpdate) {
-		
 		this.needUpdate = needUpdate;
-		
 	}
 	
 	public abstract void handleNewViewPosition(ChunkRenderer cr, int x, int y, int z);
