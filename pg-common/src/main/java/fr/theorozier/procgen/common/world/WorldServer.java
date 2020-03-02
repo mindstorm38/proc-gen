@@ -2,9 +2,13 @@ package fr.theorozier.procgen.common.world;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.load.DimensionMetadata;
 import fr.theorozier.procgen.common.world.task.WorldTaskManager;
+import fr.theorozier.procgen.common.world.util.exception.InvalidDimensionMetadataException;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.profiler.Profiler;
 
@@ -239,6 +243,7 @@ public class WorldServer {
 	 * @param dimensionDirectory Dimension directory.
 	 * @return Dimension metadata.
 	 * @throws IllegalStateException If metadata file doesn't exists, or if some I/O failure occurs.
+	 * @throws InvalidDimensionMetadataException If JSON metadata is invalid.
 	 */
 	public static DimensionMetadata loadDimensionMetadata(File dimensionDirectory) {
 		
@@ -248,14 +253,16 @@ public class WorldServer {
 			
 			try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))) {
 				return GSON.fromJson(reader, DimensionMetadata.class);
-			} catch (IOException e) {
-				throw new IllegalStateException("Failed to load dimension metadata from '" + metadataFile + "'.");
+			} catch (IOException | JsonIOException e) {
+				throw new IllegalStateException("Failed to load dimension metadata from '" + metadataFile + "'.", e);
+			} catch (JsonSyntaxException se) {
+				throw new InvalidDimensionMetadataException("Failed to parse dimension metadata syntax.", se);
 			}
 			
 		} else {
 			throw new IllegalStateException("The metadata file doesn't exists (at '" + metadataFile + "').");
 		}
-		
+
 	}
 	
 	/**
