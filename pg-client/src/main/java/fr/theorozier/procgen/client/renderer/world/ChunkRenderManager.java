@@ -8,6 +8,7 @@ import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkDirectLayerD
 import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkLayerData;
 import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkLayerDataProvider;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
@@ -38,6 +39,10 @@ import static io.msengine.common.util.GameLogger.LOGGER;
 public class ChunkRenderManager {
 	
 	private static final ThreadingDispatch CHUNK_RENDERER_DISPATCH = ThreadingDispatch.register("CHUNK_RENDER", 3);
+	private static final Profiler PROFILER = GameProfiler.getInstance();
+	
+	private static final int RENDER_DISTANCE_MIN = 4;
+	private static final int RENDER_DISTANCE_MAX = 64;
 	
 	// These distances are squared, for optimisation.
 	public static final int RENDER_DISTANCE_CHUNKS = 12;
@@ -49,28 +54,36 @@ public class ChunkRenderManager {
 	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
 	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;
 	
+	// Local cache for global singletons
 	private final WorldRenderer renderer;
-	private final Profiler profiler;
 	
-	private final BlockPosition cachedBlockPos;
-	
+	// Chunk renderers for each chunks
 	private final Map<BlockPositioned, ChunkRenderer> chunkRenderers;
 	private final List<ChunkRenderer> chunkRenderersList;
 	private final List<ImmutableBlockPosition> unloadingChunkRenderers;
 	
+	// Chunk layer providers
 	private final ChunkLayerDataProvider[] layerHandlers;
 	
-	private ExecutorService chunkComputer = null;
+	// Tasks managing
+	private ExecutorService threadPool = null;
 	private final HashMap<ChunkUpdateDescriptor, Future<ChunkUpdateDescriptor>> chunkUpdates = new HashMap<>();
 	private final List<Future<ChunkUpdateDescriptor>> chunkUpdatesDescriptors = new ArrayList<>();
 	
+	// Cached block position used to avoid repetitive reallocations.
+	private final BlockPosition cachedBlockPos;
+	
+	// Render distance
+	private int renderDistance = 0;
+	private int renderDistanceSquared = 0;
+	
 	private float viewX, viewY, viewZ;
-	private int renderOffsetX, renderOffsetZ;
+	private int renderOffsetX = 0;
+	private int renderOffsetZ = 0;
 	
 	public ChunkRenderManager(WorldRenderer renderer) {
 		
 		this.renderer = renderer;
-		this.profiler = GameProfiler.getInstance();
 		
 		this.cachedBlockPos = new BlockPosition();
 		
@@ -83,9 +96,6 @@ public class ChunkRenderManager {
 		this.setLayerHandler(BlockRenderLayer.CUTOUT, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.CUTOUT_NOT_CULLED, ChunkDirectLayerData::new);
 		this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkDirectLayerData::new);
-		
-		this.renderOffsetX = 0;
-		this.renderOffsetZ = 0;
 		
 	}
 	
@@ -106,36 +116,57 @@ public class ChunkRenderManager {
 	}
 	
 	/**
-	 * Initialize the chunk render manager, this create the new thread pool for chunk render data recomputation.
+	 * <p>Initialize the chunk render manager, this create the new thread pool for chunk render data recomputation.</p>
+	 * <p><b>Must only be called from {@link WorldRenderer}.</b></p>
 	 */
 	void init() {
 		
 		int poolSize = CHUNK_RENDERER_DISPATCH.getEffectiveCount();
 		
 		LOGGER.info("Starting world chunk renderer tasks thread pool (" + poolSize + " threads) ...");
-		this.chunkComputer = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
+		this.threadPool = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
 		
 	}
 	
 	/**
-	 * Stop and shutdown internal thread pool.
+	 * <p>Stop and shutdown internal thread pool.</p>
+	 * <p><b>Must only be called from {@link WorldRenderer}.</b></p>
 	 */
 	void stop() {
 		
 		LOGGER.info("Shutting down chunk renderer tasks thread pool ...");
-		this.chunkComputer.shutdown();
+		this.threadPool.shutdown(); // FIXME Potential leaks if never finished (case not confirmed)...
+		this.threadPool = null;
 		
 	}
 	
 	/**
-	 * Render
-	 * @param layer
+	 * <p>Set internal render distance and then create missing {@link ChunkRenderer} or delete those too many.</p>
+	 * <p><b>Must only be called from {@link WorldRenderer} while initialized.</b></p>
+	 * @param renderDistance The render distance, in chunks.
+	 */
+	void setRenderDistance(int renderDistance) {
+		
+		MathUtils.requireIntegerInRange(renderDistance, RENDER_DISTANCE_MIN, RENDER_DISTANCE_MAX, "Given render distance");
+		
+		this.renderDistance = renderDistance;
+		this.renderDistanceSquared = (renderDistance << 4) * (renderDistance << 4);
+		
+	}
+	
+	/**
+	 * Render a specific layer on the current framebuffer.
+	 * Layer are used by {@link WorldRenderer} to change render properties for each layers.
+	 * @param layer The block render layer to render.
 	 */
 	void render(BlockRenderLayer layer) {
 		
-		this.profiler.startSection("render_layer_" + layer.name());
+		if (this.renderDistance == 0)
+			return;
+		
+		PROFILER.startSection("render_layer_" + layer.name());
 		this.chunkRenderersList.forEach(cr -> cr.render(layer, RENDER_DISTANCE_SQUARED));
-		this.profiler.endSection();
+		PROFILER.endSection();
 		
 	}
 	
@@ -144,7 +175,7 @@ public class ChunkRenderManager {
 	 */
 	void update() {
 		
-		this.profiler.startSection("chunk_render_update");
+		PROFILER.startSection("chunk_render_update");
 		
 		Iterator<Future<ChunkUpdateDescriptor>> chunkUpdatesIt = this.chunkUpdatesDescriptors.iterator();
 		Future<ChunkUpdateDescriptor> future;
@@ -187,7 +218,7 @@ public class ChunkRenderManager {
 		
 		this.chunkRenderersList.forEach(ChunkRenderer::update);
 		
-		this.profiler.endSection();
+		PROFILER.endSection();
 		
 	}
 	
@@ -328,14 +359,14 @@ public class ChunkRenderManager {
 	
 	public void scheduleUpdateTask(ChunkRenderer cr, BlockRenderLayer layer, Runnable action) {
 		
-		if (this.chunkComputer == null)
+		if (this.threadPool == null)
 			throw new IllegalStateException("Can't schedule update tasks while associated thread pool is not initialized.");
 		
 		ChunkUpdateDescriptor descriptor = new ChunkUpdateDescriptor(cr.getChunkPosition(), layer);
 		
 		if (!this.chunkUpdates.containsKey(descriptor)) {
 			
-			Future<ChunkUpdateDescriptor> future = this.chunkComputer.submit(action, descriptor);
+			Future<ChunkUpdateDescriptor> future = this.threadPool.submit(action, descriptor);
 			this.chunkUpdates.put(descriptor, future);
 			this.chunkUpdatesDescriptors.add(future);
 			
