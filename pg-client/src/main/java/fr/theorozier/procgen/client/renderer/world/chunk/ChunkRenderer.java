@@ -13,8 +13,18 @@ import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ *
+ * <p>ChunkRenderer manage a single vertical chunk render data.</p>
+ * <p>It store its neighbours, layers and draw buffers ({@link IndicesDrawBuffer}).</p>
+ * <p>Internal rendered chunks can be dynamically changed and re-rendered.</p>
+ *
+ * @author Théo Rozier
+ *
+ */
 public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private final ChunkRenderManager renderManager;
@@ -27,6 +37,8 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
+	private int xOffset = 0;
+	private int zOffset = 0;
 	
 	public ChunkRenderer(ChunkRenderManager renderManager) {
 		
@@ -84,10 +96,13 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	public void setChunk(WorldChunk chunk) {
 		
-		this.chunk = chunk;
+		this.chunk = Objects.requireNonNull(chunk);
 		
 		for (BlockRenderLayer layer : BlockRenderLayer.values())
 			this.layers[layer.ordinal()].setChunk(chunk);
+
+		this.xOffset = chunk.getChunkPos().getX() >> 1;
+		this.zOffset = chunk.getChunkPos().getZ() >> 1;
 			
 	}
 	
