@@ -6,6 +6,7 @@ import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
+import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.chunk.WorldSection;
@@ -23,7 +24,6 @@ import io.msengine.client.renderer.util.BlendMode;
 import io.msengine.client.renderer.window.Window;
 import io.msengine.client.renderer.window.listener.WindowFramebufferSizeEventListener;
 import io.msengine.client.renderer.window.listener.WindowMousePositionEventListener;
-import io.msengine.client.util.camera.SmoothCamera3D;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
@@ -46,10 +46,17 @@ public class WorldRenderer implements ModelApplyListener,
 		WorldChunkListener,
 		WorldEntityListener {
 	
+	// CONSTS //
+	
 	private static final Profiler PROFILER = GameProfiler.getInstance();
 	
 	private static final int RENDER_OFFSET_BASE  = 2048;
 	private static final int RENDER_OFFSET_SHIFT = 12; // Step : 4096 (2^12)
+	
+	public static final int RENDER_DISTANCE_MIN = 4;
+	public static final int RENDER_DISTANCE_MAX = 64;
+	
+	// CLASS //
 	
 	private final Window window;
 	
@@ -58,7 +65,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private final WorldSkyBox skyBox;
 	
 	private final ModelHandler model;
-	private final SmoothCamera3D camera;
+	private final WorldCamera camera;
 	private final Matrix4f globalMatrix;
 	private final Matrix4f projectionMatrix;
 	
@@ -73,7 +80,9 @@ public class WorldRenderer implements ModelApplyListener,
 	private final ChunkRenderManager chunkRenderManager;
 	private final EntityRenderManager entityRenderManager;
 	
-	private int renderOffsetX, renderOffsetZ;
+	private int renderDistance = 0;
+	
+	// private int renderOffsetX, renderOffsetZ;
 	
 	public WorldRenderer() {
 		
@@ -85,19 +94,19 @@ public class WorldRenderer implements ModelApplyListener,
 		this.skyBox = new WorldSkyBox(this.shaderManager);
 		
 		this.model = new ModelHandler(this);
-		this.camera = new SmoothCamera3D();
+		this.camera = new WorldCamera();
 		this.globalMatrix = new Matrix4f();
 		this.projectionMatrix = new Matrix4f();
 		
 		this.chunkRenderManager = new ChunkRenderManager(this);
 		this.entityRenderManager = new EntityRenderManager(this);
 		
-		this.renderOffsetX = 0;
-		this.renderOffsetZ = 0;
+		// this.renderOffsetX = 0;
+		// this.renderOffsetZ = 0;
 		
 	}
 	
-	public SmoothCamera3D getCamera() {
+	public WorldCamera getCamera() {
 		return this.camera;
 	}
 	
@@ -131,6 +140,7 @@ public class WorldRenderer implements ModelApplyListener,
 		RenderGame.getCurrentRender().getTextureManager().loadTexture(this.terrainMap);
 		
 		this.shaderManager.build();
+		this.shaderManager.setGlobalOffset(0, 0, 0);
 		this.skyBox.init();
 		
 		this.camera.setSpeed(0.2f);
@@ -138,19 +148,19 @@ public class WorldRenderer implements ModelApplyListener,
 		this.camera.instantTarget();
 		this.camera.updateViewMatrix();
 		
-		this.updateRenderSize(this.window);
-		
 		this.chunkRenderManager.init();
 		this.entityRenderManager.init();
 		
 		this.init = true;
+		
+		this.setRenderDistance(8);
 		
 	}
 	
 	/**
 	 * @return True if the world renderer was initialized, even if called {@link #stop()}.
 	 */
-	public boolean initialized() {
+	public boolean isInitialized() {
 		return this.init;
 	}
 	
@@ -163,12 +173,29 @@ public class WorldRenderer implements ModelApplyListener,
 		if (!this.init)
 			throw new IllegalStateException("World renderer can't be stoped until initialized.");
 		
+		this.chunkRenderManager.stop();
 		this.entityRenderManager.stop();
 		
 		this.skyBox.stop();
 		this.shaderManager.delete();
 		
 		this.window.removeMousePositionEventListener(this);
+		
+	}
+	
+	/**
+	 * Set world render distance.
+	 * @param renderDistance The new distance.
+	 */
+	public void setRenderDistance(int renderDistance) {
+		
+		if (!this.init)
+			throw new IllegalStateException("Can't set render distance if WorldRenderer is not initialized.");
+		
+		MathUtils.requireIntegerInRange(renderDistance, RENDER_DISTANCE_MIN, RENDER_DISTANCE_MAX, "Given render distance");
+		this.renderDistance = renderDistance;
+		this.chunkRenderManager.setRenderDistance(renderDistance, renderDistance);
+		this.updateRenderSize();
 		
 	}
 	
@@ -245,11 +272,16 @@ public class WorldRenderer implements ModelApplyListener,
 			
 		}
 		
+		float camX = this.camera.getLerpedX(alpha);
+		float camY = this.camera.getLerpedY(alpha);
+		float camZ = this.camera.getLerpedZ(alpha);
+		
 		Matrix4f view = this.camera.getViewMatrix();
 		view.identity();
 		view.rotateX(-this.camera.getLerpedPitch(alpha));
 		view.rotateY(this.camera.getLerpedYaw(alpha));
-		view.translate(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
+		view.translate(0, -camY, 0);
+		// view.translate(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		
 		this.updateGlobalMatrix();
 		this.model.apply();
@@ -261,30 +293,29 @@ public class WorldRenderer implements ModelApplyListener,
 		this.shaderManager.use();
 		
 		PROFILER.startSection("render_skybox");
-		this.shaderManager.setGlobalOffset(0, 0, 0);
 		this.renderSkyBox();
 		
 		PROFILER.endStartSection("render_chunks");
 		// this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
-		this.renderChunks(alpha);
+		this.renderChunks(alpha, camX, camZ);
 		PROFILER.endSection();
 		
 		this.shaderManager.end();
 	
 	}
 	
-	private void renderChunks(float alpha) {
+	private void renderChunks(float alpha, float camX, float camZ) {
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
 		
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 		glDepthMask(true);
-		this.chunkRenderManager.render(BlockRenderLayer.OPAQUE);
-		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT);
+		this.chunkRenderManager.render(BlockRenderLayer.OPAQUE, camX, camZ);
+		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT, camX, camZ);
 		
 		glDisable(GL_CULL_FACE);
-		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT_NOT_CULLED);
+		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT_NOT_CULLED, camX, camZ);
 		this.entityRenderManager.render(alpha);
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
@@ -293,7 +324,7 @@ public class WorldRenderer implements ModelApplyListener,
 		glDepthMask(false);
 		glEnable(GL_BLEND);
 		BlendMode.TRANSPARENCY.use();
-		this.chunkRenderManager.render(BlockRenderLayer.TRANSPARENT);
+		this.chunkRenderManager.render(BlockRenderLayer.TRANSPARENT, camX, camZ);
 		
 		glDepthMask(true);
 		
@@ -318,7 +349,9 @@ public class WorldRenderer implements ModelApplyListener,
 		this.terrainMap.tick();
 		PROFILER.endSection();
 		
-		this.chunkRenderManager.update();
+		if (this.ready) {
+			this.chunkRenderManager.update();
+		}
 		
 		this.camera.update();
 		
@@ -334,7 +367,7 @@ public class WorldRenderer implements ModelApplyListener,
 		if (!this.init)
 			return;
 		
-		if (this.ready) {
+		if (this.renderingWorld != null) {
 			
 			this.renderingWorld.getEventManager().removeEventListener(WorldLoadingListener.class, this);
 			this.renderingWorld.getEventManager().removeEventListener(WorldChunkListener.class, this);
@@ -347,7 +380,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.renderingWorld = world;
 		this.ready = world != null;
 		
-		if (this.ready) {
+		if (world != null) {
 			
 			this.chunkRenderManager.updateViewPosition(this.camera);
 			this.renderingWorld.getEntitiesView().forEach(this.entityRenderManager::addEntity);
@@ -361,7 +394,7 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	/**
-	 * @return Current rendering world, or Null if .
+	 * @return Current rendering world, or Null if no rendered world.
 	 */
 	public WorldClient getRenderingWorld() {
 		return this.renderingWorld;
@@ -408,17 +441,16 @@ public class WorldRenderer implements ModelApplyListener,
 	private void updateRenderSize(int width, int height) {
 		
 		this.projectionMatrix.identity();
-		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, ChunkRenderManager.RENDER_DISTANCE * 3f);
+		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, (this.renderDistance << 4) * 3f);
 		this.updateGlobalMatrix();
 		
 	}
 	
 	/**
 	 * Update render size to window's size.
-	 * @param window The window.
 	 */
-	private void updateRenderSize(Window window) {
-		this.updateRenderSize(window.getWidth(), window.getHeight());
+	private void updateRenderSize() {
+		this.updateRenderSize(this.window.getWidth(), this.window.getHeight());
 	}
 	
 	@Override

@@ -71,11 +71,9 @@ subprojects {
         exclude("*.so.git", "*.so.sha1")
     }
 
-    /*
     tasks.register("showConf") {
         configurations.named("runtimeClasspath").get().forEach { println(it) }
     }
-    */
 
 }
 

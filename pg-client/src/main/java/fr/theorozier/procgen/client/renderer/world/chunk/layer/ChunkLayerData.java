@@ -18,8 +18,8 @@ public abstract class ChunkLayerData {
 	protected final ChunkRenderManager renderManager;
 	protected final WorldRenderDataArray dataArray;
 	
-	protected WorldChunk chunk;
-	protected WorldBase world;
+	protected WorldChunk chunk = null;
+	protected WorldBase world = null;
 	
 	private boolean needUpdate = false;
 	
@@ -37,9 +37,15 @@ public abstract class ChunkLayerData {
 		return this.layer;
 	}
 	
-	public void setChunk(WorldChunk chunk) {
+	public void setChunk(WorldChunk chunk, int roX, int roZ) {
+		
 		this.chunk = chunk;
 		this.world = chunk.getWorld();
+		this.roX = roX;
+		this.roZ = roZ;
+		
+		this.setNeedUpdate(true);
+		
 	}
 	
 	public boolean doNeedUpdate() {
@@ -53,12 +59,14 @@ public abstract class ChunkLayerData {
 	public abstract void handleNewViewPosition(ChunkRenderer cr, int x, int y, int z);
 	public abstract void handleChunkUpdate(ChunkRenderer cr);
 	
+	/*
 	protected void refreshRenderOffsets() {
 		
 		this.roX = this.renderManager.getRenderOffsetX();
 		this.roZ = this.renderManager.getRenderOffsetZ();
 		
 	}
+	*/
 	
 	protected void rebuildArrays(Runnable run) {
 		
@@ -131,11 +139,11 @@ public abstract class ChunkLayerData {
 							else faces.setFaceBlock(state, Direction.WEST, this.world.getBlockAt(wx, wy, wz - 1));
 							
 							if (faces.isVisible()) {
-								consumer.accept(wx, wy, wz, state, renderer, faces);
+								consumer.accept(wx, wy, wz, x, y, z, state, renderer, faces);
 							}
 							
 						} else {
-							consumer.accept(wx, wy, wz, state, renderer, faces);
+							consumer.accept(wx, wy, wz, x, y, z, state, renderer, faces);
 						}
 						
 					}
@@ -147,7 +155,7 @@ public abstract class ChunkLayerData {
 	}
 	
 	protected interface BlockConsumer {
-		void accept(int bx, int by, int bz, BlockState block, BlockRenderer renderer, BlockFaces faces);
+		void accept(int wx, int wy, int wz, int bx, int by, int bz, BlockState block, BlockRenderer renderer, BlockFaces faces);
 	}
 	
 }

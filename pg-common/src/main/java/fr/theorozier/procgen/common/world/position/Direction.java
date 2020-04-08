@@ -36,4 +36,6 @@ public enum Direction {
 		return values()[(int) (n * values().length)];
 	}
 	
+	public static final int COUNT = 6;
+	
 }

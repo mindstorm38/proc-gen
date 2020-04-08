@@ -33,7 +33,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	@Override
 	public void handleChunkUpdate(ChunkRenderer cr) {
 		
-		this.refreshRenderOffsets();
+		// this.refreshRenderOffsets();
 		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildCacheAndData);
 		
 	}
@@ -49,7 +49,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 		
 		this.cache.clear();
 		
-		this.foreachBlocks((bx, by, bz, block, renderer, faces) -> {
+		this.foreachBlocks((wx, wy, wz, bx, by, bz, block, renderer, faces) -> {
 			this.cache.add(new ChunkCompiledBlock(renderer, block, faces, bx, by, bz));
 		});
 		

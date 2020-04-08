@@ -75,7 +75,12 @@ public abstract class EntityRenderer<E extends Entity> {
 		this.parts.put(id, part);
 		
 		if (this.initied) {
+			
+			if (this.optionalDataArray.loaded())
+				this.optionalDataArray.get().resetBuffers();
+			
 			part.initPart(this.shaderManager, this.optionalDataArray.get());
+			
 		}
 		
 	}

@@ -84,7 +84,7 @@ public class EntityRenderManager {
 	 */
 	public <E extends Entity> void addEntityRenderer(Class<E> entityClass, EntityRenderer<? super E> renderer) {
 		
-		if (this.renderer.initialized())
+		if (this.renderer.isInitialized())
 			throw new IllegalStateException("Can't add entity renderer after world initialization.");
 		
 		this.entityRenderers.put(entityClass, renderer);

@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world.chunk;
 
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
+import fr.theorozier.procgen.client.renderer.world.WorldCamera;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkLayerData;
@@ -9,11 +10,11 @@ import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
+import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -29,23 +30,31 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private final ChunkRenderManager renderManager;
 	private final WorldRenderer renderer;
+	private final ModelHandler model;
+	private final WorldCamera camera;
 	
-	private final Map<Integer, ChunkRenderer> neighbours;
+	private final ChunkRenderer[] neighbours;
 	
 	private final ChunkLayerData[] layers;
 	private final IndicesDrawBuffer[] drawBuffers;
 	
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
-	private int xOffset = 0;
-	private int zOffset = 0;
+	
+	// Render Offsets
+	private int roX = 0;
+	private int roZ = 0;
+	private int chunkX = 0;
+	private int chunkZ = 0;
 	
 	public ChunkRenderer(ChunkRenderManager renderManager) {
 		
 		this.renderManager = renderManager;
 		this.renderer = renderManager.getWorldRenderer();
+		this.model = renderManager.getWorldRenderer().getModelHandler();
+		this.camera = renderManager.getWorldRenderer().getCamera();
 		
-		this.neighbours = new HashMap<>();
+		this.neighbours = new ChunkRenderer[Direction.COUNT];
 		
 		this.layers = new ChunkLayerData[BlockRenderLayer.COUNT];
 		this.drawBuffers = new IndicesDrawBuffer[BlockRenderLayer.COUNT];
@@ -72,22 +81,18 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.drawBuffers[layer.ordinal()];
 	}
 	
-	public ImmutableBlockPosition getChunkPosition() {
-		return this.chunk.getChunkPos();
-	}
-	
 	public void init() {
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
 			this.drawBuffers[i] = this.renderer.getShaderManager().createBasicDrawBuffer(true, true);
 		
-		this.setNeedUpdate(true);
-		
 	}
 	
 	public void delete() {
 		
-		this.neighbours.forEach((i, cr) -> cr.removeNeighbour(Direction.values()[i].oposite()));
+		for (int i = 0; i < Direction.COUNT; ++i)
+			if (this.neighbours[i] != null)
+				this.neighbours[i].removeNeighbour(Direction.values()[i].oposite());
 		
 		for (int i = 0; i < this.drawBuffers.length; ++i)
 			this.drawBuffers[i].delete();
@@ -96,23 +101,67 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	public void setChunk(WorldChunk chunk) {
 		
-		this.chunk = Objects.requireNonNull(chunk);
+		this.chunk = Objects.requireNonNull(chunk, "ChunkRenderer chunk can't be null.");
 		
-		for (BlockRenderLayer layer : BlockRenderLayer.values())
-			this.layers[layer.ordinal()].setChunk(chunk);
-
-		this.xOffset = chunk.getChunkPos().getX() >> 1;
-		this.zOffset = chunk.getChunkPos().getZ() >> 1;
-			
+		this.chunkX = chunk.getChunkPos().getX() << 4;
+		this.chunkZ = chunk.getChunkPos().getZ() << 4;
+		
+		this.roX = (chunk.getChunkPos().getX() & 15) << 4;
+		this.roZ = (chunk.getChunkPos().getZ() & 15) << 4;
+		
+		for (ChunkLayerData layerData : this.layers)
+			layerData.setChunk(chunk, this.roX, this.roZ);
+		
 	}
 	
+	public void releaseChunk() {
+		this.chunk = null;
+	}
+	
+	/**
+	 * @return True if the {@link ChunkRenderer} currently handle a Chunk for rendering.
+	 */
+	public boolean isActive() {
+		return this.chunk != null;
+	}
+	
+	public WorldChunk getChunk() {
+		return this.chunk;
+	}
+	
+	public ImmutableBlockPosition getChunkPosition() {
+		return this.chunk.getChunkPos();
+	}
+	
+	public int getRenderOffsetX() {
+		return this.roX;
+	}
+	
+	public int getRenderOffsetZ() {
+		return this.roZ;
+	}
+	
+	// NEIGHBOURS //
+	
 	public void setNeighbour(Direction face, ChunkRenderer cr) {
-		this.neighbours.put(face.ordinal(), cr);
+		this.neighbours[face.ordinal()] = cr;
 	}
 	
 	public void removeNeighbour(Direction face) {
-		this.neighbours.remove(face.ordinal());
+		this.setNeighbour(face, null);
 	}
+	
+	public void removeAllNeighbours(BiConsumer<Direction, ChunkRenderer> consumer) {
+		for (Direction dir : Direction.values()) {
+			ChunkRenderer nb = this.neighbours[dir.ordinal()];
+			if (nb != null) {
+				this.neighbours[dir.ordinal()] = null;
+				consumer.accept(dir, nb);
+			}
+		}
+	}
+	
+	// UPDATES //
 	
 	public void setNeedUpdate(BlockRenderLayer layer, boolean needUpdate) {
 		this.getLayerData(layer).setNeedUpdate(needUpdate);
@@ -125,30 +174,56 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
-	public void render(BlockRenderLayer layer, int maxdist) {
-		
-		if (this.distanceToCameraSquared <= maxdist)
-			this.render(layer);
-		
-	}
-	
-	public void render(BlockRenderLayer layer) {
-		this.drawBuffers[layer.ordinal()].drawElements();
-	}
-	
 	public void update() {
 		
-		for (ChunkLayerData layerData : this.layers) {
-			if (layerData.doNeedUpdate()) {
-				
-				layerData.handleChunkUpdate(this);
-				layerData.setNeedUpdate(false);
-				
+		if (this.isActive()) {
+			for (ChunkLayerData layerData : this.layers) {
+				if (layerData.doNeedUpdate()) {
+					
+					layerData.handleChunkUpdate(this);
+					layerData.setNeedUpdate(false);
+					
+				}
 			}
 		}
-	
+		
 	}
 	
+	/**
+	 * <p>Render a specific block render layer only if the internal computed squared distance to camera
+	 * (using {@link #updateDistanceToCamera(float, float, float)}) is less or equals than (squared) 'maxdist'
+	 * <b>and</b> this chunk is active.</p>
+	 * @param layer The render layer to render.
+	 * @param maxdist The maximum (squared) distance.
+	 * @see #render(BlockRenderLayer, float, float)
+	 */
+	public void render(BlockRenderLayer layer, int maxdist, float camX, float camZ) {
+		
+		if (this.isActive() && this.distanceToCameraSquared <= maxdist)
+			this.render(layer, camX, camZ);
+		
+	}
+	
+	/**
+	 * Render a specific block render layer.
+	 * @param layer The render layer to render.
+	 * @see #render(BlockRenderLayer, int, float, float)
+	 */
+	public void render(BlockRenderLayer layer, float camX, float camZ) {
+		
+		this.model.push().translate(this.chunkX - camX, 0, this.chunkZ - camZ).apply();
+		this.drawBuffers[layer.ordinal()].drawElements();
+		this.model.pop();
+		
+	}
+	
+	/**
+	 * Update the squared distance to a specific camera position and return it.
+	 * @param x The camera X position.
+	 * @param y The camera Y position.
+	 * @param z The camera Z position.
+	 * @return The computed distance to camera.
+	 */
 	public float updateDistanceToCamera(float x, float y, float z) {
 		return this.distanceToCameraSquared = (int) this.chunk.getDistSquaredTo(x, y, z);
 	}
@@ -179,7 +254,9 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 		if (this.chunk == chunk) {
 			
-			this.neighbours.forEach((i, cr) -> cr.setNeedUpdate(true));
+			for (int i = 0; i < Direction.COUNT; ++i)
+				this.neighbours[i].setNeedUpdate(true);
+			
 			this.setNeedUpdate(true);
 			
 		}
@@ -192,7 +269,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			
 			checkBlockOnFaces(pos, dir -> {
 				
-				ChunkRenderer neighbour = this.neighbours.get(dir.ordinal());
+				ChunkRenderer neighbour = this.neighbours[dir.ordinal()];
 				
 				if (neighbour != null)
 					neighbour.setNeedUpdate(true);
@@ -205,6 +282,11 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
+	/**
+	 * Utility method to trigger a callback for each direction for neighbors who need updates.
+	 * @param pos The block update position.
+	 * @param consumer The callback for directions.
+	 */
 	private static void checkBlockOnFaces(BlockPositioned pos, Consumer<Direction> consumer) {
 		
 		int rx = pos.getX() & 15;
@@ -229,11 +311,11 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	@Override
 	public int hashCode() {
-		return this.chunk.getChunkPos().hashCode();
+		return this.chunk.getChunkPos().hashCode(); // TODO Change that
 	}
 	
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) { // TODO Also change this
 		if (obj == this) return true;
 		if (obj.getClass() != getClass()) return true;
 		ChunkRenderer render = (ChunkRenderer) obj;

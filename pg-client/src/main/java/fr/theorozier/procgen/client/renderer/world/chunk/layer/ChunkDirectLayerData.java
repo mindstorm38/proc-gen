@@ -21,7 +21,7 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	@Override
 	public void handleChunkUpdate(ChunkRenderer cr) {
 		
-		this.refreshRenderOffsets();
+		// this.refreshRenderOffsets();
 		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildData);
 		
 	}
@@ -33,10 +33,10 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	public void rebuildData(TextureMap terrainMap) {
 		
 		this.rebuildArrays(() -> {
-			this.foreachBlocks((bx, by, bz, block, renderer, faces) -> {
+			this.foreachBlocks((wx, wy, wz, bx, by, bz, block, renderer, faces) -> {
 				
 				try {
-					renderer.getRenderData(this.world, block, bx, by, bz, bx + this.roX, by, bz + this.roZ, faces, terrainMap, this.dataArray);
+					renderer.getRenderData(this.world, block, wx, wy, wz, bx, wy, bz, faces, terrainMap, this.dataArray);
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, "Failed to render a block at " + bx + "/" + by + "/" + bz, e);
 				}

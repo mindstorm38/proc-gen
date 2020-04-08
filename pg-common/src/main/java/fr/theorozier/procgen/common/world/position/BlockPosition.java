@@ -76,6 +76,10 @@ public class BlockPosition extends AbsBlockPosition {
 		return this.set(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
 	}
 	
+	public BlockPosition set(BlockPositioned pos, Direction dir) {
+		return this.set(pos.getX() + dir.rx, pos.getY() + dir.ry, pos.getZ() + dir.rz);
+	}
+	
 	public BlockPosition set(BlockPositioned pos) {
 		return this.set(pos.getX(), pos.getY(), pos.getZ());
 	}
