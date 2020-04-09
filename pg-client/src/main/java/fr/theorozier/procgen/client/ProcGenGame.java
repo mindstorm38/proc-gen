@@ -240,6 +240,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 			
 			// TODO Just for temporary tests.
 			worldServer.getMainDimension().addWorldLoadingPosition(ProcGenGame.getGameInstance().getTestLoadingPosition());
+			this.worldRenderer.getCamera().setTarget(0, 80, 0, 0, 0);
 			
 			this.clientWorld = new WorldSinglePlayer(worldServer.getMainDimension());
 			

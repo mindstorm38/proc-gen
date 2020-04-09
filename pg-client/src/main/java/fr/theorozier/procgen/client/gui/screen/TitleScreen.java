@@ -36,7 +36,7 @@ public class TitleScreen extends Screen {
 		this.addChild(this.backgroundImage);
 		
 		// Version
-		this.versionText = new GuiTextBase("ProcGen Beta 0.1.3");
+		this.versionText = new GuiTextBase("ProcGen Beta 0.1.2");
 		this.versionText.setHeight(20);
 		this.versionText.setAnchor(-1, 1);
 		this.versionText.setXPos(12);

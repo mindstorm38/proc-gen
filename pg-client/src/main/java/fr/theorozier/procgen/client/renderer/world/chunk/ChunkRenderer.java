@@ -1,7 +1,6 @@
 package fr.theorozier.procgen.client.renderer.world.chunk;
 
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
-import fr.theorozier.procgen.client.renderer.world.WorldCamera;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.chunk.layer.ChunkLayerData;
@@ -28,10 +27,11 @@ import java.util.function.Consumer;
  */
 public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
+	private static final int FIRST_UPDATED_MASK = (1 << BlockRenderLayer.COUNT) - 1;
+	
 	private final ChunkRenderManager renderManager;
 	private final WorldRenderer renderer;
 	private final ModelHandler model;
-	private final WorldCamera camera;
 	
 	private final ChunkRenderer[] neighbours;
 	
@@ -40,10 +40,12 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
+	private int firstUpdates = 0;
+	private boolean firstUpdated = false;
 	
 	// Render Offsets
-	private int roX = 0;
-	private int roZ = 0;
+	// private int roX = 0;
+	// private int roZ = 0;
 	private int chunkX = 0;
 	private int chunkZ = 0;
 	
@@ -52,7 +54,6 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		this.renderManager = renderManager;
 		this.renderer = renderManager.getWorldRenderer();
 		this.model = renderManager.getWorldRenderer().getModelHandler();
-		this.camera = renderManager.getWorldRenderer().getCamera();
 		
 		this.neighbours = new ChunkRenderer[Direction.COUNT];
 		
@@ -102,15 +103,17 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	public void setChunk(WorldChunk chunk) {
 		
 		this.chunk = Objects.requireNonNull(chunk, "ChunkRenderer chunk can't be null.");
+		this.firstUpdates = 0;
+		this.firstUpdated = false;
 		
 		this.chunkX = chunk.getChunkPos().getX() << 4;
 		this.chunkZ = chunk.getChunkPos().getZ() << 4;
 		
-		this.roX = (chunk.getChunkPos().getX() & 15) << 4;
-		this.roZ = (chunk.getChunkPos().getZ() & 15) << 4;
+		// this.roX = (chunk.getChunkPos().getX() & 15) << 4;
+		// this.roZ = (chunk.getChunkPos().getZ() & 15) << 4;
 		
 		for (ChunkLayerData layerData : this.layers)
-			layerData.setChunk(chunk, this.roX, this.roZ);
+			layerData.setChunk(chunk/*, this.roX, this.roZ*/);
 		
 	}
 	
@@ -125,6 +128,10 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.chunk != null;
 	}
 	
+	public boolean isRenderable() {
+		return this.isActive() && this.firstUpdated;
+	}
+	
 	public WorldChunk getChunk() {
 		return this.chunk;
 	}
@@ -133,13 +140,14 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.chunk.getChunkPos();
 	}
 	
+	/*
 	public int getRenderOffsetX() {
 		return this.roX;
 	}
 	
 	public int getRenderOffsetZ() {
 		return this.roZ;
-	}
+	}*/
 	
 	// NEIGHBOURS //
 	
@@ -199,7 +207,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	 */
 	public void render(BlockRenderLayer layer, int maxdist, float camX, float camZ) {
 		
-		if (this.isActive() && this.distanceToCameraSquared <= maxdist)
+		if (this.isRenderable() && this.distanceToCameraSquared <= maxdist)
 			this.render(layer, camX, camZ);
 		
 	}
@@ -239,7 +247,19 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	public void chunkUpdateDone(BlockRenderLayer layer) {
 		
 		ChunkLayerData data = this.getLayerData(layer);
-		if (data != null) this.uploadLayerData(data);
+		
+		if (data != null) {
+			
+			this.uploadLayerData(data);
+			
+			if (!this.firstUpdated) {
+				
+				this.firstUpdates |= 1 << layer.ordinal();
+				this.firstUpdated = (this.firstUpdates & FIRST_UPDATED_MASK) == FIRST_UPDATED_MASK;
+				
+			}
+			
+		}
 		
 	}
 	

@@ -145,15 +145,13 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.camera.setSpeed(0.2f);
 		this.camera.setTarget(0, 110, 0, 0, 0);
-		this.camera.instantTarget();
-		this.camera.updateViewMatrix();
 		
 		this.chunkRenderManager.init();
 		this.entityRenderManager.init();
 		
 		this.init = true;
 		
-		this.setRenderDistance(8);
+		this.setRenderDistance(32);
 		
 	}
 	
@@ -194,7 +192,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		MathUtils.requireIntegerInRange(renderDistance, RENDER_DISTANCE_MIN, RENDER_DISTANCE_MAX, "Given render distance");
 		this.renderDistance = renderDistance;
-		this.chunkRenderManager.setRenderDistance(renderDistance, renderDistance);
+		this.chunkRenderManager.setRenderDistance(renderDistance);
 		this.updateRenderSize();
 		
 	}
@@ -293,7 +291,7 @@ public class WorldRenderer implements ModelApplyListener,
 		this.shaderManager.use();
 		
 		PROFILER.startSection("render_skybox");
-		this.renderSkyBox();
+		this.renderSkyBox(camY);
 		
 		PROFILER.endStartSection("render_chunks");
 		// this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
@@ -316,7 +314,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		glDisable(GL_CULL_FACE);
 		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT_NOT_CULLED, camX, camZ);
-		this.entityRenderManager.render(alpha);
+		this.entityRenderManager.render(alpha, camX, camZ);
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
 		
@@ -330,13 +328,13 @@ public class WorldRenderer implements ModelApplyListener,
 		
 	}
 	
-	private void renderSkyBox() {
+	private void renderSkyBox(float camY) {
 		
 		this.shaderManager.setTextureSampler(null);
 		
-		// this.model.push().translate(this.camera.getX() + this.renderOffsetX, this.camera.getY(), this.camera.getZ() + this.renderOffsetZ).apply();
+		this.model.push().translate(0, camY, 0).apply();
 		this.skyBox.render();
-		// this.model.pop();
+		this.model.pop().apply();
 	
 	}
 	
@@ -388,6 +386,9 @@ public class WorldRenderer implements ModelApplyListener,
 			this.renderingWorld.getEventManager().addEventListener(WorldLoadingListener.class, this);
 			this.renderingWorld.getEventManager().addEventListener(WorldChunkListener.class, this);
 			this.renderingWorld.getEventManager().addEventListener(WorldEntityListener.class, this);
+			
+			this.camera.instantTarget();
+			this.camera.updateViewMatrix();
 			
 		}
 	
@@ -441,7 +442,7 @@ public class WorldRenderer implements ModelApplyListener,
 	private void updateRenderSize(int width, int height) {
 		
 		this.projectionMatrix.identity();
-		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, (this.renderDistance << 4) * 3f);
+		this.projectionMatrix.perspective((float) Math.toRadians(70f), (float) width / (float) height, 0.1f, (this.renderDistance << 4) * 4f);
 		this.updateGlobalMatrix();
 		
 	}

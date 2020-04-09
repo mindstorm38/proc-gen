@@ -23,7 +23,7 @@ public abstract class ChunkLayerData {
 	
 	private boolean needUpdate = false;
 	
-	protected int roX, roZ;
+	// protected int roX, roZ;
 	
 	public ChunkLayerData(BlockRenderLayer layer, ChunkRenderManager renderManager) {
 		
@@ -37,12 +37,12 @@ public abstract class ChunkLayerData {
 		return this.layer;
 	}
 	
-	public void setChunk(WorldChunk chunk, int roX, int roZ) {
+	public void setChunk(WorldChunk chunk/*, int roX, int roZ*/) {
 		
 		this.chunk = chunk;
 		this.world = chunk.getWorld();
-		this.roX = roX;
-		this.roZ = roZ;
+		// this.roX = roX;
+		// this.roZ = roZ;
 		
 		this.setNeedUpdate(true);
 		

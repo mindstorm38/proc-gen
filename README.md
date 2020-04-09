@@ -42,6 +42,13 @@ generation.
 - [x] Asynchronous (multi-threaded) chunk generation
 - [x] Asynchronous dimension chunk saving on file system
 - [ ] Rework of rendering system
+  - [x] Solve far render issues
+  - [ ] Rendering optimizations
+    - [ ] Shared `WorldRenderDataArray` for all chunk renderers
+    - [ ] Use `MemoryUtil` natives for building data arrays
+    - [ ] Caching of blocks indices, in order to re-render only necessary faces
+    - [ ] Viewing Frustum Culling
+    - [ ] Occlusion Culling
 - [ ] Items
 - [x] All-model falling blocks
 - [x] TNT ***(WIP)***

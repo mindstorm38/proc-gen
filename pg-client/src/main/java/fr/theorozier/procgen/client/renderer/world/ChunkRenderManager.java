@@ -41,16 +41,6 @@ public class ChunkRenderManager {
 	private static final ThreadingDispatch CHUNK_RENDERER_DISPATCH = ThreadingDispatch.register("CHUNK_RENDER", 3);
 	private static final Profiler PROFILER = GameProfiler.getInstance();
 	
-	// These distances are squared, for optimisation.
-	/*public static final int RENDER_DISTANCE_CHUNKS = 12;
-	public static final int UNLOAD_DISTANCE_CHUNKS = 16;
-	
-	public static final int RENDER_DISTANCE = RENDER_DISTANCE_CHUNKS << 4;
-	public static final int UNLOAD_DISTANCE = UNLOAD_DISTANCE_CHUNKS << 4;
-	
-	public static final int RENDER_DISTANCE_SQUARED = RENDER_DISTANCE * RENDER_DISTANCE;
-	public static final int UNLOAD_DISTANCE_SQUARED = UNLOAD_DISTANCE * UNLOAD_DISTANCE;*/
-	
 	// Local cache for global singletons
 	private final WorldRenderer renderer;
 	private final ModelHandler model;
@@ -78,8 +68,6 @@ public class ChunkRenderManager {
 	private int unloadDistanceSquared = 0;
 	
 	private float viewX, viewY, viewZ;
-	// private int renderOffsetX = 0;
-	// private int renderOffsetZ = 0;
 	
 	public ChunkRenderManager(WorldRenderer renderer) {
 		
@@ -104,11 +92,6 @@ public class ChunkRenderManager {
 	public ChunkLayerData provideLayerData(BlockRenderLayer layer) {
 		return this.layerHandlers[layer.ordinal()].provide(layer, this);
 	}
-	
-	/*@Deprecated
-	private void resortChunkRenderers() {
-		this.chunkRenderers.sort(ChunkRenderer::compareTo);
-	}*/
 	
 	/**
 	 * <p>Initialize the chunk render manager, this create the new thread pool for chunk render data recomputation.</p>
@@ -140,7 +123,7 @@ public class ChunkRenderManager {
 	 * <p><b>Must only be called from {@link WorldRenderer} while initialized.</b></p>
 	 * @param renderDistance The render distance, in chunks.
 	 */
-	void setRenderDistance(int renderDistance, int verticalChunkCount) {
+	void setRenderDistance(int renderDistance) {
 		
 		this.disableRenderDistance();
 		
@@ -148,11 +131,11 @@ public class ChunkRenderManager {
 		this.renderDistanceSquared = (renderDistance << 4) * (renderDistance << 4);
 		this.unloadDistanceSquared = ((renderDistance + 2) << 4) * ((renderDistance + 2) << 4);
 		
-		int length = this.renderDistance * 2 + 1;
+		int length = (this.renderDistance << 1) + 1;
 		
 		// Multiply by a large approximation of the ratio of volume taken by a sphere in a cube.
-		int renderersCount = MathHelper.floorFloatInt(0.6f * length * length * length); // FIXME Why "verticalChunkCount" ?
-		
+		int renderersCount = MathHelper.floorFloatInt(0.7f * length * length * length);
+		System.out.println("Chunk renderer manager render distance : " + renderDistance + " ; renderers count : " + renderersCount);
 		ChunkRenderer renderer;
 		for (int i = 0; i < renderersCount; ++i) {
 			
@@ -296,6 +279,7 @@ public class ChunkRenderManager {
 			this.usedChunkRenderers.put(pos, cr);
 			
 			cr.setChunk(chunk);
+			cr.updateDistanceToCamera(this.viewX, this.viewY, this.viewZ);
 			
 		}
 		
@@ -322,96 +306,11 @@ public class ChunkRenderManager {
 		
 	}
 	
-	/*
-	private void loadChunkRenderer(WorldChunk chunk) {
-		
-		
-		
-		ImmutableBlockPosition pos = chunk.getChunkPos();
-		ChunkRenderer cr = this.usedChunkRenderers.get(pos);
-		
-		if (cr == null) {
-			
-			//System.out.println("Loading chunk at " + pos);
-			
-			//System.out.println("Loading chunk at " + pos + " (chunk in the middle : " + chunk.getBlockAt(7, 7, 7) + ")");
-			
-			cr = new ChunkRenderer(this);
-			cr.setChunk(chunk); // FIXME: Temporary retrocompat
-			
-			this.usedChunkRenderers.put(pos, cr);
-			this.chunkRenderers.add(cr);
-			
-			// this.resortChunkRenderers();
-			
-			cr.init();
-			
-			ChunkRenderer neighbour;
-			for (Direction dir : Direction.values()) {
-				if ((neighbour = this.usedChunkRenderers.get(this.cachedBlockPos.set(pos, dir.rx, dir.ry, dir.rz))) != null) {
-					
-					neighbour.setNeedUpdate(true);
-					
-					neighbour.setNeighbour(dir.oposite(), cr);
-					cr.setNeighbour(dir, neighbour);
-					
-				}
-			}
-			
-		}
-		
-	}
-	*/
-	
-	/*
-	private void deleteChunkRenderer(AbsBlockPosition pos) {
-		
-		ChunkRenderer cr = this.usedChunkRenderers.get(pos);
-		
-		if (cr != null) {
-			
-			//System.out.println("Unloading chunk at " + pos);
-			
-			this.usedChunkRenderers.remove(cr.getChunkPosition());
-			this.chunkRenderers.remove(cr);
-			cr.delete();
-			
-		}
-		
-	}
-	*/
-	
-	/*
-	void updateRenderOffset(int dx, int dz) {
-		
-		if (this.renderOffsetX != dx || this.renderOffsetZ != dz) {
-			
-			this.renderOffsetX = dx;
-			this.renderOffsetZ = dz;
-			
-			this.chunkRenderers.forEach(cr -> cr.setNeedUpdate(true));
-			
-		}
-		
-	}
-	
-	public int getRenderOffsetX() {
-		return renderOffsetX;
-	}
-	
-	public int getRenderOffsetZ() {
-		return renderOffsetZ;
-	}
-	*/
-	
 	void updateViewPosition(SmoothCamera3D cam) {
 		this.updateViewPosition(cam.getTargetX(), cam.getTargetY(), cam.getTargetZ());
 	}
 	
 	void updateViewPosition(float x, float y, float z) {
-		
-		// if (!this.isReady())
-		// 	return;
 		
 		this.viewX = x;
 		this.viewY = y;
@@ -437,21 +336,6 @@ public class ChunkRenderManager {
 			this.releasingChunkRenderers.clear();
 			
 		}
-		
-		// this.resortChunkRenderers();
-		/*
-		WorldClient world = this.renderer.getRenderingWorld();
-		
-		if (world != null) {
-			
-			world.forEachChunkNear(x, y, z, this.renderDistance, chunk -> {
-			
-				if (chunk.getDistSquaredTo(x, y, z) <= this.renderDistanceSquared)
-					this.allocateChunkRenderer(chunk);
-			
-			});
-			
-		}*/
 		
 		this.allocateChunkRenderersNear(x, y, z);
 		
@@ -497,16 +381,13 @@ public class ChunkRenderManager {
 	
 	void chunkLoaded(WorldChunk chunk) {
 		
-		if (this.isReady() && chunk.getDistSquaredTo(this.viewX, this.viewY, this.viewZ) <= this.renderDistanceSquared)
+		if (chunk.getDistSquaredTo(this.viewX, this.viewY, this.viewZ) <= this.renderDistanceSquared)
 			this.allocateChunkRenderer(chunk);
 		
 	}
 	
 	void chunkUnloaded(AbsBlockPosition pos) {
-		
-		if (this.isReady())
-			this.releaseChunkRenderer(pos);
-		
+		this.releaseChunkRenderer(pos);
 	}
 	
 	void chunkUpdated(WorldChunk chunk) {

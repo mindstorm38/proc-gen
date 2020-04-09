@@ -12,7 +12,7 @@ public class BufferedIntArray {
 	
 	public BufferedIntArray() {
 		
-		this.arr = new int[DEFAULT_GROW];
+		this.arr = new int[0];
 		this.size = 0;
 		this.grow = DEFAULT_GROW;
 		

@@ -10,6 +10,7 @@ import io.msengine.client.renderer.texture.TextureMap;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class ChunkSortedLayerData extends ChunkLayerData {
 	
 	private final List<ChunkCompiledBlock> cache;
@@ -74,7 +75,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 				block = compiledBlock.getBlock();
 				compiledBlock.mutateBlockFaces(faces);
 				
-				compiledBlock.getRenderer().getRenderData(this.world, block, compiledBlock.getX(), compiledBlock.getY(), compiledBlock.getZ(), compiledBlock.getX() + this.roX, compiledBlock.getY(), compiledBlock.getZ() + this.roZ, faces, terrainMap, this.dataArray);
+				compiledBlock.getRenderer().getRenderData(this.world, block, compiledBlock.getX(), compiledBlock.getY(), compiledBlock.getZ(), compiledBlock.getX(), compiledBlock.getY(), compiledBlock.getZ(), faces, terrainMap, this.dataArray);
 				
 			}
 			

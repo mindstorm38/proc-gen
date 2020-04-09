@@ -12,7 +12,7 @@ public class BufferedFloatArray {
 	
 	public BufferedFloatArray() {
 		
-		this.arr = new float[DEFAULT_GROW];
+		this.arr = new float[0];
 		this.size = 0;
 		this.grow = DEFAULT_GROW;
 		

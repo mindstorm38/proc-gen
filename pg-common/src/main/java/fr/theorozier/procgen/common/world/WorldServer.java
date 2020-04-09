@@ -3,7 +3,6 @@ package fr.theorozier.procgen.common.world;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import fr.theorozier.procgen.common.util.SaveUtils;
 import fr.theorozier.procgen.common.world.load.DimensionMetadata;

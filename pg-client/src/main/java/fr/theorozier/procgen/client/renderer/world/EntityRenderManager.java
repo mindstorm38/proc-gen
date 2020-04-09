@@ -100,13 +100,15 @@ public class EntityRenderManager {
 	 * Render entities.
 	 * @param alpha Render lerp ratio.
 	 */
-	void render(float alpha) {
+	void render(float alpha, float camX, float camZ) {
 	
 		ModelHandler model = this.model;
 		EntityRenderer<?> renderer;
 		ShaderSamplerObject sampler = null, newSampler;
 		
 		this.shaderManager.setTextureSampler(null);
+		
+		model.push().translate(-camX, 0, -camZ);
 		
 		for (Map.Entry<Class<? extends Entity>, HashSet<Entity>> entitiesOfClass : this.entitiesByClasses.entrySet()) {
 			
