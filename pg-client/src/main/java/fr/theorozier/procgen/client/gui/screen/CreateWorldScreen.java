@@ -120,7 +120,7 @@ public class CreateWorldScreen extends Screen {
 					try {
 						
 						WorldServer servedWorld = new WorldServer(worldDir);
-						DimensionMetadata dimensionMetadata = new DimensionMetadata(this.getWorldSeed(), ChunkGeneratorProviders.BETA_3D_CHUNK_PROVIDER);
+						DimensionMetadata dimensionMetadata = new DimensionMetadata(this.getWorldSeed(), ChunkGeneratorProviders.FLAT_CHUNK_PROVIDER);
 						WorldDimension dimension = servedWorld.createNewDimension("overworld", dimensionMetadata);
 						ProcGenGame.getGameInstance().setServedWorld(servedWorld);
 						

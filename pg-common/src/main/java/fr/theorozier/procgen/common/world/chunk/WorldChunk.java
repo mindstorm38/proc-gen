@@ -168,7 +168,7 @@ public class WorldChunk {
 				break;
 		}
 		
-		return this.getBlockAt(x, y, z);
+		return this.getBlockAt(x + direction.rx, y + direction.ry, z + direction.rz);
 		
 	}
 	

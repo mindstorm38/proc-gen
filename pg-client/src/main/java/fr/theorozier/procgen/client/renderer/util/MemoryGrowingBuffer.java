@@ -7,15 +7,15 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class MemoryGrowingBuffer<T extends Buffer> extends GrowingBuffer<T> {
 	
-	public MemoryGrowingBuffer(Function<Integer, T> bufferBuilder, BiConsumer<T, T> oldWriter, int grow) {
+	public MemoryGrowingBuffer(IntFunction<T> bufferBuilder, BiConsumer<T, T> oldWriter, int grow) {
 		super(bufferBuilder, MemoryUtil::memFree, oldWriter, grow);
 	}
 	
-	public MemoryGrowingBuffer(Function<Integer, T> bufferBuilder, BiConsumer<T, T> oldWriter) {
+	public MemoryGrowingBuffer(IntFunction<T> bufferBuilder, BiConsumer<T, T> oldWriter) {
 		super(bufferBuilder, MemoryUtil::memFree, oldWriter);
 	}
 	

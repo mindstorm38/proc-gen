@@ -1,27 +1,28 @@
 package fr.theorozier.procgen.common.util;
 
 import java.nio.Buffer;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class GrowingBuffer<T extends Buffer> {
 	
-	private final Function<Integer, T> bufferBuilder;
+	private final IntFunction<T> bufferBuilder;
 	private final Consumer<T> freeBuffer;
 	private final BiConsumer<T, T> oldWriter;
 	private final int grow;
 	
 	private T buffer = null;
 	
-	public GrowingBuffer(Function<Integer, T> bufferBuilder, Consumer<T> freeBuffer, BiConsumer<T, T> oldWriter, int grow) {
+	public GrowingBuffer(IntFunction<T> bufferBuilder, Consumer<T> freeBuffer, BiConsumer<T, T> oldWriter, int grow) {
 		this.bufferBuilder = bufferBuilder;
 		this.freeBuffer = freeBuffer;
 		this.oldWriter = oldWriter;
 		this.grow = grow;
 	}
 	
-	public GrowingBuffer(Function<Integer, T> bufferBuilder, Consumer<T> freeBuffer, BiConsumer<T, T> oldWriter) {
+	public GrowingBuffer(IntFunction<T> bufferBuilder, Consumer<T> freeBuffer, BiConsumer<T, T> oldWriter) {
 		this(bufferBuilder, freeBuffer, oldWriter, 2048);
 	}
 	
@@ -82,6 +83,10 @@ public class GrowingBuffer<T extends Buffer> {
 	 */
 	public T ensure(int len) {
 		
+		if (len < 1) {
+			throw new IllegalArgumentException("Invalid len to ensure, minimum is 1.");
+		}
+		
 		T buf = this.buffer;
 		
 		int cap, pos;
@@ -98,21 +103,23 @@ public class GrowingBuffer<T extends Buffer> {
 		
 		if (miss > 0) {
 			
-			this.buffer = this.bufferBuilder.apply(cap + this.round(miss));
+			this.buffer = Objects.requireNonNull(this.bufferBuilder.apply(cap + this.round(miss)), "Buffer builder returned null.");
 			
 			if (buf != null) {
-				buf.flip();
+				
+				buf.limit(pos);
+				buf.position(0);
+				
 				this.oldWriter.accept(this.buffer, buf);
 				this.freeBuffer.accept(buf);
+				
 			}
 			
 			buf = this.buffer;
 			
 		}
 		
-		if (buf != null) {
-			buf.limit(buf.capacity());
-		}
+		buf.limit(buf.capacity());
 		
 		return buf;
 		

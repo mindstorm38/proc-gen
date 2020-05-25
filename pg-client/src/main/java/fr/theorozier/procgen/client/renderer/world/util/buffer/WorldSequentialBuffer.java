@@ -35,18 +35,12 @@ public class WorldSequentialBuffer implements WorldRenderDataBuffer {
 	public void clear() {
 		this.data.clear();
 		this.indices.clear();
+		this.idx = 0;
 	}
 	
 	public void flip() {
 		this.data.flip();
 		this.indices.flip();
-	}
-	
-	// Vertices count //
-	
-	@Override
-	public int vertices() {
-		return this.idx;
 	}
 	
 	// Basic Vertex //
@@ -154,8 +148,10 @@ public class WorldSequentialBuffer implements WorldRenderDataBuffer {
 	public void faceVertex(int vidx, float x, float y, float z) {
 		FloatBuffer buf = this.data.get();
 		int pos = buf.position();
-		buf.position(pos - 32 + (vidx << 3)).put(x).put(y).put(z);
-		buf.position(pos);
+		vidx <<= 3;
+		buf.put(pos - 32 + vidx, x);
+		buf.put(pos - 31 + vidx, y);
+		buf.put(pos - 30 + vidx, z);
 	}
 	
 	// Face Colors //
@@ -175,8 +171,10 @@ public class WorldSequentialBuffer implements WorldRenderDataBuffer {
 	public void faceColor(int vidx, float r, float g, float b) {
 		FloatBuffer buf = this.data.get();
 		int pos = buf.position();
-		buf.position(pos - 29 + (vidx << 3)).put(r).put(g).put(b);
-		buf.position(pos);
+		vidx <<= 3;
+		buf.put(pos - 29 + vidx, r);
+		buf.put(pos - 28 + vidx, g);
+		buf.put(pos - 27 + vidx, b);
 	}
 	
 	// Face Texcoords //
@@ -225,11 +223,18 @@ public class WorldSequentialBuffer implements WorldRenderDataBuffer {
 	public void faceTexCoord(int vidx, float u, float v) {
 		FloatBuffer buf = this.data.get();
 		int pos = buf.position();
-		buf.position(pos - 26 + (vidx << 3)).put(u).put(v);
-		buf.position(pos);
+		vidx <<= 3;
+		buf.put(pos - 26 + vidx, u);
+		buf.put(pos - 27 + vidx, u);
 	}
 	
 	// Indices //
+	
+	@Override
+	public int indices() {
+		// FIXME: Currently not used
+		return this.indices.get().remaining();
+	}
 	
 	@Override
 	public void triangle(int a, int b, int c) {

@@ -3,6 +3,7 @@ package fr.theorozier.procgen.common.world.gen.provider;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.gen.beta.Beta3DChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.beta.BetaChunkGenerator;
+import fr.theorozier.procgen.common.world.gen.beta.FlatChunkGenerator;
 import fr.theorozier.procgen.common.world.gen.chunk.ChunkGenerator;
 
 import java.util.HashMap;
@@ -16,6 +17,7 @@ public final class ChunkGeneratorProviders {
 	// DEFAULT PROVIDERS //
 	public static final ChunkGeneratorProvider BETA_CHUNK_PROVIDER = registerDirect("beta", world -> new BetaChunkGenerator(world.getSeed()));
 	public static final ChunkGeneratorProvider BETA_3D_CHUNK_PROVIDER = registerDirect("beta_3d", world -> new Beta3DChunkGenerator(world.getSeed()));
+	public static final ChunkGeneratorProvider FLAT_CHUNK_PROVIDER = registerDirect("flat", world -> new FlatChunkGenerator(world.getSeed()));
 	
 	// REGISTERS METHODS //
 	public static <A extends ChunkGeneratorProvider> A register(A provider) {

@@ -60,11 +60,6 @@ public class WorldRenderDataArray implements WorldRenderDataBuffer {
 		return this.indices.getSize();
 	}
 	
-	@Override
-	public int vertices() {
-		return this.getIndicesCount();
-	}
-	
 	public BufferedFloatArray getVertices() {
 		return this.vertices;
 	}
@@ -101,23 +96,6 @@ public class WorldRenderDataArray implements WorldRenderDataBuffer {
 	@Override
 	public void texcoord(float u, float v) {
 		this.texcoords.put(u).put(v);
-	}
-	
-	@Override
-	public void triangle(int a, int b, int c) {
-		
-		this.indices.put(this.idx + a).put(this.idx + b).put(this.idx + c);
-		this.idx += 3;
-		
-	}
-	
-	@Override
-	public void rect(int a, int b, int c, int d) {
-		
-		this.indices.put(this.idx + a).put(this.idx + b).put(this.idx + c);
-		this.indices.put(this.idx + a).put(this.idx + c).put(this.idx + d);
-		this.idx += 4;
-		
 	}
 	
 	// Faces Vertices //
@@ -245,6 +223,30 @@ public class WorldRenderDataArray implements WorldRenderDataBuffer {
 	@Override
 	public void faceTexCoord(int vidx, float u, float v) {
 		this.texcoord(u, v);
+	}
+	
+	// Indices //
+	
+	@Override
+	public int indices() {
+		return this.getIndicesCount();
+	}
+	
+	@Override
+	public void triangle(int a, int b, int c) {
+		
+		this.indices.put(this.idx + a).put(this.idx + b).put(this.idx + c);
+		this.idx += 3;
+		
+	}
+	
+	@Override
+	public void rect(int a, int b, int c, int d) {
+		
+		this.indices.put(this.idx + a).put(this.idx + b).put(this.idx + c);
+		this.indices.put(this.idx + a).put(this.idx + c).put(this.idx + d);
+		this.idx += 4;
+		
 	}
 	
 	// Upload method //

@@ -120,6 +120,8 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		this.chunkX = chunk.getChunkPos().getX() << 4;
 		this.chunkZ = chunk.getChunkPos().getZ() << 4;
 		
+		this.setNeedUpdate();
+		
 		// this.roX = (chunk.getChunkPos().getX() & 15) << 4;
 		// this.roZ = (chunk.getChunkPos().getZ() & 15) << 4;
 		
@@ -198,7 +200,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		if (this.isActive()) {
 			
 			if (!this.redrawing && this.doNeedUpdate()) {
-				
+				//System.out.println("[Chunk " + this.chunk.getChunkPos() + "] Not redrawing and need update (" + Integer.toBinaryString(this.changed) + ").");
 				this.redrawing = true;
 				this.renderManager.scheduleChunkRedrawTask(this, this::redrawGlobal);
 				
@@ -381,6 +383,8 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			uploadDescriptor.getLayerBufferObjectCreate(layer, this.renderManager.getSequentialBufferPool());
 		}*/
 		
+		//System.out.println("[Chunk " + chunk.getChunkPos() + "] Redraw Global (" + Integer.toBinaryString(this.changed) + ")...");
+		
 		for (BlockRenderLayer layer : BlockRenderLayer.values()) {
 			if (this.doNeedUpdate(layer)) {
 				uploadDescriptor.clearBuffer(layer, this.renderManager.getSequentialBufferPool());
@@ -418,11 +422,10 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 							if (faces.isVisible()) {
 								
 								//buffer = uploadDescriptor.getLayerBufferObject(state.getBlock().getRenderLayer()).get();
-								
 								//int vertices = buffer.vertices();
 								//int layer = state.getBlock().getRenderLayer().ordinal();
 								buffer = uploadDescriptor.getBuffer(state.getBlock().getRenderLayer());
-								renderer.getRenderData(world, state, cx + x, cy + y, cz + z, x, y, z, faces, terrainMap, buffer);
+								renderer.getRenderData(world, state, cx + x, cy + y, cz + z, x, cy + y, z, faces, terrainMap, buffer);
 								//vertices = buffer.vertices() - vertices;
 								//shapeCache = buildShapeCache(this.shapesVertCounts[layer], vertices);
 								//this.shapesVertCounts[layer] += vertices;
@@ -539,11 +542,20 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			bit = 1 << i;
 			if ((this.changed & bit) == bit) {
 				if ((buff = uploadDescriptor.getBuffer(i)) != null) {
+					
 					buff.flip();
+					
+					this.drawBuffers[i].bindVao();
 					this.drawBuffers[i].uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, buff.getData(), BufferUsage.DYNAMIC_DRAW);
 					this.drawBuffers[i].uploadIboData(buff.getIndices(), BufferUsage.DYNAMIC_DRAW);
+					this.drawBuffers[i].setIndicesCount(buff.getIndices().remaining());
+					
 				}
 			}
+		}
+		
+		if (this.changed == CHANGED_ALL) {
+			this.firstUpdated = true;
 		}
 		
 		this.redrawing = false;
@@ -582,7 +594,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.chunk.getChunkPos().equals(render.getChunkPosition());
 	}
 	
-	private static int buildShapeCache(int verticesOffset, int verticesCount) {
+	/*private static int buildShapeCache(int verticesOffset, int verticesCount) {
 		return (verticesCount & 1023) | (verticesOffset << 10);
 	}
 	
@@ -592,7 +604,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private static int getShapeVerticesCount(int shapeCache) {
 		return shapeCache & 1023;
-	}
+	}*/
 	
 	private static void computeBlockFaces(BlockFaces faces, BlockState state, WorldChunk chunk, int x, int y, int z) {
 		for (Direction direction : Direction.values()) {
@@ -600,12 +612,12 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		}
 	}
 	
-	private static short getBlockLayeredIndex(int x, int y, int z, BlockRenderLayer layer) {
+	/*private static short getBlockLayeredIndex(int x, int y, int z, BlockRenderLayer layer) {
 		return (short) (WorldChunk.getBlockIndex(x, y, z) | (layer.ordinal() << 12));
 	}
 	
 	private static BlockRenderLayer getBlockLayer(short layeredIndex) {
 		return BlockRenderLayer.values()[(layeredIndex >> 12) & 15];
-	}
+	}*/
 	
 }

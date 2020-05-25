@@ -5,10 +5,6 @@ import io.msengine.common.util.Color;
 
 public interface WorldRenderDataBuffer {
 	
-	// Vertices count //
-	
-	int vertices();
-	
 	// Basic Vertex //
 	
 	void vertex(float x, float y, float z);
@@ -171,6 +167,7 @@ public interface WorldRenderDataBuffer {
 	
 	// Indices //
 	
+	int indices();
 	void triangle(int a, int b, int c);
 	void rect(int a, int b, int c, int d);
 	
