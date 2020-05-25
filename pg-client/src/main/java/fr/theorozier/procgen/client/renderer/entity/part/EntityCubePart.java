@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.entity.part;
 
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
-import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMapTile;
@@ -73,19 +73,19 @@ public class EntityCubePart extends EntityModelPart {
 		
 		if (this.faces.isTop()) {
 			
+			dataArray.face();
 			dataArray.faceTop(this.minX, this.maxY, this.minZ, dx, dz);
 			dataArray.faceColorWhite();
 			this.applyTexcoords(Direction.TOP, dataArray);
-			dataArray.faceIndices();
 			
 		}
 		
 		if (this.faces.isBottom()) {
 			
+			dataArray.face();
 			dataArray.faceBottom(this.minX, this.minY, this.minZ, dx, dz);
 			dataArray.faceColorWhite();
 			this.applyTexcoords(Direction.BOTTOM, dataArray);
-			dataArray.faceIndices();
 			
 		}
 		
@@ -93,19 +93,19 @@ public class EntityCubePart extends EntityModelPart {
 		
 		if (this.faces.isNorth()) {
 			
+			dataArray.face();
 			dataArray.faceNorth(this.maxX, this.minY, this.minZ, dy, dz);
 			dataArray.faceColorWhite();
 			this.applyTexcoords(Direction.NORTH, dataArray);
-			dataArray.faceIndices();
 			
 		}
 		
 		if (this.faces.isSouth()) {
 			
+			dataArray.face();
 			dataArray.faceSouth(this.minX, this.minY, this.minZ, dy, dz);
 			dataArray.faceColorWhite();
 			this.applyTexcoords(Direction.SOUTH, dataArray);
-			dataArray.faceIndices();
 			
 		}
 		
@@ -113,19 +113,19 @@ public class EntityCubePart extends EntityModelPart {
 		
 		if (this.faces.isEast()) {
 			
+			dataArray.face();
 			dataArray.faceEast(this.minX, this.minY, this.maxZ, dy, dx);
 			dataArray.faceColorWhite();
 			this.applyTexcoords(Direction.EAST, dataArray);
-			dataArray.faceIndices();
 			
 		}
 		
 		if (this.faces.isWest()) {
 			
+			dataArray.face();
 			dataArray.faceWest(this.minX, this.minY, this.minZ, dy, dx);
 			dataArray.faceColorWhite();
 			this.applyTexcoords(Direction.WEST, dataArray);
-			dataArray.faceIndices();
 			
 		}
 		

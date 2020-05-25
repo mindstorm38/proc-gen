@@ -4,7 +4,7 @@ import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderers;
-import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.biome.Biomes;

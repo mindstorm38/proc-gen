@@ -151,9 +151,9 @@ public abstract class WorldBase implements WorldAccessor {
 	public void setBlockAt(int x, int y, int z, BlockState state) {
 		WorldChunk chunk = this.getChunkAtBlock(x, y, z);
 		if (chunk != null) {
-			chunk.setBlockAt(x & 15, y & 15, z & 15, state);
+			BlockState previous = chunk.setBlockAtPrevious(x & 15, y & 15, z & 15, state);
 			try (FixedObjectPool<BlockPosition>.PoolObject pos = BlockPosition.POOL.acquire()) {
-				this.eventManager.fireListeners(WorldChunkListener.class, l -> l.worldChunkBlockChanged(this, chunk, pos.get().set(x, y, z), state));
+				this.eventManager.fireListeners(WorldChunkListener.class, l -> l.worldChunkBlockChanged(this, chunk, pos.get().set(x, y, z), state, previous));
 			}
 		}
 	}

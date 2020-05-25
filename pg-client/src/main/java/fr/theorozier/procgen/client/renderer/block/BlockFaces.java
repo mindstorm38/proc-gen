@@ -66,6 +66,14 @@ public class BlockFaces {
 		this.data = data;
 	}
 	
+	public void setVisible() {
+		this.data = 1;
+	}
+	
+	public void setObscured() {
+		this.data = 0;
+	}
+	
 	@Override
 	public String toString() {
 		return Integer.toBinaryString(this.data);

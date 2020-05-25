@@ -18,6 +18,8 @@ allprojects {
 
 }
 
+description = "Proc Gen"
+
 subprojects {
 
     apply(plugin = "java")
@@ -25,7 +27,7 @@ subprojects {
 
     ext {
         set("msengineVersion", "1.0.8-SNAPSHOT")
-        set("sutilVersion", "1.1.0")
+        set("sutilVersion", "1.1.1-SNAPSHOT")
     }
 
     repositories {
@@ -76,8 +78,6 @@ subprojects {
     }
 
 }
-
-description = "Proc Gen"
 
 tasks.create<Copy>("distrib") {
 

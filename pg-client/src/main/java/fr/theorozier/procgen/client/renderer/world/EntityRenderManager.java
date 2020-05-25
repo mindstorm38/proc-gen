@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world;
 
 import fr.theorozier.procgen.client.renderer.entity.*;
-import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.entity.*;
 import io.msengine.client.renderer.model.ModelHandler;

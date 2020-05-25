@@ -146,7 +146,16 @@ public class WorldSection {
 	// UTILS //
 	
 	public static int getSectionIndex(int x, int z) {
-		return x * 16 + z;
+		return (x << 4) | z;
+		// return x * 16 + z;
+	}
+	
+	public static int getSectionX(int index) {
+		return (index >> 4) & 15;
+	}
+	
+	public static int getSectionZ(int index) {
+		return index & 15;
 	}
 	
 }

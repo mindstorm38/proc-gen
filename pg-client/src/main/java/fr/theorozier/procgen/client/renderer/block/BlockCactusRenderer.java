@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataBuffer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.position.Direction;
@@ -22,46 +22,46 @@ public class BlockCactusRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataBuffer dataArray) {
 		
 		if (faces.isTop()) {
 			
+			dataArray.face();
 			dataArray.faceTop(x, y + 1, z, 1, 1);
 			dataArray.faceColorWhite();
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP));
-			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isBottom()) {
 			
+			dataArray.face();
 			dataArray.faceBottom(x, y, z, 1, 1);
 			dataArray.faceColorWhite();
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.BOTTOM));
-			dataArray.faceIndices();
 			
 		}
 		
+		dataArray.face();
 		dataArray.faceNorth(x + 0.9375f, y, z, 1, 1);
 		dataArray.faceColorWhite();
 		dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.NORTH));
-		dataArray.faceIndices();
 		
+		dataArray.face();
 		dataArray.faceSouth(x + 0.0625f, y, z, 1, 1);
 		dataArray.faceColorWhite();
 		dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.SOUTH));
-		dataArray.faceIndices();
 		
+		dataArray.face();
 		dataArray.faceEast(x, y, z + 0.9375f, 1, 1);
 		dataArray.faceColorWhite();
 		dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.EAST));
-		dataArray.faceIndices();
-			
+		
+		dataArray.face();
 		dataArray.faceWest(x, y, z + 0.0625f, 1, 1);
 		dataArray.faceColorWhite();
 		dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.WEST));
-		dataArray.faceIndices();
-			
+		
 	}
 	
 }

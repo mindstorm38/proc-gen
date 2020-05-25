@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.common.world.position;
 
 import io.sutil.pool.FixedObjectPool;
+import io.sutil.pool.ObjectPool;
 
 /**
  *
@@ -11,7 +12,7 @@ import io.sutil.pool.FixedObjectPool;
  */
 public class SectionPosition extends AbsSectionPosition {
 
-	public static final FixedObjectPool<SectionPosition> POOL = new FixedObjectPool<>(SectionPosition::new, 32);
+	public static final ObjectPool<SectionPosition> POOL = FixedObjectPool.newSyncFixed(SectionPosition::new, 32);
 	
 	private int x, z;
 	

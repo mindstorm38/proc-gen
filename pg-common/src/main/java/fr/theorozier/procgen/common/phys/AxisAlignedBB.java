@@ -1,10 +1,11 @@
 package fr.theorozier.procgen.common.phys;
 
 import io.sutil.pool.FixedObjectPool;
+import io.sutil.pool.ObjectPool;
 
 public class AxisAlignedBB {
 
-	public static final FixedObjectPool<AxisAlignedBB> POOL = new FixedObjectPool<>(AxisAlignedBB::new, 16);
+	public static final ObjectPool<AxisAlignedBB> POOL = FixedObjectPool.newSyncFixed(AxisAlignedBB::new, 16);
 	
 	private double minX, minY, minZ;
 	private double maxX, maxY, maxZ;

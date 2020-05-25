@@ -151,7 +151,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.init = true;
 		
-		this.setRenderDistance(32);
+		this.setRenderDistance(8);
 		
 	}
 	
@@ -313,7 +313,6 @@ public class WorldRenderer implements ModelApplyListener,
 		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT, camX, camZ);
 		
 		glDisable(GL_CULL_FACE);
-		this.chunkRenderManager.render(BlockRenderLayer.CUTOUT_NOT_CULLED, camX, camZ);
 		this.entityRenderManager.render(alpha, camX, camZ);
 		
 		this.shaderManager.setTextureSampler(this.terrainMap);
@@ -509,10 +508,10 @@ public class WorldRenderer implements ModelApplyListener,
 	}
 	
 	@Override
-	public void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state) {
+	public void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state, BlockState previousState) {
 		
 		if (this.renderingWorld == world) {
-			this.chunkRenderManager.blockUpdated(chunk, pos, state);
+			this.chunkRenderManager.blockUpdated(chunk, pos, state, previousState);
 		}
 		
 	}

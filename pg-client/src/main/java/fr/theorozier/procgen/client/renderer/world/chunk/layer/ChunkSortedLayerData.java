@@ -35,7 +35,7 @@ public class ChunkSortedLayerData extends ChunkLayerData {
 	public void handleChunkUpdate(ChunkRenderer cr) {
 		
 		// this.refreshRenderOffsets();
-		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildCacheAndData);
+		//this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildCacheAndData);
 		
 	}
 	

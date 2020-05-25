@@ -58,8 +58,8 @@ public class WorldSinglePlayer extends WorldClient implements
 	}
 	
 	@Override
-	public void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state) {
-		this.eventManager.fireListeners(WorldChunkListener.class, l -> l.worldChunkBlockChanged(this, chunk, pos, state));
+	public void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state, BlockState previousState) {
+		this.eventManager.fireListeners(WorldChunkListener.class, l -> l.worldChunkBlockChanged(this, chunk, pos, state, previousState));
 	}
 	
 	@Override

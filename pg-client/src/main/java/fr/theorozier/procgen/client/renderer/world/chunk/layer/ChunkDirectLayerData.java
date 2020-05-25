@@ -22,7 +22,7 @@ public class ChunkDirectLayerData extends ChunkLayerData {
 	public void handleChunkUpdate(ChunkRenderer cr) {
 		
 		// this.refreshRenderOffsets();
-		this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildData);
+		//this.renderManager.scheduleUpdateTask(cr, this.layer, this::rebuildData);
 		
 	}
 	

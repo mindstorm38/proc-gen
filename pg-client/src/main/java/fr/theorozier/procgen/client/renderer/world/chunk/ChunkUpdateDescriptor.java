@@ -5,6 +5,7 @@ import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 
 import java.util.Objects;
 
+@Deprecated
 public class ChunkUpdateDescriptor {
 	
 	private final ImmutableBlockPosition chunkPosition;

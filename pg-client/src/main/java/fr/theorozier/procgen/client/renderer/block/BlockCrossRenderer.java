@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataBuffer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
 import io.msengine.client.renderer.texture.TextureMap;
@@ -34,7 +34,7 @@ public class BlockCrossRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataBuffer dataArray) {
 		
 		TextureMapTile tile = this.getCrossTile(block, map);
 		
@@ -44,24 +44,21 @@ public class BlockCrossRenderer extends BlockRenderer {
 		x += (rand % 3) * 0.1f;
 		z += ((rand >> 2) % 3) * 0.1f;
 		
-		dataArray.vertex(x + OFFSET, y + HEIGHT, z + OFFSET);
-		dataArray.vertex(x + OFFSET, y, z + OFFSET);
-		dataArray.vertex(x + OFFSIZE, y, z + OFFSIZE);
-		dataArray.vertex(x + OFFSIZE, y + HEIGHT, z + OFFSIZE);
+		dataArray.face();
+		dataArray.faceVertex(0, x + OFFSET, y + HEIGHT, z + OFFSET);
+		dataArray.faceVertex(1, x + OFFSET, y, z + OFFSET);
+		dataArray.faceVertex(2, x + OFFSIZE, y, z + OFFSIZE);
+		dataArray.faceVertex(3, x + OFFSIZE, y + HEIGHT, z + OFFSIZE);
+		dataArray.faceTexcoords(tile);
+		dataArray.faceColor(color);
 		
+		dataArray.face();
 		dataArray.vertex(x + OFFSET, y + HEIGHT, z + OFFSIZE);
 		dataArray.vertex(x + OFFSET, y, z + OFFSIZE);
 		dataArray.vertex(x + OFFSIZE, y, z + OFFSET);
 		dataArray.vertex(x + OFFSIZE, y + HEIGHT, z + OFFSET);
-		
-		for (int i = 0; i < 8; ++i)
-			dataArray.color(color);
-		
 		dataArray.faceTexcoords(tile);
-		dataArray.faceTexcoords(tile);
-		
-		dataArray.faceIndices();
-		dataArray.faceIndices();
+		dataArray.faceColor(color);
 		
 	}
 	

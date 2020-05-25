@@ -3,7 +3,11 @@ package fr.theorozier.procgen.client.renderer.world.util;
 import io.msengine.client.renderer.basic.Basic3DShaderManager;
 import io.msengine.client.renderer.shader.ShaderUniformBase;
 import io.msengine.client.renderer.shader.ShaderValueType;
+import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
+import io.msengine.client.renderer.vertex.VertexElement;
+import io.msengine.client.renderer.vertex.type.BasicFormat;
 import io.msengine.common.util.Color;
+import io.sutil.CollectionUtils;
 import org.joml.Matrix4f;
 
 public class WorldShaderManager extends Basic3DShaderManager {
@@ -53,6 +57,14 @@ public class WorldShaderManager extends Basic3DShaderManager {
 	
 	public void resetGlobalColor() {
 		this.setGlobalColor(Color.WHITE);
+	}
+	
+	public IndicesDrawBuffer createSequentialDrawBuffer() {
+		return new IndicesDrawBuffer(this, WorldSequentialFormat.SEQUENTIAL,
+				VertexElement.POSITION_3F.getIdentifier(),
+				VertexElement.COLOR_3F.getIdentifier(),
+				VertexElement.TEX_COORD_2F.getIdentifier()
+		);
 	}
 	
 }

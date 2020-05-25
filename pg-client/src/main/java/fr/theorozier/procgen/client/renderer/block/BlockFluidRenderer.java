@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.util.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataBuffer;
 import fr.theorozier.procgen.common.block.BlockFluid;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
@@ -37,7 +37,7 @@ public class BlockFluidRenderer extends BlockColorizableRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataArray dataArray) {
+	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataBuffer dataArray) {
 		
 		Color color = this.needColorization ? getBlockColor(world, bx, by, bz, BlockColorResolver.WATER_COLOR) : Color.WHITE;
 		boolean under = this.hasSameBlockOnTop(world, bx, by, bz);
@@ -47,55 +47,55 @@ public class BlockFluidRenderer extends BlockColorizableRenderer {
 		
 		if (faces.isTop()) {
 			
+			dataArray.face();
 			dataArray.faceTop(x, y + height, z, 1, 1);
 			dataArray.faceColor(color);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.TOP));
-			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isBottom()) {
 			
+			dataArray.face();
 			dataArray.faceBottom(x, y, z, 1, 1);
 			dataArray.faceColor(color);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.BOTTOM));
-			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isNorth()) {
 			
+			dataArray.face();
 			dataArray.faceNorth(x + 1, y, z, height, 1);
 			dataArray.faceColor(color);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.NORTH), 0, topOffset, 1, height);
-			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isSouth()) {
 			
+			dataArray.face();
 			dataArray.faceSouth(x, y, z, height, 1);
 			dataArray.faceColor(color);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.SOUTH), 0, topOffset, 1, height);
-			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isEast()) {
 			
+			dataArray.face();
 			dataArray.faceEast(x, y, z + 1, height, 1);
 			dataArray.faceColor(color);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.EAST), 0, topOffset, 1, height);
-			dataArray.faceIndices();
 			
 		}
 		
 		if (faces.isWest()) {
 			
+			dataArray.face();
 			dataArray.faceWest(x, y, z, height, 1);
 			dataArray.faceColor(color);
 			dataArray.faceTexcoords(this.getFaceTile(block, map, Direction.WEST), 0, topOffset, 1, height);
-			dataArray.faceIndices();
 			
 		}
 	

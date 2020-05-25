@@ -8,6 +8,6 @@ import fr.theorozier.procgen.common.world.position.BlockPositioned;
 public interface WorldChunkListener {
 	
 	void worldChunkUpdated(WorldBase world, WorldChunk chunk);
-	void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state);
+	void worldChunkBlockChanged(WorldBase world, WorldChunk chunk, BlockPositioned pos, BlockState state, BlockState previousState);
 	
 }
