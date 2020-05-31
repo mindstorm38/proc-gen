@@ -44,8 +44,8 @@ generation.
 - [ ] Rework of rendering system
   - [x] Solve far render issues
   - [ ] Rendering optimizations
-    - [x] Shared `WorldRenderDataBuffer` for all chunk renderers
-    - [x] Use `MemoryUtil` natives for building data arrays
+    - [x] Shared `WorldRenderSequentialBuffer` for all chunk renderers
+    - [x] Use `MemoryUtil` natives for building render data
     - [x] ~~Caching of blocks indices, in order to re-render only necessary faces~~ **(non-efficient)**
     - [ ] Viewing Frustum Culling
     - [ ] Occlusion Culling
@@ -60,4 +60,4 @@ Do not hesitate to contribute through issues, either to report real **issues**, 
 This game is currently in development, it is not playable but it is
 already possible to move through the dimension.
 
-For development I'm using Gradle (use wrapper with `./gradrew` and `./gradlew.bat`) and IntelliJ IDEA as IDE.
+For development, I'm using Gradle (use wrapper with `./gradrew` and `./gradlew.bat`) and IntelliJ IDEA as IDE.
