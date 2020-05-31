@@ -1,6 +1,7 @@
 package fr.theorozier.procgen.client.gui;
 
 import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
@@ -70,7 +71,13 @@ public class DebugScene extends GuiScene {
 			
 		}
 		
-		int idx = 8;
+		ChunkRenderManager renderManager = this.worldRenderer.getChunkRenderManager();
+		
+		this.posTexts[7].setText("Available chunk renderers : " + renderManager.getAvailableChunkRenderersCount());
+		this.posTexts[8].setText("Used chunk renderers : " + renderManager.getUsedChunkRenderersCount());
+		this.posTexts[9].setText("Chunk render buffers : " + renderManager.getChunkRenderBuffersCount());
+		
+		int idx = 11;
 		for (String line : PROFILER.getSummaryString().split("\n")) {
 			this.posTexts[idx++].setText(line);
 			if (idx >= this.posTexts.length) {

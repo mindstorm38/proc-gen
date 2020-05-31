@@ -302,7 +302,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	private static void checkDataRemaining(Buffer buffer, int needed) throws WorldRenderBufferOverflowException {
 		int missing = needed - buffer.remaining();
 		if (missing > 0) {
-			throw new WorldRenderBufferOverflowException(buffer.remaining(), missing);
+			throw new WorldRenderBufferOverflowException(buffer.capacity(), buffer.remaining(), missing);
 		}
 	}
 	

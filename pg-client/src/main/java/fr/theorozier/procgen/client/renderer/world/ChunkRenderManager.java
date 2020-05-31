@@ -308,6 +308,18 @@ public class ChunkRenderManager {
 		
 	}
 	
+	public int getUsedChunkRenderersCount() {
+		return this.usedChunkRenderers.size();
+	}
+	
+	public int getAvailableChunkRenderersCount() {
+		return this.availableChunkRenderers.size();
+	}
+	
+	public int getChunkRenderBuffersCount() {
+		return this.chunkRenderBuffers.size();
+	}
+	
 	public ChunkRenderer getChunkRendererNeighbour(WorldChunk chunk, Direction dir) {
 		return this.usedChunkRenderers.get(this.cachedBlockPos.set(chunk.getChunkPos(), dir));
 	}

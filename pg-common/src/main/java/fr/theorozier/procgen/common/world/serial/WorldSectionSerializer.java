@@ -122,34 +122,6 @@ public class WorldSectionSerializer {
 
 		// RLE (Run-Length Encoding).
 		dataRLE.encode(ArraySupplier.from(chunk.getBlockData()), buf, stateRegistry);
-		
-		/*
-		short[] data = chunk.getBlockData();
-
-		short val = data[0];
-		short last = 0, count = 1;
-
-		for (short i = 1; i < 4096; ++i) {
-
-			last = val;
-			val = data[i];
-
-			if (last != val || count == 0x100) {
-				
-				// Remove one to store RLE count, because count = 0 would never occur.
-				buf.writeByte(count - 1);
-				buf.writeShort(blockRegistry.getBlockStateSaveUid(last));
-				
-				count = 0;
-
-			}
-
-			++count;
-
-		}
-
-		buf.writeByte(count - 1);
-		buf.writeShort(blockRegistry.getBlockStateSaveUid(last));*/
 
 	}
 
@@ -288,36 +260,6 @@ public class WorldSectionSerializer {
 		
 		// RLE (Run-Length Encoding).
 		dataRLE.decode(ArraySupplier.from(chunk.getBlockData()), stream, chunkLength, mappedBlockStates);
-		
-		/*
-		short[] data = chunk.getBlockData();
-
-		short dataIndex = 0;
-		short nextIndex;
-
-		short saveUid;
-		BlockState state;
-
-		for (int i = 0; i < chunkLength; i += 3) {
-
-			// Re-add +1 because RLE count is stored with -1 offset (because 0-length RLE value never occur).
-			nextIndex = (short) (dataIndex + stream.readUnsignedByte() + 1);
-			saveUid = stream.readShort();
-
-			state = mappedBlockStates.get(saveUid);
-
-			if (state == null) {
-				dataIndex = nextIndex;
-			} else {
-
-				for (; dataIndex < nextIndex; ++dataIndex) {
-					data[dataIndex] = state.getSaveUid();
-				}
-
-			}
-
-		}
-		*/
 
 	}
 

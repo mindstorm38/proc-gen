@@ -43,11 +43,11 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	private final IndicesDrawBuffer[] drawBuffers = new IndicesDrawBuffer[LAYERS_COUNT];
 	
 	private boolean redrawing = false;
+	private boolean firstUpdated = false;
 	private int changed = 0;
 	
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
-	private boolean firstUpdated = false;
 	private int chunkX = 0;
 	private int chunkZ = 0;
 	
@@ -157,8 +157,9 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	 */
 	public void render(BlockRenderLayer layer, int maxdist, float camX, float camZ) {
 		
-		if (this.isRenderable() && this.distanceToCameraSquared <= maxdist)
+		if (this.isRenderable() && this.distanceToCameraSquared <= maxdist) {
 			this.render(layer, camX, camZ);
+		}
 		
 	}
 	
@@ -290,17 +291,18 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	public void uploadRedrawBuffers(ChunkRenderBuffers renderBuffers) {
 		
 		WorldRenderSequentialBuffer buff;
-		for (int i = 0, bit; i < LAYERS_COUNT; ++i) {
+		for (int i = 0, bit, indices; i < LAYERS_COUNT; ++i) {
 			bit = 1 << i;
 			if ((this.changed & bit) == bit) {
 				
 				buff = renderBuffers.getBuffer(i);
+				indices = buff.indices();
 				buff.flip();
 				
 				this.drawBuffers[i].bindVao();
 				this.drawBuffers[i].uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, buff.getData(), BufferUsage.DYNAMIC_DRAW);
 				this.drawBuffers[i].uploadIboData(buff.getIndices(), BufferUsage.DYNAMIC_DRAW);
-				this.drawBuffers[i].setIndicesCount(buff.getIndices().remaining());
+				this.drawBuffers[i].setIndicesCount(indices);
 				
 			}
 		}

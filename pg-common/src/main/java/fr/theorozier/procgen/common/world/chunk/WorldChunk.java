@@ -27,6 +27,7 @@ public class WorldChunk {
 	private final ImmutableBlockPosition centerBlockPosition;
 	
 	private final short[] data;
+	private boolean empty = true;
 	
 	private final HashSet<Entity> entities;
 	
@@ -98,6 +99,11 @@ public class WorldChunk {
 	
 	public BlockState getBlockAtIndex(int idx) {
 		return Blocks.getBlockState(this.data[idx]);
+	}
+	
+	// TODO, implement empty state.
+	public boolean isEmpty() {
+		return this.empty;
 	}
 	
 	/**
