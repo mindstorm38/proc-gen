@@ -2,39 +2,48 @@ package fr.theorozier.procgen.common.util;
 
 import java.nio.Buffer;
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
 
 public class GrowingBuffer<T extends Buffer> {
 	
-	private final IntFunction<T> bufferBuilder;
-	private final Consumer<T> freeBuffer;
-	private final BiConsumer<T, T> oldWriter;
-	private final int grow;
+	protected final BufferAlloc<T> alloc;
+	protected final BufferRealloc<T> realloc;
+	protected final BufferFree<T> free;
+	protected final int grow;
 	
 	private T buffer = null;
 	
-	public GrowingBuffer(IntFunction<T> bufferBuilder, Consumer<T> freeBuffer, BiConsumer<T, T> oldWriter, int grow) {
-		this.bufferBuilder = bufferBuilder;
-		this.freeBuffer = freeBuffer;
-		this.oldWriter = oldWriter;
+	public GrowingBuffer(BufferAlloc<T> alloc, BufferRealloc<T> realloc, BufferFree<T> free, int grow) {
+		this.alloc = alloc;
+		this.realloc = realloc;
+		this.free = free;
 		this.grow = grow;
 	}
 	
-	public GrowingBuffer(IntFunction<T> bufferBuilder, Consumer<T> freeBuffer, BiConsumer<T, T> oldWriter) {
-		this(bufferBuilder, freeBuffer, oldWriter, 2048);
+	public GrowingBuffer(BufferAlloc<T> alloc, BufferRealloc<T> realloc, BufferFree<T> free) {
+		this(alloc, realloc, free, 2048);
+	}
+	
+	protected T alloc(int size) {
+		return this.alloc.alloc(size);
+	}
+	
+	protected T realloc(T old, int nsize) {
+		return this.realloc.realloc(old, nsize);
+	}
+	
+	protected void free(T buf) {
+		this.free.free(buf);
 	}
 	
 	public void alloc() {
 		if (this.buffer == null) {
-			this.buffer = this.bufferBuilder.apply(0);
+			this.buffer = this.alloc(0);
 		}
 	}
 	
 	public void free() {
 		if (this.buffer != null) {
-			this.freeBuffer.accept(this.buffer);
+			this.free(this.buffer);
 			this.buffer = null;
 		}
 	}
@@ -103,19 +112,30 @@ public class GrowingBuffer<T extends Buffer> {
 		
 		if (miss > 0) {
 			
-			this.buffer = Objects.requireNonNull(this.bufferBuilder.apply(cap + this.round(miss)), "Buffer builder returned null.");
+			int newcap = cap + this.round(miss);
+			
+			if (this.buffer != null) {
+				buf = Objects.requireNonNull(this.realloc(this.buffer, newcap), "Realloc method returned null !");
+			} else {
+				buf = Objects.requireNonNull(this.alloc(newcap), "");
+			}
+			
+			this.buffer = buf;
+			
+			/*
+			this.buffer = Objects.requireNonNull(this.alloc.apply(cap + this.round(miss)), "Buffer builder returned null.");
 			
 			if (buf != null) {
 				
 				buf.limit(pos);
 				buf.position(0);
 				
-				this.oldWriter.accept(this.buffer, buf);
-				this.freeBuffer.accept(buf);
+				this.realloc.accept(this.buffer, buf);
+				this.free.accept(buf);
 				
 			}
 			
-			buf = this.buffer;
+			buf = this.buffer;*/
 			
 		}
 		
@@ -128,6 +148,21 @@ public class GrowingBuffer<T extends Buffer> {
 	private int round(int missing) {
 		int grow = this.grow;
 		return ((missing + grow - 1) / grow) * grow;
+	}
+	
+	@FunctionalInterface
+	public interface BufferAlloc<T extends Buffer> {
+		T alloc(int size);
+	}
+	
+	@FunctionalInterface
+	public interface BufferRealloc<T extends Buffer> {
+		T realloc(T old, int nsize);
+	}
+	
+	@FunctionalInterface
+	public interface BufferFree<T extends Buffer> {
+		void free(T buf);
 	}
 	
 }

@@ -1,15 +1,14 @@
 package fr.theorozier.procgen.client.renderer.world;
 
-import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRedrawFunction;
+import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawData;
+import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFunction;
+import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderBuffers;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
-import fr.theorozier.procgen.client.renderer.world.chunk.ChunkUploadDescriptor;
-import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldSequentialBuffer;
-import fr.theorozier.procgen.client.renderer.world.util.pool.ChunkUploadDescriptorPool;
-import fr.theorozier.procgen.client.renderer.world.util.pool.WorldSequentialBufferPool;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
+import fr.theorozier.procgen.common.util.concurrent.PriorityThreadPoolExecutor;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 import fr.theorozier.procgen.common.world.position.BlockPosition;
@@ -20,13 +19,12 @@ import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.util.camera.SmoothCamera3D;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
-import io.sutil.pool.ObjectPool;
 import io.sutil.profiler.Profiler;
 
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 
@@ -44,6 +42,9 @@ public class ChunkRenderManager {
 	private static final ThreadingDispatch CHUNK_RENDERER_DISPATCH = ThreadingDispatch.register("CHUNK_RENDER", 3);
 	private static final Profiler PROFILER = GameProfiler.getInstance();
 	
+	private static final int TICK_MAX_CHUNK_UPDATES = 1024;
+	private static final int TICK_MAX_CHUNK_UPLOAD = 1024;
+	
 	// Local cache for global singletons
 	private final WorldRenderer renderer;
 	private final ModelHandler model;
@@ -54,19 +55,13 @@ public class ChunkRenderManager {
 	private final Map<AbsBlockPosition, ChunkRenderer> usedChunkRenderers = new HashMap<>();
 	private final List<ImmutableBlockPosition> releasingChunkRenderers = new ArrayList<>();
 	
-	// Chunk layer providers
-	//private final ChunkLayerDataProvider[] layerHandlers = new ChunkLayerDataProvider[BlockRenderLayer.COUNT];
-	
 	// Tasks managing
-	private ExecutorService threadPool = null;
-	//private final HashMap<ChunkUpdateDescriptor, Future<ChunkUpdateDescriptor>> chunkUpdates = new HashMap<>();
-	//private final List<Future<ChunkUpdateDescriptor>> chunkUpdatesDescriptors = new ArrayList<>();
+	private PriorityThreadPoolExecutor threadPool = null;
+	private BlockingQueue<ChunkRenderBuffers> chunkRenderBuffers = null;
 	private final List<Future<ChunkRedrawData>> chunkRedrawFutures = new ArrayList<>();
 	
 	// Cached block position used to avoid repetitive reallocations
 	private final BlockPosition cachedBlockPos = new BlockPosition();
-	private final WorldSequentialBufferPool sequentialBufferPool = new WorldSequentialBufferPool(16);
-	private final ChunkUploadDescriptorPool uploadDescriptorPool = new ChunkUploadDescriptorPool(16);
 	
 	// Render distance in chunks, and the squared distance in blocks
 	private int renderDistance = 0;
@@ -80,23 +75,11 @@ public class ChunkRenderManager {
 		this.renderer = renderer;
 		this.model = renderer.getModelHandler();
 		
-		//this.setLayerHandler(BlockRenderLayer.OPAQUE, ChunkDirectLayerData::new);
-		//this.setLayerHandler(BlockRenderLayer.CUTOUT, ChunkDirectLayerData::new);
-		//this.setLayerHandler(BlockRenderLayer.TRANSPARENT, ChunkDirectLayerData::new);
-		
 	}
 	
 	public WorldRenderer getWorldRenderer() {
 		return this.renderer;
 	}
-	
-	/*private void setLayerHandler(BlockRenderLayer layer, ChunkLayerDataProvider handler) {
-		this.layerHandlers[layer.ordinal()] = handler;
-	}
-	
-	public ChunkLayerData provideLayerData(BlockRenderLayer layer) {
-		return this.layerHandlers[layer.ordinal()].provide(layer, this);
-	}*/
 	
 	/**
 	 * <p>Initialize the chunk render manager, this create the new thread pool for chunk render data recomputation.</p>
@@ -104,10 +87,17 @@ public class ChunkRenderManager {
 	 */
 	void init() {
 		
-		int poolSize = CHUNK_RENDERER_DISPATCH.getEffectiveCount();
+		int poolSize = CHUNK_RENDERER_DISPATCH.getEffectiveCount() * 2;
+		int renderBuffersSize = poolSize * 3;
 		
 		LOGGER.info("Starting world chunk renderer tasks thread pool (" + poolSize + " threads) ...");
-		this.threadPool = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
+		// this.threadPool = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
+		this.threadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
+		this.chunkRenderBuffers = new ArrayBlockingQueue<>(renderBuffersSize);
+		
+		for (int i = 0; i < renderBuffersSize; ++i) {
+			this.chunkRenderBuffers.add(new ChunkRenderBuffers());
+		}
 		
 	}
 	
@@ -121,7 +111,8 @@ public class ChunkRenderManager {
 		this.threadPool.shutdown(); // FIXME Potential leaks if never finished (case not confirmed)...
 		this.threadPool = null;
 		
-		this.sequentialBufferPool.getObjects().stream().map(ObjectPool.PoolObject::get).forEach(WorldSequentialBuffer::free);
+		this.chunkRenderBuffers.forEach(ChunkRenderBuffers::free);
+		this.chunkRenderBuffers = null;
 		
 	}
 	
@@ -138,7 +129,7 @@ public class ChunkRenderManager {
 		this.renderDistanceSquared = (renderDistance << 4) * (renderDistance << 4);
 		this.unloadDistanceSquared = ((renderDistance + 2) << 4) * ((renderDistance + 2) << 4);
 		
-		int length = (this.renderDistance << 1) + 1;
+		int length = ((renderDistance + 2) << 1) + 1;
 		
 		// Multiply by a large approximation of the ratio of volume taken by a sphere in a cube.
 		int renderersCount = MathHelper.floorFloatInt(0.7f * length * length * length);
@@ -187,14 +178,10 @@ public class ChunkRenderManager {
 	 */
 	void render(BlockRenderLayer layer, float camX, float camZ) {
 		
-		// if (this.isReady()) { FIXME Commented to avoid double-check of isReady() here and in WorldRenderer that have the same renderDistance.
-		
 		PROFILER.startSection("render_layer_" + layer.name());
 		this.chunkRenderers.forEach(cr -> cr.render(layer, this.renderDistanceSquared, camX, camZ));
 		this.model.apply(); // Apply the last model.pop() in cr.render(...)
 		PROFILER.endSection();
-		
-		// }
 		
 	}
 	
@@ -209,6 +196,8 @@ public class ChunkRenderManager {
 		Future<ChunkRedrawData> redrawFuture;
 		ChunkRedrawData redrawData;
 		
+		int actcounter = 0;
+		
 		for (int i = 0, size = redrawFutures.size(); i < size; ++i) {
 			if ((redrawFuture = redrawFutures.get(i)).isDone()) {
 				
@@ -216,7 +205,8 @@ public class ChunkRenderManager {
 					
 					redrawData = redrawFuture.get();
 					redrawData.upload();
-					redrawData.release(this.sequentialBufferPool, this.uploadDescriptorPool);
+					redrawData.free();
+					actcounter++;
 					
 				} catch (InterruptedException | ExecutionException e) {
 					LOGGER.log(Level.WARNING, "Redraw task interrupted.", e);
@@ -228,44 +218,15 @@ public class ChunkRenderManager {
 			}
 		}
 		
-		/*
-		Iterator<Future<ChunkUpdateDescriptor>> chunkUpdatesIt = this.chunkUpdatesDescriptors.iterator();
-		Future<ChunkUpdateDescriptor> future;
-		ChunkUpdateDescriptor descriptor;
-		ChunkRenderer renderer;
+		ChunkRenderer cr;
+		int size = this.chunkRenderers.size();
+		actcounter = 0;
 		
-		while (chunkUpdatesIt.hasNext()) {
-			
-			future = chunkUpdatesIt.next();
-			
-			if (future.isDone()) {
-				
-				try {
-					
-					descriptor = future.get();
-					renderer = this.usedChunkRenderers.get(descriptor.getChunkPosition());
-					// TODO renderer is sometimes NULL
-					
-					if (renderer != null) {
-						renderer.chunkUpdateDone(descriptor.getRenderLayer());
-					}
-					
-					this.chunkUpdates.remove(descriptor);
-					
-				} catch (InterruptedException | ExecutionException e) {
-					if (e.getCause() != null) {
-						e.getCause().printStackTrace();
-					}
-				}
-				
-				chunkUpdatesIt.remove();
-				
+		for (int i = 0; i < size; ++i) {
+			if (this.chunkRenderers.get(i).update()) {
+				actcounter++;
 			}
-			
 		}
-		*/
-		
-		this.chunkRenderers.forEach(ChunkRenderer::update);
 		
 		PROFILER.endSection();
 		
@@ -289,7 +250,7 @@ public class ChunkRenderManager {
 	 */
 	private ChunkRenderer allocateChunkRenderer(WorldChunk chunk) {
 		
-		ImmutableBlockPosition pos = chunk.getChunkPos();
+		ImmutableBlockPosition pos = Objects.requireNonNull(chunk).getChunkPos();
 		ChunkRenderer cr = this.usedChunkRenderers.get(pos);
 		
 		if (cr != null)
@@ -301,12 +262,8 @@ public class ChunkRenderManager {
 			
 			ChunkRenderer neighbour;
 			for (Direction dir : Direction.values()) {
-				if ((neighbour = this.usedChunkRenderers.get(this.cachedBlockPos.set(pos, dir))) != null) {
-					
+				if ((neighbour = this.getChunkRendererNeighbour(chunk, dir)) != null) {
 					neighbour.setNeedUpdate();
-					neighbour.setNeighbour(dir.oposite(), cr);
-					cr.setNeighbour(dir, neighbour);
-					
 				}
 			}
 			
@@ -331,13 +288,28 @@ public class ChunkRenderManager {
 		
 		if (renderer != null) {
 			
-			renderer.releaseChunk();
-			renderer.removeAllNeighbours((dir, neighbour) -> neighbour.removeNeighbour(dir.oposite()));
+			if (renderer.isActive()) {
+				
+				WorldChunk chunk = renderer.getChunk();
+				ChunkRenderer neighbour;
+				for (Direction dir : Direction.values()) {
+					if ((neighbour = this.getChunkRendererNeighbour(chunk, dir)) != null) {
+						neighbour.setNeedUpdate();
+					}
+				}
+				
+				renderer.releaseChunk();
+				
+			}
+			
 			this.availableChunkRenderers.add(renderer);
-			// FIXME Do neighbours need setNeedUpdate(true) ?
 			
 		}
 		
+	}
+	
+	public ChunkRenderer getChunkRendererNeighbour(WorldChunk chunk, Direction dir) {
+		return this.usedChunkRenderers.get(this.cachedBlockPos.set(chunk.getChunkPos(), dir));
 	}
 	
 	void updateViewPosition(SmoothCamera3D cam) {
@@ -359,7 +331,7 @@ public class ChunkRenderManager {
 			if (cr.updateDistanceToCamera(x, y, z) > this.unloadDistanceSquared) {
 				this.releasingChunkRenderers.add(pos.immutableBlockPos());
 			} else {
-				cr.updateViewPosition(ix, iy, iz);
+				// cr.updateViewPosition(ix, iy, iz);
 			}
 			
 		});
@@ -383,8 +355,9 @@ public class ChunkRenderManager {
 			
 			world.forEachChunkNear(x, y, z, this.renderDistance, chunk -> {
 				
-				if (chunk.getDistSquaredTo(x, y, z) <= this.renderDistanceSquared)
+				if (chunk.getDistSquaredTo(x, y, z) <= this.renderDistanceSquared) {
 					this.allocateChunkRenderer(chunk);
+				}
 				
 			});
 			
@@ -392,28 +365,7 @@ public class ChunkRenderManager {
 		
 	}
 	
-	public WorldSequentialBufferPool getSequentialBufferPool() {
-		return this.sequentialBufferPool;
-	}
-	
 	// Update tasks
-	
-	/*public void scheduleUpdateTask(ChunkRenderer cr, BlockRenderLayer layer, Runnable action) {
-		
-		if (this.threadPool == null)
-			throw new IllegalStateException("Can't schedule update tasks while associated thread pool is not initialized.");
-		
-		ChunkUpdateDescriptor descriptor = new ChunkUpdateDescriptor(cr.getChunkPosition(), layer);
-		
-		if (!this.chunkUpdates.containsKey(descriptor)) {
-			
-			Future<ChunkUpdateDescriptor> future = this.threadPool.submit(action, descriptor);
-			this.chunkUpdates.put(descriptor, future);
-			this.chunkUpdatesDescriptors.add(future);
-			
-		}
-		
-	}*/
 	
 	public void scheduleChunkRedrawTask(ChunkRenderer cr, ChunkRedrawFunction redrawFunc) {
 		
@@ -421,67 +373,23 @@ public class ChunkRenderManager {
 			throw new IllegalStateException("Can't schedule update tasks while associated thread pool is not initialized.");
 		}
 		
-		ChunkRedrawData data = new ChunkRedrawData(cr, this.uploadDescriptorPool.acquire());
+		ChunkRedrawData data = new ChunkRedrawData(this, cr);
 		this.chunkRedrawFutures.add(this.threadPool.submit(data.newTask(redrawFunc), data));
 		
 	}
 	
-	private static class ChunkRedrawData {
-		
-		private ChunkRenderer cr;
-		private WorldChunk chunk;
-		private ChunkUploadDescriptorPool.PoolObject pooledUploadDescriptor;
-		
-		ChunkRedrawData(ChunkRenderer cr, ChunkUploadDescriptorPool.PoolObject pooledUploadDescriptor) {
-			this.cr = cr;
-			this.chunk = cr.getChunk();
-			this.pooledUploadDescriptor = pooledUploadDescriptor;
+	public ChunkRenderBuffers takeRenderBuffers() {
+		try {
+			return this.chunkRenderBuffers.take();
+		} catch (InterruptedException e) {
+			throw new IllegalStateException("Taking render buffers was interrupted !");
 		}
-		
-		ChunkRedrawTask newTask(ChunkRedrawFunction redrawFunc) {
-			return new ChunkRedrawTask(this.cr, redrawFunc, this.pooledUploadDescriptor.get());
-		}
-		
-		void upload() {
-			if (this.cr.getChunk() == this.chunk) {
-				this.cr.uploadComputedDescription(this.pooledUploadDescriptor.get());
-			}
-		}
-		
-		void release(WorldSequentialBufferPool bufferPool, ChunkUploadDescriptorPool uploadDescriptorPool) {
-			
-			this.pooledUploadDescriptor.get().releaseAllBuffers(bufferPool);
-			uploadDescriptorPool.release(this.pooledUploadDescriptor);
-			
-			this.cr = null;
-			this.chunk = null;
-			this.pooledUploadDescriptor = null;
-			
-		}
-		
 	}
 	
-	private static class ChunkRedrawTask implements Runnable {
-		
-		private final ChunkRenderer cr;
-		private final WorldChunk chunk;
-		private final ChunkRedrawFunction redrawFunc;
-		private final ChunkUploadDescriptor uploadDescriptor;
-		
-		ChunkRedrawTask(ChunkRenderer cr, ChunkRedrawFunction redrawFunc, ChunkUploadDescriptor uploadDescriptor) {
-			this.cr = cr;
-			this.chunk = cr.getChunk();
-			this.redrawFunc = redrawFunc;
-			this.uploadDescriptor = uploadDescriptor;
+	public void putRenderBuffers(ChunkRenderBuffers buffers) {
+		if (!this.chunkRenderBuffers.offer(buffers)) {
+			throw new IllegalStateException("Failed to put back the render buffers ! Be careful and only put back buffers acquired by takeRenderBuffers().");
 		}
-		
-		@Override
-		public void run() {
-			if (this.chunk == this.cr.getChunk()) {
-				this.redrawFunc.accept(this.chunk, this.uploadDescriptor);
-			}
-		}
-		
 	}
 	
 	// Events //

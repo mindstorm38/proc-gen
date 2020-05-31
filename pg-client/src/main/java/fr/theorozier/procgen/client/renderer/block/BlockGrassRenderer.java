@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataBuffer;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.position.Direction;
@@ -27,7 +27,7 @@ public class BlockGrassRenderer extends BlockRenderer {
 	}
 	
 	@Override
-	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataBuffer dataArray) {
+	public void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderBuffer dataArray) {
 		
 		Color color = getBlockColor(world, bx, by, bz, BlockColorResolver.GRASS_COLOR);
 		TextureMapTile sideTile = this.getSideColorTile(map);

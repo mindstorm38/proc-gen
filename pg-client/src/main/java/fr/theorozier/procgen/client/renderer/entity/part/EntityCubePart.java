@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.entity.part;
 
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
-import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMapTile;

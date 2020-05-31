@@ -151,7 +151,7 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.init = true;
 		
-		this.setRenderDistance(32);
+		this.setRenderDistance(16);
 		
 	}
 	

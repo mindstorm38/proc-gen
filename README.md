@@ -44,9 +44,9 @@ generation.
 - [ ] Rework of rendering system
   - [x] Solve far render issues
   - [ ] Rendering optimizations
-    - [ ] Shared `WorldRenderDataArray` for all chunk renderers
-    - [ ] Use `MemoryUtil` natives for building data arrays
-    - [ ] Caching of blocks indices, in order to re-render only necessary faces
+    - [x] Shared `WorldRenderDataBuffer` for all chunk renderers
+    - [x] Use `MemoryUtil` natives for building data arrays
+    - [x] ~~Caching of blocks indices, in order to re-render only necessary faces~~ **(non-efficient)**
     - [ ] Viewing Frustum Culling
     - [ ] Occlusion Culling
 - [ ] Items

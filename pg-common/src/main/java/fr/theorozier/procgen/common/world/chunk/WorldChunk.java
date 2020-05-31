@@ -172,6 +172,16 @@ public class WorldChunk {
 		
 	}
 	
+	public WorldChunk getNeighbourChunk(Direction direction) {
+		switch (direction) {
+			case TOP:
+			case BOTTOM:
+				return this.section.getChunkAt(this.position.getY() + direction.ry);
+			default:
+				return this.world.getChunkAt(this.position.getX() + direction.rx, this.position.getY(), this.position.getZ() + direction.rz);
+		}
+	}
+	
 	// ENTITIES //
 	
 	public void addEntity(Entity entity) {

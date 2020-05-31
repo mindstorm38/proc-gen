@@ -85,8 +85,8 @@ public class ThreadingDispatch {
 	// WORLD_CHUNK_LOADERS (),
 	// WORLD_RENDERING ();
 	
-	private String identifier;
-	private int ratio;
+	private final String identifier;
+	private final int ratio;
 	private int effectiveCount = 0;
 	
 	public ThreadingDispatch(String identifier, int ratio) {

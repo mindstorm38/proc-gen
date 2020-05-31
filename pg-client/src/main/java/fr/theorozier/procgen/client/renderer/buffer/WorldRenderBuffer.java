@@ -1,9 +1,9 @@
-package fr.theorozier.procgen.client.renderer.world.util.buffer;
+package fr.theorozier.procgen.client.renderer.buffer;
 
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.common.util.Color;
 
-public interface WorldRenderDataBuffer {
+public interface WorldRenderBuffer {
 	
 	// Basic Vertex //
 	

@@ -1,6 +1,6 @@
 package fr.theorozier.procgen.client.renderer.block;
 
-import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataBuffer;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.WorldAccessor;
 import fr.theorozier.procgen.common.world.biome.Biome;
@@ -117,7 +117,7 @@ public abstract class BlockRenderer {
 		
 	}
 	
-	public abstract void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderDataBuffer dataArray);
+	public abstract void getRenderData(WorldAccessor world, BlockState block, int bx, int by, int bz, float x, float y, float z, BlockFaces faces, TextureMap map, WorldRenderBuffer dataArray);
 	
 	public boolean needFaces() {
 		return true;

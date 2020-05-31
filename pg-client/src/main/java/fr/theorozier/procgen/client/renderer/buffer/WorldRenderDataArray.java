@@ -1,4 +1,4 @@
-package fr.theorozier.procgen.client.renderer.world.util.buffer;
+package fr.theorozier.procgen.client.renderer.buffer;
 
 import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.common.util.array.BufferedIntArray;
@@ -21,7 +21,7 @@ import java.nio.IntBuffer;
  * @author Theo Rozier
  *
  */
-public class WorldRenderDataArray implements WorldRenderDataBuffer {
+public class WorldRenderDataArray implements WorldRenderBuffer {
 	
 	private final BufferedFloatArray vertices = new BufferedFloatArray();
 	private final BufferedFloatArray colors = new BufferedFloatArray();

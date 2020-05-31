@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.common.util.concurrent;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,7 @@ public class PriorityFuture<V> implements RunnableFuture<V>, PrioritySupplier {
 	}
 	
 	@Override
-	public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+	public V get(long timeout, @Nonnull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 		return this.delegate.get(timeout, unit);
 	}
 	

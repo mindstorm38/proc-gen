@@ -3,7 +3,7 @@ package fr.theorozier.procgen.client.renderer.world.chunk.layer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
-import fr.theorozier.procgen.client.renderer.world.util.buffer.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderers;
