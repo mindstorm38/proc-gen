@@ -51,6 +51,13 @@ public class ChunkRedrawData {
 		}
 	}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		if (this.buffers != null) {
+			System.out.println("Loosed buffers " + this.buffers + " in " + this); // FIXME, WHY THERE ARE FUCKING LEAKS HERE ?
+		}
+	}
+	
 	private class Task implements PriorityRunnable {
 		
 		private final ChunkRedrawFunction function;

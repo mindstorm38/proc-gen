@@ -5,6 +5,7 @@ import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderers;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
+import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFuture;
 import fr.theorozier.procgen.client.renderer.world.util.WorldSequentialFormat;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
@@ -42,9 +43,11 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private final IndicesDrawBuffer[] drawBuffers = new IndicesDrawBuffer[LAYERS_COUNT];
 	
-	private boolean redrawing = false;
+	//private boolean redrawing = false;
 	private boolean firstUpdated = false;
 	private int changed = 0;
+	
+	private ChunkRedrawFuture<?> redrawingFuture = null;
 	
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
@@ -79,18 +82,26 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	public void setChunk(WorldChunk chunk) {
 		
-		this.chunk = Objects.requireNonNull(chunk, "ChunkRenderer chunk can't be null.");
-		this.firstUpdated = false;
+		Objects.requireNonNull(chunk, "ChunkRenderer chunk can't be null.");
 		
-		this.chunkX = chunk.getChunkPos().getX() << 4;
-		this.chunkZ = chunk.getChunkPos().getZ() << 4;
+		if (this.chunk != chunk) {
+			
+			this.chunk = chunk;
+			this.firstUpdated = false;
+			
+			this.chunkX = chunk.getChunkPos().getX() << 4;
+			this.chunkZ = chunk.getChunkPos().getZ() << 4;
+			
+		}
 		
 		this.setNeedUpdate();
+		this.cancelRedrawing();
 		
 	}
 	
 	public void releaseChunk() {
 		this.chunk = null;
+		this.cancelRedrawing();
 	}
 	
 	/**
@@ -133,10 +144,10 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	public boolean update() {
 		
-		if (this.isActive() && !this.redrawing && this.doNeedUpdate()) {
+		if (this.isActive() && this.redrawingFuture == null && this.doNeedUpdate()) {
 			
-			this.redrawing = true;
-			this.renderManager.scheduleChunkRedrawTask(this, this::redrawGlobal);
+			//this.redrawing = true;
+			this.redrawingFuture = this.renderManager.scheduleChunkRedrawTask(this, this::redrawGlobal);
 			return true;
 			
 		} else {
@@ -233,7 +244,23 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		
 	}
 	
-	// BUFFER UPDATES //
+	// BUFFER REDRAWING //
+	
+	public boolean isRedrawing() {
+		return this.redrawingFuture != null;
+	}
+	
+	private void doneRedrawing() {
+		this.redrawingFuture = null;
+		this.changed = 0;
+	}
+	
+	public void cancelRedrawing() {
+		if (this.redrawingFuture != null) {
+			this.redrawingFuture.cancel(false);
+			this.redrawingFuture = null;
+		}
+	}
 	
 	private void redrawGlobal(WorldChunk chunk, ChunkRenderBuffers renderBuffers) {
 		
@@ -311,8 +338,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			this.firstUpdated = true;
 		}
 		
-		this.redrawing = false;
-		this.changed = 0;
+		this.doneRedrawing();
 		
 	}
 	

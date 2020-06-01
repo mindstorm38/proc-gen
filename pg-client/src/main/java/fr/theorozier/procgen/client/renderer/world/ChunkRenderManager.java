@@ -4,6 +4,7 @@ import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawData;
 import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFunction;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderBuffers;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
+import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFuture;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
@@ -24,8 +25,8 @@ import io.sutil.profiler.Profiler;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
@@ -58,7 +59,7 @@ public class ChunkRenderManager {
 	// Tasks managing
 	private PriorityThreadPoolExecutor threadPool = null;
 	private BlockingQueue<ChunkRenderBuffers> chunkRenderBuffers = null;
-	private final List<Future<ChunkRedrawData>> chunkRedrawFutures = new ArrayList<>();
+	private final List<ChunkRedrawFuture<?>> chunkRedrawFutures = new ArrayList<>();
 	
 	// Cached block position used to avoid repetitive reallocations
 	private final BlockPosition cachedBlockPos = new BlockPosition();
@@ -192,8 +193,8 @@ public class ChunkRenderManager {
 		
 		PROFILER.startSection("chunk_render_update");
 		
-		List<Future<ChunkRedrawData>> redrawFutures = this.chunkRedrawFutures;
-		Future<ChunkRedrawData> redrawFuture;
+		List<ChunkRedrawFuture<?>> redrawFutures = this.chunkRedrawFutures;
+		ChunkRedrawFuture<?> redrawFuture;
 		ChunkRedrawData redrawData;
 		
 		int actcounter = 0;
@@ -201,16 +202,18 @@ public class ChunkRenderManager {
 		for (int i = 0, size = redrawFutures.size(); i < size; ++i) {
 			if ((redrawFuture = redrawFutures.get(i)).isDone()) {
 				
+				redrawData = redrawFuture.getData();
+				
 				try {
-					
-					redrawData = redrawFuture.get();
+					redrawFuture.get();
 					redrawData.upload();
-					redrawData.free();
 					actcounter++;
-					
 				} catch (InterruptedException | ExecutionException e) {
 					LOGGER.log(Level.WARNING, "Redraw task interrupted.", e);
+				} catch (CancellationException ignored) {
+					//
 				} finally {
+					redrawData.free();
 					redrawFutures.remove(i--);
 					size--;
 				}
@@ -320,6 +323,10 @@ public class ChunkRenderManager {
 		return this.chunkRenderBuffers.size();
 	}
 	
+	public int getRunningRedrawTasksCount() {
+		return this.chunkRedrawFutures.size();
+	}
+	
 	public ChunkRenderer getChunkRendererNeighbour(WorldChunk chunk, Direction dir) {
 		return this.usedChunkRenderers.get(this.cachedBlockPos.set(chunk.getChunkPos(), dir));
 	}
@@ -367,8 +374,10 @@ public class ChunkRenderManager {
 			
 			world.forEachChunkNear(x, y, z, this.renderDistance, chunk -> {
 				
-				if (chunk.getDistSquaredTo(x, y, z) <= this.renderDistanceSquared) {
-					this.allocateChunkRenderer(chunk);
+				if (!this.usedChunkRenderers.containsKey(chunk.getChunkPos())) {
+					if (chunk.getDistSquaredTo(x, y, z) <= this.renderDistanceSquared) {
+						this.allocateChunkRenderer(chunk);
+					}
 				}
 				
 			});
@@ -379,14 +388,16 @@ public class ChunkRenderManager {
 	
 	// Update tasks
 	
-	public void scheduleChunkRedrawTask(ChunkRenderer cr, ChunkRedrawFunction redrawFunc) {
+	public ChunkRedrawFuture<?> scheduleChunkRedrawTask(ChunkRenderer cr, ChunkRedrawFunction redrawFunc) {
 		
 		if (this.threadPool == null) {
 			throw new IllegalStateException("Can't schedule update tasks while associated thread pool is not initialized.");
 		}
 		
 		ChunkRedrawData data = new ChunkRedrawData(this, cr);
-		this.chunkRedrawFutures.add(this.threadPool.submit(data.newTask(redrawFunc), data));
+		ChunkRedrawFuture<?> future = new ChunkRedrawFuture<>(data, this.threadPool.submit(data.newTask(redrawFunc)));
+		this.chunkRedrawFutures.add(future);
+		return future;
 		
 	}
 	
@@ -394,7 +405,7 @@ public class ChunkRenderManager {
 		try {
 			return this.chunkRenderBuffers.take();
 		} catch (InterruptedException e) {
-			throw new IllegalStateException("Taking render buffers was interrupted !");
+			throw new IllegalStateException("Interrupted while taking render buffers.");
 		}
 	}
 	

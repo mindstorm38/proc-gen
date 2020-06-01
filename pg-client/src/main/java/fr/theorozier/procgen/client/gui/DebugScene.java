@@ -16,7 +16,6 @@ import io.sutil.math.MathHelper;
 import io.sutil.profiler.Profiler;
 import io.sutil.profiler.ProfilerSection;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 
 public class DebugScene extends GuiScene {
@@ -76,8 +75,10 @@ public class DebugScene extends GuiScene {
 		this.posTexts[7].setText("Available chunk renderers : " + renderManager.getAvailableChunkRenderersCount());
 		this.posTexts[8].setText("Used chunk renderers : " + renderManager.getUsedChunkRenderersCount());
 		this.posTexts[9].setText("Chunk render buffers : " + renderManager.getChunkRenderBuffersCount());
+		this.posTexts[10].setText("Running redraw tasks : " + renderManager.getRunningRedrawTasksCount());
 		
-		int idx = 11;
+		
+		int idx = 12;
 		for (String line : PROFILER.getSummaryString().split("\n")) {
 			this.posTexts[idx++].setText(line);
 			if (idx >= this.posTexts.length) {
