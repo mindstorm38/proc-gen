@@ -1,9 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world;
 
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.client.renderer.entity.*;
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.entity.*;
 import io.msengine.client.renderer.model.ModelHandler;
@@ -59,9 +57,7 @@ public class EntityRenderManager {
 	void init() {
 		
 		WorldShaderManager shaderManager = this.shaderManager;
-		WorldRenderSequentialBuffer renderBuffer = new WorldRenderSequentialBuffer();
-		
-		renderBuffer.allocBlocks(9);
+		WorldRenderSequentialBuffer renderBuffer = newEntityRenderSequentialBuffer();
 		
 		for (EntityRenderer<?> renderer : this.entityRenderers.values()) {
 			if (!renderer.isInitied()) {
@@ -171,6 +167,16 @@ public class EntityRenderManager {
 			classEntities.remove(entity);
 		}
 		
+	}
+	
+	/**
+	 * Create a new entity {@link WorldRenderSequentialBuffer} with a default allocation capacity.
+	 * @return The allocated sequential buffer.
+	 */
+	public static WorldRenderSequentialBuffer newEntityRenderSequentialBuffer() {
+		WorldRenderSequentialBuffer renderBuffer = new WorldRenderSequentialBuffer.Growing();
+		renderBuffer.allocBlocks(9);
+		return renderBuffer;
 	}
 	
 }

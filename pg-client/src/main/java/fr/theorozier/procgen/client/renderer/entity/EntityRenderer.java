@@ -2,6 +2,7 @@ package fr.theorozier.procgen.client.renderer.entity;
 
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.client.renderer.entity.part.EntityModelPart;
+import fr.theorozier.procgen.client.renderer.world.EntityRenderManager;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.entity.Entity;
 import io.msengine.client.renderer.model.ModelHandler;
@@ -26,9 +27,7 @@ public abstract class EntityRenderer<E extends Entity> {
 	
 	private final LazyLoadValue<WorldRenderSequentialBuffer> optionalDataArray = new LazyLoadValue<WorldRenderSequentialBuffer>() {
 		@Override public WorldRenderSequentialBuffer create() {
-			WorldRenderSequentialBuffer ret = new WorldRenderSequentialBuffer();
-			ret.allocBlocks(9);
-			return ret;
+			return EntityRenderManager.newEntityRenderSequentialBuffer();
 		}
 	};
 	
@@ -80,8 +79,9 @@ public abstract class EntityRenderer<E extends Entity> {
 		
 		if (this.initied) {
 			
-			if (this.optionalDataArray.loaded())
+			if (this.optionalDataArray.loaded()) {
 				this.optionalDataArray.get().clear();
+			}
 			
 			part.initPart(this.shaderManager, this.optionalDataArray.get());
 			

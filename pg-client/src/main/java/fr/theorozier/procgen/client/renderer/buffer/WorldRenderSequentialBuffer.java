@@ -9,6 +9,10 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+/**
+ * A buffer for rendering world according with {@link fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager WorldShaderManager}
+ * and using {@link WorldSequentialFormat}. It contains lot of utilities to draw faces easily.
+ */
 public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	private static final float[] FACE_BUFFER = new float[32];
@@ -25,16 +29,25 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 		return this.indices;
 	}
 	
-	public void allocRaw(int dataCapacity, int indicesCapacity) {
+	protected void allocDataRaw(int dataCapacity) {
 		
 		this.data = this.data == null ?
 				MemoryUtil.memAllocFloat(dataCapacity) :
 				MemoryUtil.memRealloc(this.data, dataCapacity);
 		
+	}
+	
+	protected void allocIndicesRaw(int indicesCapacity) {
+		
 		this.indices = this.indices == null ?
 				MemoryUtil.memAllocInt(indicesCapacity) :
 				MemoryUtil.memRealloc(this.indices, indicesCapacity);
 		
+	}
+	
+	public void allocRaw(int dataCapacity, int indicesCapacity) {
+		this.allocDataRaw(dataCapacity);
+		this.allocIndicesRaw(indicesCapacity);
 	}
 	
 	public void allocVertices(int verticesCapacity, int indicesCapacity) {
@@ -286,9 +299,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public int indices() {
-		// FIXME: Currently not used
-		return this.indices.position();
-		// return this.indices.get().remaining();
+		return this.indices.remaining();
 	}
 	
 	@Override
@@ -315,25 +326,26 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 		WorldRenderBuffer.checkDrawBufferFormat(drawBuffer, WorldSequentialFormat.SEQUENTIAL);
 		
 		this.flip();
-		int remain = this.indices.remaining();
+		int indices = this.indices();
 		
 		drawBuffer.bindVao();
 		drawBuffer.uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, this.data, BufferUsage.DYNAMIC_DRAW);
 		drawBuffer.uploadIboData(this.indices, BufferUsage.DYNAMIC_DRAW);
-		drawBuffer.setIndicesCount(remain);
+		drawBuffer.setIndicesCount(indices);
 		
 	}
 	
+	// For debug //
 	public int getTotalBytes() {
 		return ((this.data != null ? this.data.capacity() : 0) + (this.indices != null ? this.indices.capacity() : 0)) << 2;
 	}
 	
-	protected void checkIndicesRemaining(int needed) {
-		checkBufferRemaining(this.indices, needed);
-	}
-	
 	protected void checkDataRemaining(int needed) {
 		checkBufferRemaining(this.data, needed);
+	}
+	
+	protected void checkIndicesRemaining(int needed) {
+		checkBufferRemaining(this.indices, needed);
 	}
 	
 	protected static void checkBufferRemaining(Buffer buffer, int needed) throws WorldRenderBufferOverflowException {
@@ -343,10 +355,40 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 		}
 	}
 	
-	protected static void checkBufferPosition(Buffer buffer, int needed) {
+	protected static void checkBufferPosition(Buffer buffer, int needed) throws WorldRenderBufferOverflowException {
 		if (buffer.position() < needed) {
 			throw new WorldRenderBufferOverflowException(buffer.position(), needed);
 		}
+	}
+	
+	// Growing Version //
+	
+	/**
+	 * Same as {@link WorldRenderSequentialBuffer} but reallocating internal buffer
+	 * instead of overflown, must be used <u>only in main thread</u>.
+	 */
+	public static class Growing extends WorldRenderSequentialBuffer {
+		
+		@Override
+		protected void checkDataRemaining(int needed) {
+			
+			int missing = needed - this.getData().remaining();
+			if (missing > 0) {
+				this.allocIndicesRaw(this.getData().position() + missing);
+			}
+			
+		}
+		
+		@Override
+		protected void checkIndicesRemaining(int needed) {
+			
+			int missing = needed - this.getIndices().remaining();
+			if (missing > 0) {
+				this.allocIndicesRaw(this.getIndices().position() + missing);
+			}
+			
+		}
+		
 	}
 	
 }
