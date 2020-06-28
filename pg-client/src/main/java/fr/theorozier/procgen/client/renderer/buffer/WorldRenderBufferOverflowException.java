@@ -6,4 +6,8 @@ public class WorldRenderBufferOverflowException extends RuntimeException {
 		super("A render buffer overflown, current cap: " + capacity + ", remaining: " + remaining + ", missing: " + missing + ".");
 	}
 	
+	public WorldRenderBufferOverflowException(int cursor, int expected) {
+		super("A render buffer overflown, cursor: " + cursor + ", expected: " + expected + ".");
+	}
+	
 }

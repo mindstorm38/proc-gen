@@ -74,7 +74,8 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public void vertex(float x, float y, float z) {
-		checkDataRemaining(this.data, 3);
+		// checkBufferRemaining(this.data, 3);
+		this.checkDataRemaining(3);
 		this.data.put(x).put(y).put(z);
 	}
 	
@@ -82,7 +83,8 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public void color(float r, float g, float b) {
-		checkDataRemaining(this.data, 3);
+		// checkBufferRemaining(this.data, 3);
+		this.checkDataRemaining(3);
 		this.data.put(r).put(g).put(b);
 	}
 	
@@ -90,7 +92,8 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public void texcoord(float u, float v) {
-		checkDataRemaining(this.data, 2);
+		// checkBufferRemaining(this.data, 2);
+		this.checkDataRemaining(2);
 		this.data.put(u).put(v);
 	}
 	
@@ -98,7 +101,8 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public void face() {
-		checkDataRemaining(this.data, 32);
+		// checkBufferRemaining(this.data, 32);
+		this.checkDataRemaining(32);
 		this.data.put(FACE_BUFFER);
 		this.rect(0, 1, 2, 3);
 	}
@@ -112,7 +116,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceTop(float x, float y, float z, float dx, float dz) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 32).put(x     ).put(y).put(z     );
 		buf.position(pos - 24).put(x     ).put(y).put(z + dz);
@@ -124,7 +128,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceBottom(float x, float y, float z, float dx, float dz) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 32).put(x     ).put(y).put(z + dz);
 		buf.position(pos - 24).put(x     ).put(y).put(z     );
@@ -136,7 +140,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceNorth(float x, float y, float z, float dy, float dz) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 32).put(x).put(y + dy).put(z + dz);
 		buf.position(pos - 24).put(x).put(y     ).put(z + dz);
@@ -148,7 +152,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceSouth(float x, float y, float z, float dy, float dz) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 32).put(x).put(y + dy).put(z     );
 		buf.position(pos - 24).put(x).put(y     ).put(z     );
@@ -160,7 +164,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceEast(float x, float y, float z, float dy, float dx) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 32).put(x     ).put(y + dy).put(z);
 		buf.position(pos - 24).put(x     ).put(y     ).put(z);
@@ -172,7 +176,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceWest(float x, float y, float z, float dy, float dx) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 32).put(x + dx).put(y + dy).put(z);
 		buf.position(pos - 24).put(x + dx).put(y     ).put(z);
@@ -184,7 +188,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceVertex(int vidx, float x, float y, float z) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 3);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		vidx <<= 3;
 		buf.put(pos - 32 + vidx, x);
@@ -197,7 +201,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceColor(float r, float g, float b) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 12);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 29).put(r).put(g).put(b);
 		buf.position(pos - 21).put(r).put(g).put(b);
@@ -209,7 +213,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceColor(int vidx, float r, float g, float b) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 3);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		vidx <<= 3;
 		buf.put(pos - 29 + vidx, r);
@@ -222,7 +226,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceTexCoordsRot0(float u, float v, float w, float h) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 8);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 26).put(u    ).put(v    );
 		buf.position(pos - 18).put(u    ).put(v + h);
@@ -233,7 +237,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceTexCoordsRot1(float u, float v, float w, float h) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 8);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 26).put(u    ).put(v + h);
 		buf.position(pos - 18).put(u + w).put(v + h);
@@ -244,7 +248,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceTexCoordsRot2(float u, float v, float w, float h) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 8);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 26).put(u + w).put(v + h);
 		buf.position(pos - 18).put(u + w).put(v    );
@@ -255,7 +259,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceTexCoordsRot3(float u, float v, float w, float h) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 8);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		buf.position(pos - 26).put(u + w).put(v    );
 		buf.position(pos - 18).put(u    ).put(v    );
@@ -266,7 +270,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	@Override
 	public void faceTexCoord(int vidx, float u, float v) {
 		FloatBuffer buf = this.data;
-		checkDataRemaining(buf, 2);
+		checkBufferPosition(buf, 32);
 		int pos = buf.position();
 		vidx <<= 3;
 		buf.put(pos - 26 + vidx, u);
@@ -284,7 +288,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public void triangle(int a, int b, int c) {
-		checkDataRemaining(this.indices, 3);
+		this.checkIndicesRemaining(3);
 		int i = this.idx;
 		this.indices.put(i + a).put(i + b).put(i + c);
 		this.idx = i + 3;
@@ -292,7 +296,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	
 	@Override
 	public void rect(int a, int b, int c, int d) {
-		checkDataRemaining(this.indices, 6);
+		this.checkIndicesRemaining(6);
 		int i = this.idx;
 		this.indices
 				.put(i + a).put(i + b).put(i + c)
@@ -326,10 +330,24 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 		return ((this.data != null ? this.data.capacity() : 0) + (this.indices != null ? this.indices.capacity() : 0)) << 2;
 	}
 	
-	private static void checkDataRemaining(Buffer buffer, int needed) throws WorldRenderBufferOverflowException {
+	protected void checkIndicesRemaining(int needed) {
+		checkBufferRemaining(this.indices, needed);
+	}
+	
+	protected void checkDataRemaining(int needed) {
+		checkBufferRemaining(this.data, needed);
+	}
+	
+	protected static void checkBufferRemaining(Buffer buffer, int needed) throws WorldRenderBufferOverflowException {
 		int missing = needed - buffer.remaining();
 		if (missing > 0) {
 			throw new WorldRenderBufferOverflowException(buffer.capacity(), buffer.remaining(), missing);
+		}
+	}
+	
+	protected static void checkBufferPosition(Buffer buffer, int needed) {
+		if (buffer.position() < needed) {
+			throw new WorldRenderBufferOverflowException(buffer.position(), needed);
 		}
 	}
 	
