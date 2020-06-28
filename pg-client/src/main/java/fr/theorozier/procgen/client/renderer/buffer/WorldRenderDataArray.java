@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.client.renderer.buffer;
 
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.common.util.array.BufferedIntArray;
 import io.msengine.client.renderer.util.BufferUsage;
@@ -32,7 +33,8 @@ public class WorldRenderDataArray implements WorldRenderBuffer {
 	
 	public WorldRenderDataArray() {}
 	
-	public void resetBuffers() {
+	@Override
+	public void clear() {
 		
 		this.vertices.setSize(0);
 		this.colors.setSize(0);
@@ -251,8 +253,8 @@ public class WorldRenderDataArray implements WorldRenderBuffer {
 	
 	// Upload method //
 	
-	@Deprecated
-	public void uploadToDrawBuffer(IndicesDrawBuffer drawBuffer) {
+	@Override
+	public void upload(IndicesDrawBuffer drawBuffer) {
 		
 		FloatBuffer verticesBuf = null;
 		FloatBuffer colorsBuf = null;
@@ -261,15 +263,15 @@ public class WorldRenderDataArray implements WorldRenderBuffer {
 		
 		try {
 			
-			verticesBuf = MemoryUtil.memAllocFloat(vertices.getSize());
-			colorsBuf = MemoryUtil.memAllocFloat(colors.getSize());
-			texcoordsBuf = MemoryUtil.memAllocFloat(texcoords.getSize());
-			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(indices.getSize()));
+			verticesBuf = MemoryUtil.memAllocFloat(this.vertices.getSize());
+			colorsBuf = MemoryUtil.memAllocFloat(this.colors.getSize());
+			texcoordsBuf = MemoryUtil.memAllocFloat(this.texcoords.getSize());
+			indicesBuf = MemoryUtil.memAllocInt(drawBuffer.setIndicesCount(this.indices.getSize()));
 			
-			vertices.resultToBuffer(verticesBuf);
-			colors.resultToBuffer(colorsBuf);
-			texcoords.resultToBuffer(texcoordsBuf);
-			indices.resultToBuffer(indicesBuf);
+			this.vertices.resultToBuffer(verticesBuf);
+			this.colors.resultToBuffer(colorsBuf);
+			this.texcoords.resultToBuffer(texcoordsBuf);
+			this.indices.resultToBuffer(indicesBuf);
 			
 			verticesBuf.flip();
 			colorsBuf.flip();
@@ -291,6 +293,11 @@ public class WorldRenderDataArray implements WorldRenderBuffer {
 			
 		}
 	
+	}
+	
+	@Override
+	public IndicesDrawBuffer newDrawBuffer(WorldShaderManager shaderManager) {
+		return shaderManager.createBasicDrawBuffer(true, true);
 	}
 	
 	@Override

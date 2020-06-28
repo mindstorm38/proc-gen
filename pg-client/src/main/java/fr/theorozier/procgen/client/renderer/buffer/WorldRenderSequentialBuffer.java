@@ -1,5 +1,9 @@
 package fr.theorozier.procgen.client.renderer.buffer;
 
+import fr.theorozier.procgen.client.renderer.world.util.WorldSequentialFormat;
+import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
+import io.msengine.client.renderer.util.BufferUsage;
+import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.Buffer;
@@ -54,6 +58,7 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 		
 	}
 	
+	@Override
 	public void clear() {
 		this.data.clear();
 		this.indices.clear();
@@ -293,6 +298,28 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 				.put(i + a).put(i + b).put(i + c)
 				.put(i + a).put(i + c).put(i + d);
 		this.idx = i + 4;
+	}
+	
+	@Override
+	public void upload(IndicesDrawBuffer indicesDrawBuffer) {
+		
+		if (indicesDrawBuffer.getFormat() != WorldSequentialFormat.SEQUENTIAL) {
+			throw new IllegalArgumentException("Invalid draw buffer format for a sequential buffer.");
+		}
+		
+		this.flip();
+		int remain = this.indices.remaining();
+		
+		indicesDrawBuffer.bindVao();
+		indicesDrawBuffer.uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, this.data, BufferUsage.DYNAMIC_DRAW);
+		indicesDrawBuffer.uploadIboData(this.indices, BufferUsage.DYNAMIC_DRAW);
+		indicesDrawBuffer.setIndicesCount(remain);
+		
+	}
+	
+	@Override
+	public IndicesDrawBuffer newDrawBuffer(WorldShaderManager shaderManager) {
+		return shaderManager.createSequentialDrawBuffer();
 	}
 	
 	public int getTotalBytes() {

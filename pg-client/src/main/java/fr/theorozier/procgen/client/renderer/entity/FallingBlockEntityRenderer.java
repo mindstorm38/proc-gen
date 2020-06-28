@@ -1,8 +1,8 @@
 package fr.theorozier.procgen.client.renderer.entity;
 
 import fr.theorozier.procgen.client.ProcGenGame;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.entity.part.EntityBlockRendererPart;
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.FallingBlockEntity;
@@ -21,8 +21,8 @@ public class FallingBlockEntityRenderer extends MotionEntityRenderer<FallingBloc
 	public FallingBlockEntityRenderer() { }
 	
 	@Override
-	public void initRenderer(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
-		super.initRenderer(shaderManager, dataArray);
+	public void initRenderer(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
+		super.initRenderer(shaderManager, renderBuffer);
 	}
 	
 	@Override

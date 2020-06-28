@@ -1,7 +1,8 @@
 package fr.theorozier.procgen.client.renderer.entity;
 
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.client.renderer.entity.part.EntityModelPart;
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.entity.Entity;
 import io.msengine.client.renderer.model.ModelHandler;
@@ -24,9 +25,11 @@ public abstract class EntityRenderer<E extends Entity> {
 	private boolean initied = false;
 	private final HashMap<String, EntityModelPart> parts = new HashMap<>();
 	
-	private final LazyLoadValue<WorldRenderDataArray> optionalDataArray = new LazyLoadValue<WorldRenderDataArray>() {
-		public WorldRenderDataArray create() {
-			return new WorldRenderDataArray();
+	private final LazyLoadValue<WorldRenderSequentialBuffer> optionalDataArray = new LazyLoadValue<WorldRenderSequentialBuffer>() {
+		@Override public WorldRenderSequentialBuffer create() {
+			WorldRenderSequentialBuffer ret = new WorldRenderSequentialBuffer();
+			ret.allocBlocks(9);
+			return ret;
 		}
 	};
 	
@@ -36,15 +39,15 @@ public abstract class EntityRenderer<E extends Entity> {
 		return this.initied;
 	}
 	
-	public void initRenderer(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
+	public void initRenderer(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
 	
 		if (this.initied)
 			throw new IllegalStateException("This '" + this.getClass() + "' can't be initialized twice.");
 		
 		this.parts.values().forEach(p -> {
 			
-			dataArray.resetBuffers();
-			p.initPart(shaderManager, dataArray);
+			renderBuffer.clear();
+			p.initPart(shaderManager, renderBuffer);
 			
 		});
 		
@@ -62,6 +65,11 @@ public abstract class EntityRenderer<E extends Entity> {
 		
 		this.parts.values().forEach(EntityModelPart::stopPart);
 		
+		if (this.optionalDataArray.loaded()) {
+			this.optionalDataArray.get().free();
+			this.optionalDataArray.reset();
+		}
+		
 		this.shaderManager = null;
 		this.initied = false;
 		
@@ -77,7 +85,7 @@ public abstract class EntityRenderer<E extends Entity> {
 		if (this.initied) {
 			
 			if (this.optionalDataArray.loaded())
-				this.optionalDataArray.get().resetBuffers();
+				this.optionalDataArray.get().clear();
 			
 			part.initPart(this.shaderManager, this.optionalDataArray.get());
 			

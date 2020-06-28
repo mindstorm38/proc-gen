@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.client.renderer.world;
 
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.client.renderer.entity.*;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
@@ -57,11 +59,17 @@ public class EntityRenderManager {
 	void init() {
 		
 		WorldShaderManager shaderManager = this.shaderManager;
-		WorldRenderDataArray dataArray = new WorldRenderDataArray();
+		WorldRenderSequentialBuffer renderBuffer = new WorldRenderSequentialBuffer();
 		
-		for (EntityRenderer<?> renderer : this.entityRenderers.values())
-			if (!renderer.isInitied())
-				renderer.initRenderer(shaderManager, dataArray);
+		renderBuffer.allocBlocks(9);
+		
+		for (EntityRenderer<?> renderer : this.entityRenderers.values()) {
+			if (!renderer.isInitied()) {
+				renderer.initRenderer(shaderManager, renderBuffer);
+			}
+		}
+		
+		renderBuffer.free();
 		
 	}
 	
@@ -70,9 +78,11 @@ public class EntityRenderManager {
 	 */
 	void stop() {
 		
-		for (EntityRenderer<?> renderer : this.entityRenderers.values())
-			if (renderer.isInitied())
+		for (EntityRenderer<?> renderer : this.entityRenderers.values()) {
+			if (renderer.isInitied()) {
 				renderer.stopRenderer();
+			}
+		}
 		
 	}
 	

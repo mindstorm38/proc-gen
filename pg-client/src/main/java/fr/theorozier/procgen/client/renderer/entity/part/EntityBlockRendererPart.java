@@ -4,7 +4,7 @@ import fr.theorozier.procgen.client.ProcGenGame;
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderers;
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.world.biome.Biomes;
@@ -26,7 +26,7 @@ public class EntityBlockRendererPart extends EntityModelPart {
 	}
 	
 	@Override
-	public void init(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
+	public void init(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
 		
 		BlockRenderer renderer = BlockRenderers.getRenderer(this.blockState.getBlock());
 		
@@ -38,10 +38,9 @@ public class EntityBlockRendererPart extends EntityModelPart {
 		if (terrainMap == null)
 			return;
 		
-		renderer.getRenderData(DUMMY_EMPTY_WORLD, this.blockState, 0, 0, 0, 0f, 0f, 0f, BlockFaces.ImmutableBlockFaces.FULL_FACES, terrainMap, dataArray);
+		renderer.getRenderData(DUMMY_EMPTY_WORLD, this.blockState, 0, 0, 0, 0f, 0f, 0f, BlockFaces.ImmutableBlockFaces.FULL_FACES, terrainMap, renderBuffer);
 		
-		this.buffer = shaderManager.createBasicDrawBuffer(true, true);
-		dataArray.uploadToDrawBuffer(this.buffer);
+		this.buffer = renderBuffer.newDrawBufferAndUpload(shaderManager);
 		
 	}
 	

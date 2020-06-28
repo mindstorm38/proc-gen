@@ -401,12 +401,8 @@ public class ChunkRenderManager {
 		
 	}
 	
-	public ChunkRenderBuffers takeRenderBuffers() {
-		try {
-			return this.chunkRenderBuffers.take();
-		} catch (InterruptedException e) {
-			throw new IllegalStateException("Interrupted while taking render buffers.");
-		}
+	public ChunkRenderBuffers takeRenderBuffers() throws InterruptedException {
+		return this.chunkRenderBuffers.take();
 	}
 	
 	public void putRenderBuffers(ChunkRenderBuffers buffers) {

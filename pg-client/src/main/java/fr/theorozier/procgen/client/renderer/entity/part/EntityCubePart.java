@@ -1,7 +1,7 @@
 package fr.theorozier.procgen.client.renderer.entity.part;
 
 import fr.theorozier.procgen.client.renderer.block.BlockFaces;
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderDataArray;
+import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMapTile;
@@ -52,7 +52,7 @@ public class EntityCubePart extends EntityModelPart {
 		this.setFaceTile(dir, tile, 0);
 	}
 	
-	protected void applyTexcoords(Direction direction, WorldRenderDataArray dataArray) {
+	protected void applyTexcoords(Direction direction, WorldRenderBuffer dataArray) {
 		
 		TextureMapTile tile = this.tiles[direction.ordinal()];
 		
@@ -63,7 +63,7 @@ public class EntityCubePart extends EntityModelPart {
 	}
 	
 	@Override
-	public void init(WorldShaderManager shaderManager, WorldRenderDataArray dataArray) {
+	public void init(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
 		
 		float dx = this.maxX - this.minX;
 		float dy = this.maxY - this.minY;
@@ -73,19 +73,19 @@ public class EntityCubePart extends EntityModelPart {
 		
 		if (this.faces.isTop()) {
 			
-			dataArray.face();
-			dataArray.faceTop(this.minX, this.maxY, this.minZ, dx, dz);
-			dataArray.faceColorWhite();
-			this.applyTexcoords(Direction.TOP, dataArray);
+			renderBuffer.face();
+			renderBuffer.faceTop(this.minX, this.maxY, this.minZ, dx, dz);
+			renderBuffer.faceColorWhite();
+			this.applyTexcoords(Direction.TOP, renderBuffer);
 			
 		}
 		
 		if (this.faces.isBottom()) {
 			
-			dataArray.face();
-			dataArray.faceBottom(this.minX, this.minY, this.minZ, dx, dz);
-			dataArray.faceColorWhite();
-			this.applyTexcoords(Direction.BOTTOM, dataArray);
+			renderBuffer.face();
+			renderBuffer.faceBottom(this.minX, this.minY, this.minZ, dx, dz);
+			renderBuffer.faceColorWhite();
+			this.applyTexcoords(Direction.BOTTOM, renderBuffer);
 			
 		}
 		
@@ -93,19 +93,19 @@ public class EntityCubePart extends EntityModelPart {
 		
 		if (this.faces.isNorth()) {
 			
-			dataArray.face();
-			dataArray.faceNorth(this.maxX, this.minY, this.minZ, dy, dz);
-			dataArray.faceColorWhite();
-			this.applyTexcoords(Direction.NORTH, dataArray);
+			renderBuffer.face();
+			renderBuffer.faceNorth(this.maxX, this.minY, this.minZ, dy, dz);
+			renderBuffer.faceColorWhite();
+			this.applyTexcoords(Direction.NORTH, renderBuffer);
 			
 		}
 		
 		if (this.faces.isSouth()) {
 			
-			dataArray.face();
-			dataArray.faceSouth(this.minX, this.minY, this.minZ, dy, dz);
-			dataArray.faceColorWhite();
-			this.applyTexcoords(Direction.SOUTH, dataArray);
+			renderBuffer.face();
+			renderBuffer.faceSouth(this.minX, this.minY, this.minZ, dy, dz);
+			renderBuffer.faceColorWhite();
+			this.applyTexcoords(Direction.SOUTH, renderBuffer);
 			
 		}
 		
@@ -113,92 +113,23 @@ public class EntityCubePart extends EntityModelPart {
 		
 		if (this.faces.isEast()) {
 			
-			dataArray.face();
-			dataArray.faceEast(this.minX, this.minY, this.maxZ, dy, dx);
-			dataArray.faceColorWhite();
-			this.applyTexcoords(Direction.EAST, dataArray);
+			renderBuffer.face();
+			renderBuffer.faceEast(this.minX, this.minY, this.maxZ, dy, dx);
+			renderBuffer.faceColorWhite();
+			this.applyTexcoords(Direction.EAST, renderBuffer);
 			
 		}
 		
 		if (this.faces.isWest()) {
 			
-			dataArray.face();
-			dataArray.faceWest(this.minX, this.minY, this.minZ, dy, dx);
-			dataArray.faceColorWhite();
-			this.applyTexcoords(Direction.WEST, dataArray);
+			renderBuffer.face();
+			renderBuffer.faceWest(this.minX, this.minY, this.minZ, dy, dx);
+			renderBuffer.faceColorWhite();
+			this.applyTexcoords(Direction.WEST, renderBuffer);
 			
 		}
 		
-		this.buffer = shaderManager.createBasicDrawBuffer(true, true);
-		dataArray.uploadToDrawBuffer(this.buffer);
-		
-		/*
-		FloatBuffer vertices = null;
-		FloatBuffer colors = null;
-		IntBuffer indices = null;
-		
-		try {
-			
-			vertices = MemoryUtil.memAllocFloat(24);
-			colors = MemoryUtil.memAllocFloat(24);
-			indices = MemoryUtil.memAllocInt(this.buffer.setIndicesCount(36));
-			
-			vertices.put(minX).put(minY).put(minZ);
-			vertices.put(maxX).put(minY).put(minZ);
-			vertices.put(minX).put(minY).put(maxZ);
-			vertices.put(maxX).put(minY).put(maxZ);
-			vertices.put(minX).put(maxY).put(minZ);
-			vertices.put(maxX).put(maxY).put(minZ);
-			vertices.put(minX).put(maxY).put(maxZ);
-			vertices.put(maxX).put(maxY).put(maxZ);
-			
-			for (int i = 0; i < 8; ++i)
-				colors.put(0.96078431f + (float) Math.random()).put(0.61960784f + (float) Math.random()).put(0.25882352f + (float) Math.random());
-			
-			float[] texCoords = new float[4];
-			
-			
-			// WEST
-			indices.put(0).put(4).put(1);
-			indices.put(1).put(4).put(5);
-			
-			// SOUTH
-			indices.put(0).put(2).put(6);
-			indices.put(0).put(6).put(4);
-			
-			// BOTTOM
-			indices.put(0).put(1).put(3);
-			indices.put(0).put(3).put(2);
-			
-			// EAST
-			indices.put(2).put(3).put(7);
-			indices.put(2).put(7).put(6);
-			
-			// NORTH
-			indices.put(1).put(5).put(7);
-			indices.put(1).put(7).put(3);
-			
-			// TOP
-			indices.put(4).put(6).put(7);
-			indices.put(4).put(7).put(5);
-			
-			vertices.flip();
-			colors.flip();
-			indices.flip();
-			
-			this.buffer.bindVao();
-			this.buffer.uploadVboData(BasicFormat.BASIC3D_POSITION, vertices, BufferUsage.STATIC_DRAW);
-			this.buffer.uploadVboData(BasicFormat.BASIC_COLOR, colors, BufferUsage.STATIC_DRAW);
-			this.buffer.uploadIboData(indices, BufferUsage.STATIC_DRAW);
-			
-		} finally {
-			
-			BufferUtils.safeFree(vertices);
-			BufferUtils.safeFree(colors);
-			BufferUtils.safeFree(indices);
-			
-		}
-		*/
+		this.buffer = renderBuffer.newDrawBufferAndUpload(shaderManager);
 		
 	}
 	

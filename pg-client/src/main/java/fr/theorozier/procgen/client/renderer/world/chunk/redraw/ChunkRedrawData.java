@@ -6,7 +6,14 @@ import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
 import fr.theorozier.procgen.common.util.concurrent.PriorityRunnable;
 import fr.theorozier.procgen.common.world.position.AbsBlockPosition;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Deprecated
 public class ChunkRedrawData {
+	
+	private static final AtomicInteger UID = new AtomicInteger();
+	
+	private final int tmpUid = UID.getAndIncrement();
 	
 	private final ChunkRenderManager manager;
 	private final ChunkRenderer cr;
@@ -26,8 +33,16 @@ public class ChunkRedrawData {
 		
 	}
 	
+	private void debug(String msg) {
+		System.out.println("CRD#" + this.tmpUid + ": " + msg);
+	}
+	
 	private ChunkRenderBuffers getBuffers() {
-		return this.buffers == null ? (this.buffers = this.manager.takeRenderBuffers()) : this.buffers;
+		boolean taking = this.buffers == null;
+		if (taking) debug("takeRenderBuffers");
+		ChunkRenderBuffers ret = this.buffers == null ? (this.buffers = this.manager.takeRenderBuffers()) : this.buffers;
+		if (taking) debug("takeRenderBuffers:done");
+		return ret;
 	}
 	
 	private boolean isPositionCoherent() {
@@ -35,26 +50,34 @@ public class ChunkRedrawData {
 	}
 	
 	public PriorityRunnable newTask(ChunkRedrawFunction function) {
-		return new Task(function);
+		return this.new Task(function);
 	}
 	
 	public void upload() {
+		debug("upload");
 		if (this.isPositionCoherent() && this.buffers != null) {
+			debug("upload/coherent");
 			this.cr.uploadRedrawBuffers(this.buffers);
 		}
 	}
 	
 	public void free() {
+		
+		debug("free");
+		this.cr.doneRedrawing();
+		
 		if (this.buffers != null) {
+			debug("free/buffer");
 			this.manager.putRenderBuffers(this.buffers);
 			this.buffers = null;
 		}
+		
 	}
 	
 	@Override
-	protected void finalize() throws Throwable {
+	protected void finalize() {
 		if (this.buffers != null) {
-			System.out.println("Loosed buffers " + this.buffers + " in " + this); // FIXME, WHY THERE ARE FUCKING LEAKS HERE ?
+			debug("lost buffer: " + this.buffers); // FIXME, WHY THERE ARE FUCKING LEAKS HERE ?
 		}
 	}
 	

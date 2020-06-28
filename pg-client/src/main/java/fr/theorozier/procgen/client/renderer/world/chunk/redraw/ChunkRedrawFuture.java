@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+@Deprecated
 public class ChunkRedrawFuture<T> implements Future<T> {
 	
 	private final ChunkRedrawData data;

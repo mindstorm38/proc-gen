@@ -6,7 +6,6 @@ import fr.theorozier.procgen.client.renderer.block.BlockRenderers;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
 import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFuture;
-import fr.theorozier.procgen.client.renderer.world.util.WorldSequentialFormat;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
@@ -18,7 +17,6 @@ import fr.theorozier.procgen.common.world.position.Direction;
 import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.TextureMap;
-import io.msengine.client.renderer.util.BufferUsage;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 
 import java.util.Objects;
@@ -43,7 +41,6 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	private final IndicesDrawBuffer[] drawBuffers = new IndicesDrawBuffer[LAYERS_COUNT];
 	
-	//private boolean redrawing = false;
 	private boolean firstUpdated = false;
 	private int changed = 0;
 	
@@ -101,6 +98,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	public void releaseChunk() {
 		this.chunk = null;
+		this.clearNeedUpdate();
 		this.cancelRedrawing();
 	}
 	
@@ -142,11 +140,14 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.changed != 0;
 	}
 	
+	public void clearNeedUpdate() {
+		this.changed = 0;
+	}
+	
 	public boolean update() {
 		
 		if (this.isActive() && this.redrawingFuture == null && this.doNeedUpdate()) {
 			
-			//this.redrawing = true;
 			this.redrawingFuture = this.renderManager.scheduleChunkRedrawTask(this, this::redrawGlobal);
 			return true;
 			
@@ -250,9 +251,8 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return this.redrawingFuture != null;
 	}
 	
-	private void doneRedrawing() {
+	public void doneRedrawing() {
 		this.redrawingFuture = null;
-		this.changed = 0;
 	}
 	
 	public void cancelRedrawing() {
@@ -318,19 +318,10 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	public void uploadRedrawBuffers(ChunkRenderBuffers renderBuffers) {
 		
 		WorldRenderSequentialBuffer buff;
-		for (int i = 0, bit, indices; i < LAYERS_COUNT; ++i) {
+		for (int i = 0, bit; i < LAYERS_COUNT; ++i) {
 			bit = 1 << i;
 			if ((this.changed & bit) == bit) {
-				
-				buff = renderBuffers.getBuffer(i);
-				indices = buff.indices();
-				buff.flip();
-				
-				this.drawBuffers[i].bindVao();
-				this.drawBuffers[i].uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, buff.getData(), BufferUsage.DYNAMIC_DRAW);
-				this.drawBuffers[i].uploadIboData(buff.getIndices(), BufferUsage.DYNAMIC_DRAW);
-				this.drawBuffers[i].setIndicesCount(indices);
-				
+				renderBuffers.getBuffer(i).upload(this.drawBuffers[i]);
 			}
 		}
 		
@@ -338,7 +329,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			this.firstUpdated = true;
 		}
 		
-		this.doneRedrawing();
+		this.clearNeedUpdate();
 		
 	}
 	
@@ -349,47 +340,10 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 		return o.distanceToCameraSquared - this.distanceToCameraSquared;
 	}
 	
-	@Override
-	public int hashCode() {
-		return this.chunk.getChunkPos().hashCode(); // TODO Change that
-	}
-	
-	@Override
-	public boolean equals(Object obj) { // TODO Also change this
-		if (obj == this) return true;
-		if (obj.getClass() != getClass()) return true;
-		ChunkRenderer render = (ChunkRenderer) obj;
-		return this.chunk.getChunkPos().equals(render.getChunkPosition());
-	}
-	
 	private static void computeBlockFaces(BlockFaces faces, BlockState state, WorldChunk chunk, int x, int y, int z) {
 		for (Direction direction : Direction.values()) {
 			faces.setFaceBlock(state, direction, chunk.getBlockAtBlockRel(x, y, z, direction));
 		}
 	}
-	
-	// Utilities //
-	
-	/*
-	 * Utility method to trigger a callback for each direction for neighbors who need updates.
-	 * @param pos The block update position.
-	 * @param consumer The callback for directions.
-	 */
-	/*private static void checkBlockOnFaces(BlockPositioned pos, Consumer<Direction> consumer) {
-		
-		int rx = pos.getX() & 15;
-		int ry = pos.getY() & 15;
-		int rz = pos.getZ() & 15;
-		
-		if (rx == 0) consumer.accept(Direction.SOUTH);
-		else if (rx == 15) consumer.accept(Direction.NORTH);
-		
-		if (ry == 0) consumer.accept(Direction.BOTTOM);
-		else if (ry == 15) consumer.accept(Direction.TOP);
-		
-		if (rz == 0) consumer.accept(Direction.WEST);
-		else if (rz == 15) consumer.accept(Direction.EAST);
-		
-	}*/
 	
 }
