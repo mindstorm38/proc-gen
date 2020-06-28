@@ -1,6 +1,5 @@
 package fr.theorozier.procgen.client.renderer.entity;
 
-import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.client.renderer.entity.part.EntityModelPart;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 
 /**
  *
- * <u>Note : Not thread-safe.</u>
+ * <u><b>Note : Not thread-safe, all calls must be done from main thread.</b></u>
  *
  * @author Theo Rozier
  *
@@ -39,7 +38,7 @@ public abstract class EntityRenderer<E extends Entity> {
 		return this.initied;
 	}
 	
-	public void initRenderer(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
+	public void initRenderer(WorldShaderManager shaderManager, WorldRenderSequentialBuffer renderBuffer) {
 	
 		if (this.initied)
 			throw new IllegalStateException("This '" + this.getClass() + "' can't be initialized twice.");
@@ -77,9 +76,6 @@ public abstract class EntityRenderer<E extends Entity> {
 	
 	public void addPart(String id, EntityModelPart part) {
 		
-		//if (this.initied)
-		//	throw new IllegalStateException("Entity renderer already started, can't add part.");
-		
 		this.parts.put(id, part);
 		
 		if (this.initied) {
@@ -94,9 +90,6 @@ public abstract class EntityRenderer<E extends Entity> {
 	}
 	
 	public void removePart(String id) {
-		
-		//if (this.initied)
-		//	throw new IllegalStateException("Entity renderer already started, can't remove part.");
 		
 		EntityModelPart part = this.parts.remove(id);
 		

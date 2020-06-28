@@ -20,13 +20,11 @@ public class EntityBlockRendererPart extends EntityModelPart {
 	private IndicesDrawBuffer buffer;
 	
 	public EntityBlockRendererPart(BlockState blockState) {
-		
 		this.blockState = blockState;
-		
 	}
 	
 	@Override
-	public void init(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
+	public void draw(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
 		
 		BlockRenderer renderer = BlockRenderers.getRenderer(this.blockState.getBlock());
 		
@@ -40,21 +38,6 @@ public class EntityBlockRendererPart extends EntityModelPart {
 		
 		renderer.getRenderData(DUMMY_EMPTY_WORLD, this.blockState, 0, 0, 0, 0f, 0f, 0f, BlockFaces.ImmutableBlockFaces.FULL_FACES, terrainMap, renderBuffer);
 		
-		this.buffer = renderBuffer.newDrawBufferAndUpload(shaderManager);
-		
-	}
-	
-	@Override
-	public void stop() {
-		
-		this.buffer.delete();
-		this.buffer = null;
-		
-	}
-	
-	@Override
-	public void render() {
-		this.buffer.drawElements();
 	}
 	
 }

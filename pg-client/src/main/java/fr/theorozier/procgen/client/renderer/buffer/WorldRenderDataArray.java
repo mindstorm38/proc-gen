@@ -1,5 +1,6 @@
 package fr.theorozier.procgen.client.renderer.buffer;
 
+import fr.theorozier.procgen.client.renderer.world.util.WorldSequentialFormat;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.util.array.BufferedFloatArray;
 import fr.theorozier.procgen.common.util.array.BufferedIntArray;
@@ -256,6 +257,8 @@ public class WorldRenderDataArray implements WorldRenderBuffer {
 	@Override
 	public void upload(IndicesDrawBuffer drawBuffer) {
 		
+		WorldRenderBuffer.checkDrawBufferFormat(drawBuffer, WorldSequentialFormat.SEQUENTIAL);
+		
 		FloatBuffer verticesBuf = null;
 		FloatBuffer colorsBuf = null;
 		FloatBuffer texcoordsBuf = null;
@@ -293,11 +296,6 @@ public class WorldRenderDataArray implements WorldRenderBuffer {
 			
 		}
 	
-	}
-	
-	@Override
-	public IndicesDrawBuffer newDrawBuffer(WorldShaderManager shaderManager) {
-		return shaderManager.createBasicDrawBuffer(true, true);
 	}
 	
 	@Override

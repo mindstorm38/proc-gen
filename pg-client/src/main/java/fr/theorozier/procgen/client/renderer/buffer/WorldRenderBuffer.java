@@ -1,8 +1,10 @@
 package fr.theorozier.procgen.client.renderer.buffer;
 
+import fr.theorozier.procgen.client.renderer.world.util.WorldSequentialFormat;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import io.msengine.client.renderer.texture.TextureMapTile;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
+import io.msengine.client.renderer.vertex.VertexArrayFormat;
 import io.msengine.common.util.Color;
 
 public interface WorldRenderBuffer {
@@ -176,13 +178,12 @@ public interface WorldRenderBuffer {
 	
 	// Upload //
 	
-	void upload(IndicesDrawBuffer indicesDrawBuffer);
-	IndicesDrawBuffer newDrawBuffer(WorldShaderManager shaderManager);
+	void upload(IndicesDrawBuffer drawBuffer);
 	
-	default IndicesDrawBuffer newDrawBufferAndUpload(WorldShaderManager shaderManager) {
-		IndicesDrawBuffer drawBuffer = this.newDrawBuffer(shaderManager);
-		this.upload(drawBuffer);
-		return drawBuffer;
+	static void checkDrawBufferFormat(IndicesDrawBuffer drawBuffer, VertexArrayFormat format) {
+		if (drawBuffer.getFormat() != format) {
+			throw new IllegalArgumentException("Invalid draw buffer format for a sequential buffer.");
+		}
 	}
 	
 }

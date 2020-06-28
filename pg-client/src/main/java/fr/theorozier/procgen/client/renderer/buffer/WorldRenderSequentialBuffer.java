@@ -1,7 +1,6 @@
 package fr.theorozier.procgen.client.renderer.buffer;
 
 import fr.theorozier.procgen.client.renderer.world.util.WorldSequentialFormat;
-import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import io.msengine.client.renderer.util.BufferUsage;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 import org.lwjgl.system.MemoryUtil;
@@ -27,9 +26,15 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	}
 	
 	public void allocRaw(int dataCapacity, int indicesCapacity) {
-		this.free();
-		this.data = MemoryUtil.memAllocFloat(dataCapacity);
-		this.indices = MemoryUtil.memAllocInt(indicesCapacity);
+		
+		this.data = this.data == null ?
+				MemoryUtil.memAllocFloat(dataCapacity) :
+				MemoryUtil.memRealloc(this.data, dataCapacity);
+		
+		this.indices = this.indices == null ?
+				MemoryUtil.memAllocInt(indicesCapacity) :
+				MemoryUtil.memRealloc(this.indices, indicesCapacity);
+		
 	}
 	
 	public void allocVertices(int verticesCapacity, int indicesCapacity) {
@@ -305,25 +310,18 @@ public class WorldRenderSequentialBuffer implements WorldRenderBuffer {
 	}
 	
 	@Override
-	public void upload(IndicesDrawBuffer indicesDrawBuffer) {
+	public void upload(IndicesDrawBuffer drawBuffer) {
 		
-		if (indicesDrawBuffer.getFormat() != WorldSequentialFormat.SEQUENTIAL) {
-			throw new IllegalArgumentException("Invalid draw buffer format for a sequential buffer.");
-		}
+		WorldRenderBuffer.checkDrawBufferFormat(drawBuffer, WorldSequentialFormat.SEQUENTIAL);
 		
 		this.flip();
 		int remain = this.indices.remaining();
 		
-		indicesDrawBuffer.bindVao();
-		indicesDrawBuffer.uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, this.data, BufferUsage.DYNAMIC_DRAW);
-		indicesDrawBuffer.uploadIboData(this.indices, BufferUsage.DYNAMIC_DRAW);
-		indicesDrawBuffer.setIndicesCount(remain);
+		drawBuffer.bindVao();
+		drawBuffer.uploadVboData(WorldSequentialFormat.SEQUENTIAL_MAIN, this.data, BufferUsage.DYNAMIC_DRAW);
+		drawBuffer.uploadIboData(this.indices, BufferUsage.DYNAMIC_DRAW);
+		drawBuffer.setIndicesCount(remain);
 		
-	}
-	
-	@Override
-	public IndicesDrawBuffer newDrawBuffer(WorldShaderManager shaderManager) {
-		return shaderManager.createSequentialDrawBuffer();
 	}
 	
 	public int getTotalBytes() {

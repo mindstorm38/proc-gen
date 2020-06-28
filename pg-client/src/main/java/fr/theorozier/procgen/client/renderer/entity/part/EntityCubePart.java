@@ -5,7 +5,6 @@ import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.world.util.WorldShaderManager;
 import fr.theorozier.procgen.common.world.position.Direction;
 import io.msengine.client.renderer.texture.TextureMapTile;
-import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 
 public class EntityCubePart extends EntityModelPart {
 	
@@ -19,8 +18,6 @@ public class EntityCubePart extends EntityModelPart {
 	private final BlockFaces faces;
 	private final TextureMapTile[] tiles;
 	private final int[] tilesRotations;
-	
-	private IndicesDrawBuffer buffer;
 	
 	public EntityCubePart(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
 		
@@ -52,18 +49,18 @@ public class EntityCubePart extends EntityModelPart {
 		this.setFaceTile(dir, tile, 0);
 	}
 	
-	protected void applyTexcoords(Direction direction, WorldRenderBuffer dataArray) {
+	protected void applyTexcoords(Direction direction, WorldRenderBuffer renderBuffer) {
 		
 		TextureMapTile tile = this.tiles[direction.ordinal()];
 		
 		if (tile != null) {
-			dataArray.faceTexcoords(tile, this.tilesRotations[direction.ordinal()]);
+			renderBuffer.faceTexcoords(tile, this.tilesRotations[direction.ordinal()]);
 		}
 		
 	}
 	
 	@Override
-	public void init(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
+	public void draw(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
 		
 		float dx = this.maxX - this.minX;
 		float dy = this.maxY - this.minY;
@@ -129,21 +126,6 @@ public class EntityCubePart extends EntityModelPart {
 			
 		}
 		
-		this.buffer = renderBuffer.newDrawBufferAndUpload(shaderManager);
-		
-	}
-	
-	@Override
-	public void stop() {
-		
-		this.buffer.delete();
-		this.buffer = null;
-		
-	}
-	
-	@Override
-	public void render() {
-		this.buffer.drawElements();
 	}
 	
 }
