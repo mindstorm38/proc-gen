@@ -44,7 +44,7 @@ generation.
 - [ ] Rework of rendering system
   - [x] Solve far render issues
   - [ ] Rendering optimizations
-    - [x] Shared `WorldRenderSequentialBuffer` for all chunk renderers
+    - [x] Shared `WorldRenderSequentialBuffer` for all chunk renderers **(currently buggy and causing memory leaks)**
     - [x] Use `MemoryUtil` natives for building render data
     - [x] ~~Caching of blocks indices, in order to re-render only necessary faces~~ **(non-efficient)**
     - [ ] Viewing Frustum Culling
@@ -52,12 +52,14 @@ generation.
 - [ ] Items
 - [x] All-model falling blocks
 - [x] TNT ***(WIP)***
+- [ ] Modifications (Mods)
+  - [ ] Put default game blocks/entities/items in a mod, enabled by default
 
 ## Contribute
 
 Do not hesitate to contribute through issues, either to report real **issues**, or to make **suggestions** for the game !
 
-This game is currently in development, it is not playable but it is
+This game is currently in development, it is not playable, but it is
 already possible to move through the dimension.
 
 For development, I'm using Gradle (use wrapper with `./gradrew` and `./gradlew.bat`) and IntelliJ IDEA as IDE.
