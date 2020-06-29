@@ -175,7 +175,7 @@ public class EntityRenderManager {
 	 */
 	public static WorldRenderSequentialBuffer newEntityRenderSequentialBuffer() {
 		WorldRenderSequentialBuffer renderBuffer = new WorldRenderSequentialBuffer.Growing();
-		renderBuffer.allocBlocks(9);
+		renderBuffer.allocBlocks(2);
 		return renderBuffer;
 	}
 	
