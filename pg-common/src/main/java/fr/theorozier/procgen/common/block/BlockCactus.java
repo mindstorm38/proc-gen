@@ -7,8 +7,8 @@ import java.util.List;
 
 public class BlockCactus extends Block {
 	
-	public BlockCactus(int uid, String identifier) {
-		super(uid, identifier);
+	public BlockCactus(String identifier) {
+		super(identifier);
 	}
 	
 	@Override

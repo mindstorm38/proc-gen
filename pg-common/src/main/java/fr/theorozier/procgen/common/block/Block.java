@@ -5,7 +5,6 @@ import fr.theorozier.procgen.common.block.state.BlockStateContainer;
 import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.item.ItemStack;
 import fr.theorozier.procgen.common.phys.AxisAlignedBB;
-import fr.theorozier.procgen.common.util.ErrorUtils;
 import fr.theorozier.procgen.common.world.WorldDimension;
 import fr.theorozier.procgen.common.world.position.BlockPositioned;
 import fr.theorozier.procgen.common.world.position.Direction;
@@ -16,7 +15,6 @@ import java.util.Random;
 
 public class Block {
 	
-	protected final short uid;
 	protected final String identifier;
 	
 	protected final BlockStateContainer stateContainer;
@@ -24,13 +22,8 @@ public class Block {
 	
 	private float resistance = 1f;
 	
-	public Block(int uid, String identifier) {
+	public Block(String identifier) {
 		
-		if (uid <= 0)
-			throw ErrorUtils.invalidUidArgument("Block");
-		
-		// Cast to short to store it as "unsigned short".
-		this.uid = (short) uid;
 		this.identifier = StringUtils.requireNonNullAndEmpty(identifier, "Block's identifier can't be null or empty.");
 		
 		BlockStateContainer.Builder containerBuilder = new BlockStateContainer.Builder(this);
@@ -39,10 +32,6 @@ public class Block {
 		
 		this.setDefaultState(this.stateContainer.getBaseState());
 		
-	}
-	
-	public short getUid() {
-		return this.uid;
 	}
 	
 	public String getIdentifier() {
@@ -140,17 +129,11 @@ public class Block {
 	}
 
 	public void neighbourBlockUpdated(WorldDimension world, BlockPositioned pos, BlockState block, BlockPositioned neighbourPos, BlockState neighbour, Direction face) {}
-
-	@Override
-	public int hashCode() {
-		return this.getUid();
-	}
 	
 	@Override
 	public String toString() {
 		return "Block{" +
-				"uid=" + uid +
-				", identifier='" + identifier + '\'' +
+				"identifier='" + identifier + '\'' +
 				'}';
 	}
 	

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class BlockRenderers {
 
-	private static final Map<Short, BlockRenderer> blockRenderers = new HashMap<>();
+	private static final Map<String, BlockRenderer> blockRenderers = new HashMap<>();
 	
 	static {
 		
@@ -43,11 +43,11 @@ public class BlockRenderers {
 	}
 	
 	public static void registerRenderer(Block block, BlockRenderer renderer) {
-		blockRenderers.put(block.getUid(), renderer);
+		blockRenderers.put(block.getIdentifier(), renderer);
 	}
 	
 	public static BlockRenderer getRenderer(Block block) {
-		return blockRenderers.get(block.getUid());
+		return blockRenderers.get(block.getIdentifier());
 	}
 
 }

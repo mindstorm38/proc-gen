@@ -40,7 +40,12 @@ public class ChunkRedrawData {
 	private ChunkRenderBuffers getBuffers() {
 		boolean taking = this.buffers == null;
 		if (taking) debug("takeRenderBuffers");
-		ChunkRenderBuffers ret = this.buffers == null ? (this.buffers = this.manager.takeRenderBuffers()) : this.buffers;
+		ChunkRenderBuffers ret = null;
+		try {
+			ret = this.buffers == null ? (this.buffers = this.manager.takeRenderBuffers()) : this.buffers;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		if (taking) debug("takeRenderBuffers:done");
 		return ret;
 	}

@@ -21,11 +21,6 @@ public class FallingBlockEntityRenderer extends MotionEntityRenderer<FallingBloc
 	public FallingBlockEntityRenderer() { }
 	
 	@Override
-	public void initRenderer(WorldShaderManager shaderManager, WorldRenderBuffer renderBuffer) {
-		super.initRenderer(shaderManager, renderBuffer);
-	}
-	
-	@Override
 	public void initTexture() {
 		this.terrainMap = ProcGenGame.getGameInstance().getWorldRenderer().getTerrainMap();
 	}

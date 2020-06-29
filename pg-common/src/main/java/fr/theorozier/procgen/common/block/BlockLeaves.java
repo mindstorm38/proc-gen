@@ -2,10 +2,8 @@ package fr.theorozier.procgen.common.block;
 
 public class BlockLeaves extends Block {
 	
-	public BlockLeaves(int uid, String identifier) {
-		
-		super(uid, identifier);
-		
+	public BlockLeaves(String identifier) {
+		super(identifier);
 	}
 	
 	@Override

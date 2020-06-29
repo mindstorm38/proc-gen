@@ -9,8 +9,8 @@ import fr.theorozier.procgen.common.world.position.BlockPositioned;
 
 public class BlockTNT extends Block {
 	
-	public BlockTNT(int uid, String identifier) {
-		super(uid, identifier);
+	public BlockTNT(String identifier) {
+		super(identifier);
 	}
 	
 	public PrimedTNTEntity fuze(WorldDimension world, AbsBlockPosition pos, BlockState state) {

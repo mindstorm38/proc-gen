@@ -10,8 +10,8 @@ import java.util.Random;
 
 public class BlockPlant extends Block {
 	
-	public BlockPlant(int uid, String identifier) {
-		super(uid, identifier);
+	public BlockPlant(String identifier) {
+		super(identifier);
 	}
 	
 	@Override

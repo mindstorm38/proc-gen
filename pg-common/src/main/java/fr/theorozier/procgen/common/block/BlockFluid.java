@@ -9,8 +9,8 @@ import java.util.List;
 
 public abstract class BlockFluid extends Block {
 	
-	public BlockFluid(int uid, String identifier) {
-		super(uid, identifier);
+	public BlockFluid(String identifier) {
+		super(identifier);
 	}
 	
 	@Override

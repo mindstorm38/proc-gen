@@ -70,7 +70,7 @@ public abstract class ChunkLayerData {
 	
 	protected void rebuildArrays(Runnable run) {
 		
-		this.dataArray.resetBuffers();
+		this.dataArray.clear();
 		run.run();
 		this.dataArray.checkOverflows();
 		

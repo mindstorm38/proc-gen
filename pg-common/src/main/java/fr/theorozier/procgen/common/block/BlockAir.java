@@ -2,10 +2,8 @@ package fr.theorozier.procgen.common.block;
 
 public class BlockAir extends Block {
 	
-	public BlockAir(int uid, String identifier) {
-		
-		super(uid, identifier);
-		
+	public BlockAir(String identifier) {
+		super(identifier);
 	}
 	
 	@Override

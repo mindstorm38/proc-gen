@@ -6,9 +6,9 @@ import fr.theorozier.procgen.common.world.position.Axis;
 
 public class BlockLog extends Block {
 	
-	public BlockLog(int uid, String identifier) {
+	public BlockLog(String identifier) {
 		
-		super(uid, identifier);
+		super(identifier);
 		
 		this.setDefaultState(this.getDefaultState().with(DefaultProperties.AXIS, Axis.Y));
 		
