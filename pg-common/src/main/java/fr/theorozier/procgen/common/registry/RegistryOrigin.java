@@ -1,5 +1,7 @@
 package fr.theorozier.procgen.common.registry;
 
+import fr.theorozier.procgen.common.util.SaveUtils;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,9 +56,18 @@ public class RegistryOrigin<T> implements Registry<T> {
 		return this.internal.get(key);
 	}
 	
-	public Registry<T> namespaced(String namespace) {
-		return this.namespaces.computeIfAbsent(namespace, ns -> new RegistryNamespaced<>(this, ns));
+	// Namespacing //
+	
+	protected RegistryNamespaced<T> newNamespacedRegistry(String ns) {
+		return new RegistryNamespaced<>(this, ns);
 	}
+	
+	public Registry<T> namespaced(String namespace) {
+		SaveUtils.validateSavableName(namespace, "namespaced registry");
+		return this.namespaces.computeIfAbsent(namespace, this::newNamespacedRegistry);
+	}
+	
+	// All values //
 	
 	public Collection<T> values() {
 		return Collections.unmodifiableCollection(this.internal.values());

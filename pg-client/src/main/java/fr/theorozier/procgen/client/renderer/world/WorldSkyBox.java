@@ -25,6 +25,8 @@ public class WorldSkyBox {
 		
 		this.drawBuffer = this.shaderManager.createBasicDrawBuffer(true, false);
 		
+		
+		
 		FloatBuffer vertices = null;
 		FloatBuffer colors = null;
 		IntBuffer indices = null;

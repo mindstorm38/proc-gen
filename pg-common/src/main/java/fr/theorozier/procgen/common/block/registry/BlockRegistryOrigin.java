@@ -1,12 +1,13 @@
-package fr.theorozier.procgen.common.registry;
+package fr.theorozier.procgen.common.block.registry;
 
 import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.state.BlockState;
+import fr.theorozier.procgen.common.registry.RegistryOrigin;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegistryOriginBlockState extends RegistryOrigin<Block> {
+public class BlockRegistryOrigin extends RegistryOrigin<Block> {
 	
 	private final Map<Short, BlockState> uidStateRegister = new HashMap<>();
 	

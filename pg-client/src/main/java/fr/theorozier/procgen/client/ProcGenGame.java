@@ -1,9 +1,13 @@
 package fr.theorozier.procgen.client;
 
 import fr.theorozier.procgen.client.gui.screen.*;
+import fr.theorozier.procgen.client.mod.ClientSideContext;
+import fr.theorozier.procgen.client.renderer.block.registry.BlockRendererRegistry;
+import fr.theorozier.procgen.client.renderer.block.registry.BlockRendererRegistryOrigin;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.client.world.WorldList;
 import fr.theorozier.procgen.client.world.WorldSinglePlayer;
+import fr.theorozier.procgen.common.block.Block;
 import fr.theorozier.procgen.common.block.Blocks;
 import fr.theorozier.procgen.client.gui.DebugScene;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
@@ -13,6 +17,8 @@ import fr.theorozier.procgen.common.entity.FallingBlockEntity;
 import fr.theorozier.procgen.common.entity.LiveEntity;
 import fr.theorozier.procgen.common.entity.MotionEntity;
 import fr.theorozier.procgen.common.entity.PrimedTNTEntity;
+import fr.theorozier.procgen.common.block.registry.BlockRegistryOrigin;
+import fr.theorozier.procgen.common.registry.Registry;
 import fr.theorozier.procgen.common.util.ThreadingDispatch;
 import fr.theorozier.procgen.common.world.WorldServer;
 import fr.theorozier.procgen.common.world.load.WorldLoadingPosition;
@@ -36,7 +42,7 @@ import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements WindowKeyEventListener {
+public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements WindowKeyEventListener, ClientSideContext {
 	
 	public static final OptionKey KEY_FORWARD = new OptionKey("forward", GLFW.GLFW_KEY_W);
 	public static final OptionKey KEY_BACKWARD = new OptionKey("backward", GLFW.GLFW_KEY_S);
@@ -61,6 +67,9 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	}
 	
 	// Class //
+	
+	private final BlockRegistryOrigin blockRegistry = new BlockRegistryOrigin();
+	private final BlockRendererRegistryOrigin blockRendererRegistry = new BlockRendererRegistryOrigin();
 	
 	private final WorldList worldList;
 	private WorldServer servedWorld;
@@ -102,6 +111,22 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 		
 	}
 	
+	@Override
+	public Options getOptions() {
+		return this.options;
+	}
+	
+	@Override
+	public BlockRendererRegistry getBlockRendererRegistry(String namespace) {
+		return this.blockRendererRegistry.namespaced(namespace);
+	}
+	
+	@Override
+	public Registry<Block> getBlockRegistry(String namespace) {
+		return this.blockRegistry.namespaced(namespace);
+	}
+	
+	@Override
 	public WorldRenderer getWorldRenderer() {
 		return this.worldRenderer;
 	}
@@ -216,6 +241,7 @@ public class ProcGenGame extends DefaultRenderGame<ProcGenGame> implements Windo
 	
 	// World Management //
 	
+	@Override
 	public WorldList getWorldList() {
 		return this.worldList;
 	}
