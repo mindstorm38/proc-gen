@@ -60,6 +60,22 @@ public class BlockCrossRenderer extends BlockRenderer {
 		dataArray.faceTexcoords(tile);
 		dataArray.faceColor(color);
 		
+		dataArray.face();
+		dataArray.faceVertex(3, x + OFFSET, y + HEIGHT, z + OFFSET);
+		dataArray.faceVertex(2, x + OFFSET, y, z + OFFSET);
+		dataArray.faceVertex(1, x + OFFSIZE, y, z + OFFSIZE);
+		dataArray.faceVertex(0, x + OFFSIZE, y + HEIGHT, z + OFFSIZE);
+		dataArray.faceTexcoords(tile);
+		dataArray.faceColor(color);
+		
+		dataArray.face();
+		dataArray.faceVertex(3, x + OFFSET, y + HEIGHT, z + OFFSIZE);
+		dataArray.faceVertex(2, x + OFFSET, y, z + OFFSIZE);
+		dataArray.faceVertex(1, x + OFFSIZE, y, z + OFFSET);
+		dataArray.faceVertex(0, x + OFFSIZE, y + HEIGHT, z + OFFSET);
+		dataArray.faceTexcoords(tile);
+		dataArray.faceColor(color);
+		
 	}
 	
 }
