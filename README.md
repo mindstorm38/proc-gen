@@ -44,7 +44,7 @@ generation.
 - [ ] Rework of rendering system
   - [x] Solve far render issues
   - [ ] Rendering optimizations
-    - [x] Shared `WorldRenderSequentialBuffer` for all chunk renderers **(currently buggy and causing memory leaks)**
+    - [x] Shared `WorldRenderSequentialBuffer` for all chunk renderers **(now working)**
     - [x] Use `MemoryUtil` natives for building render data
     - [x] ~~Caching of blocks indices, in order to re-render only necessary faces~~ **(non-efficient)**
     - [ ] Viewing Frustum Culling
