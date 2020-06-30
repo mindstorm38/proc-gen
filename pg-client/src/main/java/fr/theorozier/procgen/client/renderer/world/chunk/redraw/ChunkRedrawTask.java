@@ -8,7 +8,7 @@ import fr.theorozier.procgen.common.world.chunk.WorldChunk;
 
 import java.util.Objects;
 
-public class ChunkRedrawTask implements PriorityCallable<ChunkRenderBuffers> {
+public class ChunkRedrawTask implements PriorityCallable<ChunkRedrawUpload> {
 	
 	private final ChunkRenderManager manager;
 	private final ChunkRenderer renderer;
@@ -28,16 +28,25 @@ public class ChunkRedrawTask implements PriorityCallable<ChunkRenderBuffers> {
 	}
 	
 	@Override
-	public ChunkRenderBuffers call() {
+	public ChunkRedrawUpload call() {
 			
 		if (this.isPositionCoherent()) {
 			
+			ChunkRenderBuffers buffers;
+			
 			try {
-				ChunkRenderBuffers buffers = this.manager.takeRenderBuffers();
-				this.func.redraw(this.chunk, buffers);
-				return buffers;
+				buffers = this.manager.takeRenderBuffers();
 			} catch (InterruptedException e) {
 				return null;
+			}
+			
+			this.func.redraw(this.chunk, buffers);
+			
+			if (Thread.interrupted() || !this.isPositionCoherent()) {
+				this.manager.releaseRenderBuffers(buffers);
+				return null;
+			} else {
+				return new ChunkRedrawUpload(this.renderer, buffers);
 			}
 			
 		} else {

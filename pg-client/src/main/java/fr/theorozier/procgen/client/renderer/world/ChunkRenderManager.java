@@ -1,10 +1,10 @@
 package fr.theorozier.procgen.client.renderer.world;
 
-import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawData;
 import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFunction;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderBuffers;
 import fr.theorozier.procgen.client.renderer.world.chunk.ChunkRenderer;
-import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFuture;
+import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawTask;
+import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawUpload;
 import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
@@ -27,6 +27,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 
 import static io.msengine.common.util.GameLogger.LOGGER;
@@ -59,7 +60,7 @@ public class ChunkRenderManager {
 	// Tasks managing
 	private PriorityThreadPoolExecutor threadPool = null;
 	private BlockingQueue<ChunkRenderBuffers> chunkRenderBuffers = null;
-	private final List<ChunkRedrawFuture<?>> chunkRedrawFutures = new ArrayList<>();
+	private final List<Future<ChunkRedrawUpload>> chunkRedrawFutures = new ArrayList<>();
 	
 	// Cached block position used to avoid repetitive reallocations
 	private final BlockPosition cachedBlockPos = new BlockPosition();
@@ -193,27 +194,29 @@ public class ChunkRenderManager {
 		
 		PROFILER.startSection("chunk_render_update");
 		
-		List<ChunkRedrawFuture<?>> redrawFutures = this.chunkRedrawFutures;
-		ChunkRedrawFuture<?> redrawFuture;
-		ChunkRedrawData redrawData;
+		List<Future<ChunkRedrawUpload>> redrawFutures = this.chunkRedrawFutures;
+		Future<ChunkRedrawUpload> redrawFuture;
+		ChunkRedrawUpload redraw;
+		//ChunkRedrawData redrawData;
 		
 		int actcounter = 0;
 		
 		for (int i = 0, size = redrawFutures.size(); i < size; ++i) {
 			if ((redrawFuture = redrawFutures.get(i)).isDone()) {
 				
-				redrawData = redrawFuture.getData();
+				// redrawData = redrawFuture.getData();
 				
 				try {
-					redrawFuture.get();
-					redrawData.upload();
+					
+					redraw = redrawFuture.get();
+					redraw.uploadAndRelease(this);
 					actcounter++;
+					
 				} catch (InterruptedException | ExecutionException e) {
 					LOGGER.log(Level.WARNING, "Redraw task interrupted.", e);
 				} catch (CancellationException ignored) {
 					//
 				} finally {
-					redrawData.free();
 					redrawFutures.remove(i--);
 					size--;
 				}
@@ -388,16 +391,20 @@ public class ChunkRenderManager {
 	
 	// Update tasks
 	
-	public ChunkRedrawFuture<?> scheduleChunkRedrawTask(ChunkRenderer cr, ChunkRedrawFunction redrawFunc) {
+	public Future<?> scheduleChunkRedrawTask(ChunkRenderer cr, ChunkRedrawFunction redrawFunc) {
 		
 		if (this.threadPool == null) {
 			throw new IllegalStateException("Can't schedule update tasks while associated thread pool is not initialized.");
 		}
 		
-		ChunkRedrawData data = new ChunkRedrawData(this, cr);
-		ChunkRedrawFuture<?> future = new ChunkRedrawFuture<>(data, this.threadPool.submit(data.newTask(redrawFunc)));
+		Future<ChunkRedrawUpload> future = this.threadPool.submit(new ChunkRedrawTask(this, cr, redrawFunc));
 		this.chunkRedrawFutures.add(future);
 		return future;
+		
+		/*ChunkRedrawData data = new ChunkRedrawData(this, cr);
+		ChunkRedrawFuture<?> future = new ChunkRedrawFuture<>(data, this.threadPool.submit(data.newTask(redrawFunc)));
+		this.chunkRedrawFutures.add(future);
+		return future;*/
 		
 	}
 	
@@ -405,7 +412,7 @@ public class ChunkRenderManager {
 		return this.chunkRenderBuffers.take();
 	}
 	
-	public void putRenderBuffers(ChunkRenderBuffers buffers) {
+	public void releaseRenderBuffers(ChunkRenderBuffers buffers) {
 		if (!this.chunkRenderBuffers.offer(buffers)) {
 			throw new IllegalStateException("Failed to put back the render buffers ! Be careful and only put back buffers acquired by takeRenderBuffers().");
 		}

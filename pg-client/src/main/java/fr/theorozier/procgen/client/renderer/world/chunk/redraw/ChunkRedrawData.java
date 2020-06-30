@@ -73,7 +73,7 @@ public class ChunkRedrawData {
 		
 		if (this.buffers != null) {
 			debug("free/buffer");
-			this.manager.putRenderBuffers(this.buffers);
+			this.manager.releaseRenderBuffers(this.buffers);
 			this.buffers = null;
 		}
 		

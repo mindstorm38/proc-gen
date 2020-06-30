@@ -5,7 +5,6 @@ import fr.theorozier.procgen.client.renderer.block.BlockRenderer;
 import fr.theorozier.procgen.client.renderer.block.BlockRenderers;
 import fr.theorozier.procgen.client.renderer.world.ChunkRenderManager;
 import fr.theorozier.procgen.client.renderer.world.WorldRenderer;
-import fr.theorozier.procgen.client.renderer.world.chunk.redraw.ChunkRedrawFuture;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderBuffer;
 import fr.theorozier.procgen.client.renderer.buffer.WorldRenderSequentialBuffer;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
@@ -20,6 +19,7 @@ import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
 
 import java.util.Objects;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -44,7 +44,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	private boolean firstUpdated = false;
 	private int changed = 0;
 	
-	private ChunkRedrawFuture<?> redrawingFuture = null;
+	private Future<?> redrawingFuture = null;
 	
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
@@ -257,7 +257,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	public void cancelRedrawing() {
 		if (this.redrawingFuture != null) {
-			this.redrawingFuture.cancel(false);
+			this.redrawingFuture.cancel(true);
 			this.redrawingFuture = null;
 		}
 	}
@@ -329,6 +329,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			this.firstUpdated = true;
 		}
 		
+		this.doneRedrawing();
 		this.clearNeedUpdate();
 		
 	}
