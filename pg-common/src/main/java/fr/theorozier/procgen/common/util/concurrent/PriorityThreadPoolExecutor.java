@@ -45,6 +45,10 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
 		
 	};
 	
+	public PriorityThreadPoolExecutor(int poolSize, Comparator<Runnable> comp, ThreadFactory threadFactory) {
+		super(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(8, comp), threadFactory);
+	}
+	
 	public PriorityThreadPoolExecutor(int poolSize, Comparator<Runnable> comp) {
 		super(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(8, comp));
 	}
