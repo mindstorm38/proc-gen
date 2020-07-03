@@ -47,7 +47,7 @@ generation.
     - [x] Shared `WorldRenderSequentialBuffer` for all chunk renderers **(now working)**
     - [x] Use `MemoryUtil` natives for building render data
     - [x] ~~Caching of blocks indices, in order to re-render only necessary faces~~ **(non-efficient)**
-    - [ ] Viewing Frustum Culling
+    - [x] Viewing Frustum Culling
     - [ ] Occlusion Culling
 - [ ] Items
 - [x] All-model falling blocks

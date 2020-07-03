@@ -6,6 +6,7 @@ import fr.theorozier.procgen.client.world.WorldClient;
 import fr.theorozier.procgen.common.block.BlockRenderLayer;
 import fr.theorozier.procgen.common.block.state.BlockState;
 import fr.theorozier.procgen.common.entity.Entity;
+import fr.theorozier.procgen.common.phys.AxisAlignedBB;
 import fr.theorozier.procgen.common.util.MathUtils;
 import fr.theorozier.procgen.common.world.WorldBase;
 import fr.theorozier.procgen.common.world.chunk.WorldChunk;
@@ -28,7 +29,10 @@ import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
 import io.sutil.pool.FixedObjectPool;
 import io.sutil.profiler.Profiler;
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
+import org.joml.Vector4d;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -65,9 +69,11 @@ public class WorldRenderer implements ModelApplyListener,
 	private final WorldSkyBox skyBox;
 	
 	private final ModelHandler model;
-	private final WorldCamera camera;
-	private final Matrix4f globalMatrix;
-	private final Matrix4f projectionMatrix;
+	private final WorldCamera camera = new WorldCamera();
+	private final Matrix4f globalMatrix = new Matrix4f();
+	private final Matrix4f projectionMatrix = new Matrix4f();
+	private final Vector4d tempVector = new Vector4d();
+	private final FrustumIntersection cachedFrustum = new FrustumIntersection();
 	
 	private WorldClient renderingWorld;
 	
@@ -82,8 +88,6 @@ public class WorldRenderer implements ModelApplyListener,
 	
 	private int renderDistance = 0;
 	
-	// private int renderOffsetX, renderOffsetZ;
-	
 	public WorldRenderer() {
 		
 		this.window = Window.getInstance();
@@ -94,15 +98,9 @@ public class WorldRenderer implements ModelApplyListener,
 		this.skyBox = new WorldSkyBox(this.shaderManager);
 		
 		this.model = new ModelHandler(this);
-		this.camera = new WorldCamera();
-		this.globalMatrix = new Matrix4f();
-		this.projectionMatrix = new Matrix4f();
 		
 		this.chunkRenderManager = new ChunkRenderManager(this);
 		this.entityRenderManager = new EntityRenderManager(this);
-		
-		// this.renderOffsetX = 0;
-		// this.renderOffsetZ = 0;
 		
 	}
 	
@@ -239,22 +237,6 @@ public class WorldRenderer implements ModelApplyListener,
 			
 			if (changed) {
 				
-				/*
-				int newRoX = -((MathHelper.floorFloatInt(this.camera.getTargetX() + RENDER_OFFSET_BASE) >> RENDER_OFFSET_SHIFT) << RENDER_OFFSET_SHIFT);
-				int newRoZ = -((MathHelper.floorFloatInt(this.camera.getTargetZ() + RENDER_OFFSET_BASE) >> RENDER_OFFSET_SHIFT) << RENDER_OFFSET_SHIFT);
-				
-				if (this.renderOffsetX != newRoX || this.renderOffsetZ != newRoZ) {
-					
-					this.renderOffsetX = newRoX;
-					this.renderOffsetZ = newRoZ;
-					
-					this.chunkRenderManager.updateRenderOffset(newRoX, newRoZ);
-					
-					System.out.println("New render offset : " + newRoX + "/" + newRoZ);
-					
-				}
-				*/
-				
 				PROFILER.startSection("update_view_pos");
 				this.chunkRenderManager.updateViewPosition(this.camera);
 				PROFILER.endSection();
@@ -262,9 +244,6 @@ public class WorldRenderer implements ModelApplyListener,
 				ProcGenGame.getGameInstance().getTestLoadingPosition().set(MathHelper.floorFloatInt(this.camera.getTargetX()), MathHelper.floorFloatInt(this.camera.getTargetZ()));
 				
 			}
-			
-			//this.camera.updateViewMatrix(alpha, this.renderOffsetX, 0, this.renderOffsetZ);
-			//this.camera.updateRotatedViewMatrix(alpha);
 			
 			PROFILER.endSection();
 			
@@ -279,7 +258,6 @@ public class WorldRenderer implements ModelApplyListener,
 		view.rotateX(-this.camera.getLerpedPitch(alpha));
 		view.rotateY(this.camera.getLerpedYaw(alpha));
 		view.translate(0, -camY, 0);
-		// view.translate(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		
 		this.updateGlobalMatrix();
 		this.model.apply();
@@ -294,7 +272,6 @@ public class WorldRenderer implements ModelApplyListener,
 		this.renderSkyBox(camY);
 		
 		PROFILER.endStartSection("render_chunks");
-		// this.shaderManager.setGlobalOffset(-this.camera.getLerpedX(alpha), -this.camera.getLerpedY(alpha), -this.camera.getLerpedZ(alpha));
 		this.renderChunks(alpha, camX, camZ);
 		PROFILER.endSection();
 		
@@ -426,11 +403,21 @@ public class WorldRenderer implements ModelApplyListener,
 		
 		this.shaderManager.setGlobalMatrix(this.globalMatrix);
 		
+		this.cachedFrustum.set(this.globalMatrix, false);
+		
 	}
 	
 	@Override
 	public void modelApply(Matrix4f model) {
 		this.shaderManager.setModelMatrix(model);
+	}
+	
+	/**
+	 * Get the frustum object used to check if points or bounding boxes are in the view frustum.
+	 * @return View frustum.
+	 */
+	public FrustumIntersection getFrustum() {
+		return this.cachedFrustum;
 	}
 	
 	/**

@@ -21,6 +21,7 @@ import io.msengine.client.util.camera.SmoothCamera3D;
 import io.msengine.common.util.GameProfiler;
 import io.sutil.math.MathHelper;
 import io.sutil.profiler.Profiler;
+import org.joml.FrustumIntersection;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -90,10 +91,10 @@ public class ChunkRenderManager {
 	void init() {
 		
 		int poolSize = CHUNK_RENDERER_DISPATCH.getEffectiveCount() * 2;
-		int renderBuffersSize = poolSize * 3;
+		int renderBuffersSize = poolSize * 4;
 		
 		LOGGER.info("Starting world chunk renderer tasks thread pool (" + poolSize + " threads) ...");
-		// this.threadPool = Executors.newFixedThreadPool(CHUNK_RENDERER_DISPATCH.getEffectiveCount());
+		
 		this.threadPool = new PriorityThreadPoolExecutor(poolSize, PriorityThreadPoolExecutor.ASC_COMPARATOR);
 		this.chunkRenderBuffers = new ArrayBlockingQueue<>(renderBuffersSize);
 		
@@ -180,8 +181,10 @@ public class ChunkRenderManager {
 	 */
 	void render(BlockRenderLayer layer, float camX, float camZ) {
 		
+		FrustumIntersection frustum = this.renderer.getFrustum();
+		
 		PROFILER.startSection("render_layer_" + layer.name());
-		this.chunkRenderers.forEach(cr -> cr.render(layer, this.renderDistanceSquared, camX, camZ));
+		this.chunkRenderers.forEach(cr -> cr.render(layer, this.renderDistanceSquared, camX, camZ, frustum));
 		this.model.apply(); // Apply the last model.pop() in cr.render(...)
 		PROFILER.endSection();
 		

@@ -17,6 +17,7 @@ import fr.theorozier.procgen.common.world.position.ImmutableBlockPosition;
 import io.msengine.client.renderer.model.ModelHandler;
 import io.msengine.client.renderer.texture.TextureMap;
 import io.msengine.client.renderer.vertex.IndicesDrawBuffer;
+import org.joml.FrustumIntersection;
 
 import java.util.Objects;
 import java.util.concurrent.Future;
@@ -49,6 +50,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	private WorldChunk chunk = null;
 	private int distanceToCameraSquared = 0;
 	private int chunkX = 0;
+	private int chunkY = 0;
 	private int chunkZ = 0;
 	
 	public ChunkRenderer(ChunkRenderManager renderManager) {
@@ -87,6 +89,7 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 			this.firstUpdated = false;
 			
 			this.chunkX = chunk.getChunkPos().getX() << 4;
+			this.chunkY = chunk.getChunkPos().getY() << 4;
 			this.chunkZ = chunk.getChunkPos().getZ() << 4;
 			
 		}
@@ -159,18 +162,25 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	
 	// RENDER //
 	
+	public boolean isInFrustum(float rx, float rz, FrustumIntersection frustum) {
+		return frustum.testAab(rx, this.chunkY, rz, rx + 16, this.chunkY + 16, rz + 16);
+	}
+	
 	/**
 	 * <p>Render a specific block render layer only if the internal computed squared distance to camera
 	 * (using {@link #updateDistanceToCamera(float, float, float)}) is less or equals than (squared) 'maxdist'
 	 * <b>and</b> this chunk is active.</p>
 	 * @param layer The render layer to render.
 	 * @param maxdist The maximum (squared) distance.
-	 * @see #render(BlockRenderLayer, float, float)
+	 * @see #renderRaw(BlockRenderLayer, float, float)
 	 */
-	public void render(BlockRenderLayer layer, int maxdist, float camX, float camZ) {
+	public void render(BlockRenderLayer layer, int maxdist, float camX, float camZ, FrustumIntersection frustum) {
 		
-		if (this.isRenderable() && this.distanceToCameraSquared <= maxdist) {
-			this.render(layer, camX, camZ);
+		float rx = this.chunkX - camX;
+		float rz = this.chunkZ - camZ;
+		
+		if (this.isRenderable() && this.distanceToCameraSquared <= maxdist && this.isInFrustum(rx, rz, frustum)) {
+			this.renderRaw(layer, rx, rz);
 		}
 		
 	}
@@ -178,11 +188,11 @@ public class ChunkRenderer implements Comparable<ChunkRenderer> {
 	/**
 	 * Render a specific block render layer.
 	 * @param layer The render layer to render.
-	 * @see #render(BlockRenderLayer, int, float, float)
+	 * @see #render(BlockRenderLayer, int, float, float, FrustumIntersection)
 	 */
-	public void render(BlockRenderLayer layer, float camX, float camZ) {
+	private void renderRaw(BlockRenderLayer layer, float rx, float rz) {
 		
-		this.model.push().translate(this.chunkX - camX, 0, this.chunkZ - camZ).apply();
+		this.model.push().translate(rx, 0, rz).apply();
 		this.drawBuffers[layer.ordinal()].drawElements();
 		this.model.pop();
 		
